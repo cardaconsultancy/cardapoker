@@ -18,6 +18,11 @@ class TexasHoldemGame:
         'Royal Flush': 900
     }
 
+    def card_rank_value(self, rank):
+        if rank == None:
+           return 0
+        return '123456789TJQKA'.index(rank) + 1
+
     def __init__(self, table, deck):
         self.table = table
         self.deck = deck
@@ -219,7 +224,11 @@ class TexasHoldemGame:
                     relevant_winners.append(winner_list[i])
                     self.logger.debug(f"{winner_list[i].name} is in winner list")
             winner_list = relevant_winners
-        self.logger.debug(f"0. The winner list {winner_list[0].name}")
+            if len(winner_list) == 1:
+                self.logger.debug(f"0. The winner is {winner_list[0].name}")
+                break
+        if len(winner_list) != 1:
+            self.logger.debug(f"0. There is a tie between winners {winner_list}")
 
 
             # new way
@@ -237,21 +246,21 @@ class TexasHoldemGame:
             # print(max_best_hand)
 
         # Find the players with the maximum best_hand attribute
-        winners = [player for player in self.table.players if player.best_hand == max_best_hand]
+        # winners = [player for player in self.table.players if player.best_hand == max_best_hand]
         ## Find the player with the best hand
         ## winner = max(player_hands, key=lambda player: player_hands[player])
         # winning_cards = max(dict_example.values())
         # winners = [key for key, value in dict_example.items() if value == winning_cards]
         # self.logger.debug(f"{winning_cards} are highest")
 
-        winners = []
-        for player in self.table.players_game:
-            if player.best_hand == max_best_hand:
-                self.logger.debug(f"Player {player.name} is a winner because {player.hand} == {max_best_hand} given on table {self.table.community_cards}")
-                winners.append(player)
+        # winners = []
+        # for player in self.table.players_game:
+        #     if player.best_hand == max_best_hand:
+        #         self.logger.debug(f"Player {player.name} is a winner because {player.hand} == {max_best_hand} given on table {self.table.community_cards}")
+        #         winners.append(player)
 
-        # choose one winner for now
-        winner = winners[0]
+        # # choose one winner for now
+        # winner = winners[0]
 
         # Award the pot to the winner
         pot = sum(player.total_bet_game for player in self.table.players)
@@ -282,68 +291,189 @@ class TexasHoldemGame:
 
         return winner
 
-    def is_royal_flush(self, sorted_hand):
-        self.logger.debug("Checking for Royal Flush...")
-        if self.is_straight_flush(sorted_hand) and sorted_hand[0].rank == 'A':# incorrect, i think this is wrong as a person could have A, 10 with 9, 8, 7, 6, 5 on the board
-            self.logger.debug(f"Found Royal Flush!")
-            return True
-        else:
-            self.logger.debug(f"No Royal Flush")
+    # def is_royal_flush(self, sorted_hand):
+    #     self.logger.debug("Checking for Royal Flush...")
+    #     if self.is_straight_flush(sorted_hand) and sorted_hand[0].rank == 'A':# incorrect, i think this is wrong as a person could have A, 10 with 9, 8, 7, 6, 5 on the board
+    #         self.logger.debug(f"Found Royal Flush!")
+    #         return True
+    #     else:
+    #         self.logger.debug(f"No Royal Flush")
 
 
-    def is_straight_flush(self, sorted_hand):
-        self.logger.debug("Checking for Straight Flush...")
-        if self.is_straight(sorted_hand) and self.is_flush(sorted_hand):
-            self.logger.debug(f"Found Straight Flush.")
-            return True
-        else:
-            self.logger.debug(f"No Straight Flush")
+    def is_royal_or_straight_flush(self, sorted_hand):
+        self.logger.debug("Checking for Royal and/or Straight Flush...")
+        for the_suit in ['♠','♥','♦','♣']:
+            # omdat als ie nou een niet suited eentje naar beneden gaat? Dat sluit nu nog niks uit...
+            suited_list = []
+            for hand in sorted_hand:
+                if hand.suit == the_suit:
+                    suited_list.append(hand)
+            print(f'suited list {suited_list}')
+            straight_suited_counter = 0
+            if suited_list[0].rank == 'A':
+                self.logger.debug(f'Found an ace')
+                suited_list.append(Card(rank='1', suit=the_suit))
+            self.logger.debug(f'New list: {suited_list}')
+            for i in range(len(suited_list)-1):
+                if self.card_rank_value(suited_list[i].rank) == self.card_rank_value(suited_list[i+1].rank) + 1:
+                    print(f'*******{self.card_rank_value(suited_list[i].rank)} = {self.card_rank_value(suited_list[i+1].rank) + 1}')
+                    straight_suited_counter += 1
+                    if straight_suited_counter == 4:
+                        self.logger.debug(f"Straight Flush was Found with suit {the_suit}!!")
+                        handscore = [8, suited_list[i - 3].rank, None, None, None, None]
+                        if sorted_hand[i].rank == 'A':
+                            self.logger.debug('... a Royal one!!!')
+                        return handscore
+                elif self.card_rank_value(suited_list[i].rank) - self.card_rank_value(suited_list[i+1].rank) > 2:
+                    print("too big of a gap")
+                    straight_suited_counter = 0 
+                    
+            self.logger.debug("No straight flush was Found.")
+            return False           
+
+
+            # for i in range(3):
+            #     # there is got to be a smarter way to do this...
+            #     if self.card_rank_value(sorted_hand[i].rank) \
+            #     == self.card_rank_value(sorted_hand[i + 1].rank) + 1 \
+            #     == self.card_rank_value(sorted_hand[i + 2].rank) + 2 \
+            #     == self.card_rank_value(sorted_hand[i + 3].rank) + 3 \
+            #     == self.card_rank_value(sorted_hand[i + 4].rank) + 4 and \
+            #     suit == sorted_hand[i].suit == sorted_hand[i + 1].suit == sorted_hand[i + 2].suit \
+            #     == sorted_hand[i + 3].suit == sorted_hand[i + 4].suit or \
+            #     self.card_rank_value(sorted_hand[i].rank) - 13 \
+            #     == self.card_rank_value(sorted_hand[i + 1].rank) + 1 \
+            #     == self.card_rank_value(sorted_hand[i + 2].rank) + 2 \
+            #     == self.card_rank_value(sorted_hand[i + 3].rank) + 3 \
+            #     == self.card_rank_value(sorted_hand[i + 4].rank) + 4 and \
+            #     suit == sorted_hand[i].suit == sorted_hand[i + 1].suit == sorted_hand[i + 2].suit \
+            #     == sorted_hand[i + 3].suit == sorted_hand[i + 4].suit:
+
+
+        # self.logger.debug("Checking for Straight Flush...")
+        # if self.is_straight(sorted_hand) and self.is_flush(sorted_hand):
+        #     self.logger.debug(f"Found Straight Flush.")
+        #     return True
+        # else:
+        #     self.logger.debug(f"No Straight Flush")
 
     def is_four_of_a_kind(self, sorted_hand):
         self.logger.debug("Checking for Four of a Kind...")
         for i in range(len(sorted_hand) - 3):
             if sorted_hand[i].rank == sorted_hand[i + 1].rank == sorted_hand[i + 2].rank == sorted_hand[i + 3].rank:
                 self.logger.debug("Four of a Kind found!")
-                return True
+                quads_rank = sorted_hand[i].rank
+                sorted_hand.remove(sorted_hand[i])
+                sorted_hand.remove(sorted_hand[i])
+                sorted_hand.remove(sorted_hand[i])
+                sorted_hand.remove(sorted_hand[i])
+                self.logger.debug(f"rest is now {sorted_hand}")
+                return [7, quads_rank, sorted_hand[0].rank, None, None, None]
         self.logger.debug("No Four of a Kind.")
         return False
 
+
     def is_full_house(self, sorted_hand):
         self.logger.debug("Checking for Full House...")
-        is_full_house = self.is_three_of_a_kind(sorted_hand) and self.is_one_pair(sorted_hand)
-        self.logger.debug(f"Is Full House: {is_full_house}")
-        return is_full_house
+        first_handscore = self.is_three_of_a_kind(sorted_hand)
+        if first_handscore != False:
+            self.logger.debug("Checking for another Pair...")
+            for i in range(len(sorted_hand) - 1):
+                if sorted_hand[i].rank == sorted_hand[i + 1].rank and sorted_hand[i].rank != first_handscore[1]:
+                    self.logger.debug("Found a full house!")
+                    return [6, first_handscore[1], sorted_hand[i].rank, None, None, None]
+        self.logger.debug(f"No Full House")
+        return False
+
 
     def is_flush(self, sorted_hand):
         self.logger.debug("Checking for Flush...")
-        is_flush = all(card.suit == sorted_hand[0].suit for card in sorted_hand)
-        self.logger.debug(f"Is Flush: {is_flush}")
-        return is_flush
+        handscore = [5]
+        for suit in ['♠','♥','♦','♣']:
+            for card in sorted_hand:
+                if card.suit == suit:
+                    handscore.append(card.rank)
+                    if len(handscore) == 6:
+                        self.logger.debug("Flush was Found!")
+                        return handscore
+            handscore = [5]
+        return False
+
+
+        # for i in range(3):
+        #     if sorted_hand[i].suit == sorted_hand[i+1].suit \
+        #         and sorted_hand[i+1].suit == sorted_hand[i+2].suit \
+        #         and sorted_hand[i+2].suit == sorted_hand[i+3].suit \
+        #         and sorted_hand[i+3].suit == sorted_hand[i+4].suit:
+        #         self.logger.debug("Flush was Found!")
+        #         handscore = [5, self.card_rank_value(sorted_hand[i].rank), self.card_rank_value(sorted_hand[i+1].rank), self.card_rank_value(sorted_hand[i+2].rank),\
+        #                      self.card_rank_value(sorted_hand[i+3].rank), self.card_rank_value(sorted_hand[i+4].rank)]
+        #         return handscore
+        # is_flush = all(card.suit == sorted_hand[0].suit for card in sorted_hand)
+        # return False
 
     def is_straight(self, sorted_hand):
         self.logger.debug("Checking for Straight...")
-        for i in range(1, len(sorted_hand)):
-            if self.card_rank_value(sorted_hand[i - 1].rank) != self.card_rank_value(sorted_hand[i].rank) + 1:
-                self.logger.debug("No Straight.")
-                return False
-        self.logger.debug("Straight found!")
-        return True
+        
+        # as there are nog 8 cards with the extra Ace possibility
+        straight_counter = 0
+        for i in range(len(sorted_hand)-1):
+            # just an extra card for each ace
+            if sorted_hand[i].rank == 'A':
+                self.logger.debug(f'Found an ace')
+                ace_suit = sorted_hand[i].suit
+                sorted_hand.append(Card(rank='1', suit=ace_suit))
+                self.logger.debug(f'New list: {sorted_hand}')
+            print("----", self.card_rank_value(sorted_hand[i].rank))
+            if self.card_rank_value(sorted_hand[i].rank) == self.card_rank_value(sorted_hand[i+1].rank) + 1:
+                print("==", self.card_rank_value(sorted_hand[i+1].rank) + 1, straight_counter)
+                straight_counter += 1
+
+            if self.card_rank_value(sorted_hand[i].rank) - self.card_rank_value(sorted_hand[i+1].rank) > 2:
+                print(f'{self.card_rank_value(sorted_hand[i+1].rank)} too big')
+                straight_counter = 0
+
+            # No need for this.
+            # elif self.card_rank_value(sorted_hand[i].rank) == self.card_rank_value(sorted_hand[i+1].rank):
+            #     continue
+
+            # this might work if unique numberlist is probably faster    
+            # if self.card_rank_value(sorted_hand[i].rank) == self.card_rank_value(sorted_hand[i+1].rank) + 1 \
+            #     == self.card_rank_value(sorted_hand[i + 2].rank) + 2 \
+            #     == self.card_rank_value(sorted_hand[i + 3].rank) + 3 \
+            #     == self.card_rank_value(sorted_hand[i + 4].rank) + 4:
+                # self.logger.debug(f'rank 1 {sorted_hand[i].rank} {self.card_rank_value(sorted_hand[i].rank)}')
+                # self.logger.debug(f'rank 2 {sorted_hand[i + 1].rank} {self.card_rank_value(sorted_hand[i+1].rank)}')
+                # self.logger.debug(f'rank 3 {self.card_rank_value(sorted_hand[i+2].rank)}')
+                # self.logger.debug(f'rank 4 {self.card_rank_value(sorted_hand[i+3].rank)}')
+                # self.logger.debug(f'rank 5 {self.card_rank_value(sorted_hand[i+4].rank)}')
+            if straight_counter == 4:
+                self.logger.debug("Straight was Found!")
+                handscore = [4, sorted_hand[i-3].rank, None, None, None, None]
+                return handscore
+        self.logger.debug("No straight found!")
+        return False
 
     def is_three_of_a_kind(self, sorted_hand):
         self.logger.debug("Checking for Three of a Kind...")
         for i in range(len(sorted_hand) - 2):
             if sorted_hand[i].rank == sorted_hand[i + 1].rank == sorted_hand[i + 2].rank:
                 self.logger.debug("Three of a Kind found!")
-                return True
+                trips_rank = sorted_hand[i].rank
+                sorted_hand.remove(sorted_hand[i])
+                sorted_hand.remove(sorted_hand[i])
+                sorted_hand.remove(sorted_hand[i])
+                self.logger.debug(f"rest is now {sorted_hand}")
+                return [3, trips_rank, sorted_hand[0].rank, sorted_hand[1].rank, None, None]
         self.logger.debug("No Three of a Kind.")
         return False
 
     def is_two_pair(self, sorted_hand):
         self.logger.debug("Checking for Two Pair...")
         pairs = 0
-        for i in range(len(sorted_hand) - 1):
+        for i in range(len(sorted_hand) - 3):
             if sorted_hand[i].rank == sorted_hand[i + 1].rank and pairs == 0:
-                self.logger.debug("First pair found!")
+                self.logger.debug("First pair found...")
 
                 # remove the two cards to easily access the kickers                
                 first_pair_rank = sorted_hand[i].rank
@@ -353,6 +483,7 @@ class TexasHoldemGame:
 
                 pairs += 1
             if sorted_hand[i].rank == sorted_hand[i + 1].rank and pairs == 1:
+                self.logger.debug("Two pair found!")
                 second_pair_rank = sorted_hand[i].rank
                 sorted_hand.remove(sorted_hand[i])
                 sorted_hand.remove(sorted_hand[i])
@@ -362,9 +493,6 @@ class TexasHoldemGame:
             # fill the rest with first, second and third kicker
         self.logger.debug(f"No two Pair!")
         return False
-    
-    def card_rank_value(self, rank):
-        return '23456789TJQKA'.index(rank) + 2
     
     def is_one_pair(self, sorted_hand):
         self.logger.debug("Checking for One Pair...")
@@ -394,26 +522,22 @@ class TexasHoldemGame:
     def evaluate_hand(self, all_cards):
         sorted_hand = sorted(all_cards, key=lambda card: self.card_rank_value(card.rank), reverse=True)
         self.logger.debug(f"...Checking for different hand Ranks.. for {sorted_hand}")
-        # if self.is_royal_flush(sorted_hand):
-        #     return self.HAND_RANKS['Royal Flush']
-        # elif self.is_straight_flush(sorted_hand):
-        #     return self.HAND_RANKS['Straight Flush']
-        # elif self.is_four_of_a_kind(sorted_hand):
-        #     return self.HAND_RANKS['Four of a Kind']
-        # elif self.is_full_house(sorted_hand):
-        #     return self.HAND_RANKS['Full House']
-        # elif self.is_flush(sorted_hand):
-        #     return self.HAND_RANKS['Flush']
-        # elif self.is_straight(sorted_hand):
-        #     return self.HAND_RANKS['Straight']
-        # elif self.is_three_of_a_kind(sorted_hand):
-        #     return self.HAND_RANKS['Three of a Kind']
-        # elif self.is_two_pair(sorted_hand):
-        #     return self.HAND_RANKS['Two Pair']
-        hand_rank = self.is_two_pair(sorted_hand)
+        hand_rank = self.is_royal_or_straight_flush(sorted_hand)
+        if hand_rank == False:
+            hand_rank = self.is_four_of_a_kind(sorted_hand)
+        if hand_rank == False:
+            hand_rank = self.is_full_house(sorted_hand)
+        if hand_rank == False:
+            hand_rank = self.is_flush(sorted_hand)
+        if hand_rank == False:
+            hand_rank = self.is_straight(sorted_hand)
+        if hand_rank == False:
+            hand_rank = self.is_three_of_a_kind(sorted_hand)
+        if hand_rank == False:
+            hand_rank = self.is_two_pair(sorted_hand)
         if hand_rank == False:
             hand_rank = self.is_one_pair(sorted_hand)
-        elif hand_rank == False:
+        if hand_rank == False:
             self.logger.debug("Return high card...")
             hand_rank = [0, sorted_hand[0].rank, sorted_hand[1].rank, sorted_hand[2].rank, sorted_hand[3].rank, sorted_hand[4].rank]
         return hand_rank

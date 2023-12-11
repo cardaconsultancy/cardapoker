@@ -107,13 +107,55 @@ class TestTexasHoldemGame(unittest.TestCase):
         # player2_hand = [Card("T", "♥"), Card("4", "♦")]
         # player3_hand = [Card("A", "♥"), Card("K", "♦")]
 
+        # # a two pair
+        # community_cards = [Card("T", "♠"), Card("9", "♠"), Card("8", "♦"), Card("3", "♦"), Card("2", "♠")]
+        # # player_1 should win, due to highest kicker
+        # player1_hand = [Card("T", "♥"), Card("9", "♦")]
+        # player2_hand = [Card("T", "♥"), Card("2", "♦")]
+        # player3_hand = [Card("A", "♥"), Card("K", "♦")]
 
-        # a two pair
-        community_cards = [Card("T", "♠"), Card("9", "♠"), Card("9", "♦"), Card("3", "♦"), Card("2", "♠")]
-        # player_1 should win, due to highest kicker
-        player1_hand = [Card("T", "♥"), Card("5", "♦")]
-        player2_hand = [Card("T", "♥"), Card("4", "♦")]
-        player3_hand = [Card("A", "♥"), Card("K", "♦")]
+        # # # trips
+        # community_cards = [Card("T", "♠"), Card("9", "♠"), Card("8", "♦"), Card("2", "♦"), Card("2", "♠")]
+        # # player_1 should win, due to highest kicker
+        # player1_hand = [Card("6", "♥"), Card("2", "♦")]
+        # player2_hand = [Card("7", "♥"), Card("2", "♦")]
+        # player3_hand = [Card("A", "♥"), Card("K", "♦")]
+
+        # # # straight
+        # community_cards = [Card("3", "♠"), Card("4", "♠"), Card("5", "♦"), Card("K", "♦"), Card("K", "♠")]
+        # player1_hand = [Card("A", "♥"), Card("2", "♦")]
+        # player2_hand = [Card("2", "♥"), Card("6", "♦")]
+        # player3_hand = [Card("6", "♥"), Card("7", "♦")]
+
+        # # # flush
+        # community_cards = [Card("3", "♠"), Card("4", "♠"), Card("5", "♠"), Card("K", "♠"), Card("K", "♠")]
+        # player1_hand = [Card("A", "♠"), Card("2", "♦")]
+        # player2_hand = [Card("2", "♠"), Card("6", "♦")]
+        # player3_hand = [Card("6", "♠"), Card("7", "♦")]
+
+        # # # full house
+        # community_cards = [Card("3", "♠"), Card("3", "♠"), Card("3", "♠"), Card("K", "♠"), Card("6", "♠")]
+        # player1_hand = [Card("A", "♠"), Card("A", "♦")]
+        # player2_hand = [Card("2", "♠"), Card("2", "♦")]
+        # player3_hand = [Card("6", "♠"), Card("6", "♦")]
+
+        # # # quads
+        # community_cards = [Card("3", "♠"), Card("3", "♠"), Card("3", "♠"), Card("2", "♠"), Card("2", "♠")]
+        # player1_hand = [Card("A", "♠"), Card("3", "♦")]
+        # player2_hand = [Card("2", "♠"), Card("2", "♦")]
+        # player3_hand = [Card("6", "♠"), Card("3", "♦")]
+
+        # # # quads
+        # community_cards = [Card("3", "♠"), Card("3", "♠"), Card("3", "♠"), Card("2", "♠"), Card("2", "♠")]
+        # player1_hand = [Card("A", "♠"), Card("3", "♦")]
+        # player2_hand = [Card("2", "♠"), Card("2", "♦")]
+        # player3_hand = [Card("6", "♠"), Card("3", "♦")]
+
+        # # straight flush
+        community_cards = [Card("3", "♠"), Card("4", "♠"), Card("5", "♠"), Card("6", "♦"), Card("7", "♦")]
+        player1_hand = [Card("A", "♠"), Card("2", "♦")]
+        player2_hand = [Card("A", "♠"), Card("2", "♠")]
+        player3_hand = [Card("6", "♠"), Card("2", "♠")]
 
         table.set_community_cards(community_cards)
         player1.set_hand(player1_hand)
