@@ -145,7 +145,7 @@ class TexasHoldemGame:
                 player.chips.lose(player_bet)
 
                 if player.total_bet_betting_round >= player.chips.amount:
-                    self.logger.debug(f"{player.name} goes all in!")
+                    self.logger.debug(f"{player.name} goes all in!!")
                     player.total_bet_betting_round = player.chips
                 
                 elif player.total_bet_betting_round < max_bet:
