@@ -100,13 +100,14 @@ class TestTexasHoldemGame(unittest.TestCase):
         player2 = Player("Jan", Chips(100))
         player3 = Player("Piet", Chips(100))
         
-        # a pair
-        test = 'pair'
-        community_cards = [Card(rank='3', suit='♣'), Card(rank='2', suit='♠'), Card(rank='J', suit='♠'), Card(rank='8', suit='♣'), Card(rank='7', suit='♠')]
-        # player_1 should win, due to highest kicker
-        player1_hand = [Card(rank='A', suit='♥'), Card(rank='J', suit='♥')]
-        player2_hand = [Card("T", "♥"), Card("4", "♦")]
-        player3_hand = [Card("A", "♥"), Card("K", "♦")]
+        test = 'quads'
+
+        # # a pair
+        # community_cards = [Card(rank='3', suit='♣'), Card(rank='2', suit='♠'), Card(rank='J', suit='♠'), Card(rank='8', suit='♣'), Card(rank='7', suit='♠')]
+        # # player_1 should win, due to highest kicker
+        # player1_hand = [Card(rank='A', suit='♥'), Card(rank='J', suit='♥')]
+        # player2_hand = [Card("T", "♥"), Card("4", "♦")]
+        # player3_hand = [Card("A", "♥"), Card("K", "♦")]
 
         # # a two pair
         # community_cards = [Card("T", "♠"), Card("9", "♠"), Card("8", "♦"), Card("3", "♦"), Card("2", "♠")]
@@ -115,12 +116,12 @@ class TestTexasHoldemGame(unittest.TestCase):
         # player2_hand = [Card("T", "♥"), Card("2", "♦")]
         # player3_hand = [Card("A", "♥"), Card("K", "♦")]
 
-        # # # trips
-        # community_cards = [Card("T", "♠"), Card("9", "♠"), Card("8", "♦"), Card("2", "♦"), Card("2", "♠")]
-        # # player_1 should win, due to highest kicker
-        # player1_hand = [Card("6", "♥"), Card("2", "♦")]
-        # player2_hand = [Card("7", "♥"), Card("2", "♦")]
-        # player3_hand = [Card("A", "♥"), Card("K", "♦")]
+        # # trips
+        community_cards = [Card("T", "♠"), Card("9", "♠"), Card("8", "♦"), Card("2", "♦"), Card("2", "♠")]
+        # player_1 should win, due to highest kicker
+        player1_hand = [Card("6", "♥"), Card("2", "♦")]
+        player2_hand = [Card("7", "♥"), Card("2", "♦")]
+        player3_hand = [Card("A", "♥"), Card("K", "♦")]
 
         # # # straight
         # community_cards = [Card("3", "♠"), Card("4", "♠"), Card("5", "♦"), Card("K", "♦"), Card("K", "♠")]
@@ -141,7 +142,7 @@ class TestTexasHoldemGame(unittest.TestCase):
         # player3_hand = [Card("6", "♠"), Card("6", "♦")]
 
         # # # quads
-        # community_cards = [Card("3", "♠"), Card("3", "♠"), Card("3", "♠"), Card("2", "♠"), Card("2", "♠")]
+        # community_cards = [Card("3", "♠"), Card("3", "♦"), Card("3", "♠"), Card("2", "♦"), Card("2", "♠")]
         # player1_hand = [Card("A", "♠"), Card("3", "♦")]
         # player2_hand = [Card("2", "♠"), Card("2", "♦")]
         # player3_hand = [Card("6", "♠"), Card("3", "♦")]
@@ -168,6 +169,9 @@ class TestTexasHoldemGame(unittest.TestCase):
         table.add_player(player3)
         if test == 'pair':
             self.assertEqual(game.determine_winners()[0], player3)
+        if test == 'quads':
+            self.assertEqual(game.determine_winners()[0], player1)
+
 
 # class TestTexasHoldemGame(unittest.TestCase):
 
@@ -203,7 +207,7 @@ class TestTexasHoldemGame(unittest.TestCase):
 #         # player2.set_hand(player2_hand)
 
 #         # Play a round
-#         game.start_round()
+        # game.start_round()
 
 #         # Check if the pot and winner are updated correctly
 #         self.assertEqual(table.pot, 0)  # Assuming no betting for simplicity in this example
