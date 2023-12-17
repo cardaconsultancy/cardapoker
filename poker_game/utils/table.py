@@ -6,6 +6,7 @@ class Table:
         self.logger = logging.getLogger(__name__)
         self.community_cards = []
         self.players = []
+        self.pots = []
         self.players_game = deque()
         # self.seats = {}
         self.blind_size = 1

@@ -1,4 +1,4 @@
-from utils.objects_on_table import Card, Chips
+from utils.objects_on_table import Card, Pot
 import logging
 from operator import attrgetter
 from collections import deque
@@ -84,7 +84,6 @@ class TexasHoldemGame:
         self.table.community_cards.append(self.deck.deal())
         self.logger.debug(f"On the table comes {self.table.community_cards[4].rank} of {self.table.community_cards[4].suit}.") 
 
-
         # Betting Round 4
         self.logger.debug(f"Players can bet on the river, final bet!")
         self.betting_round()
@@ -119,8 +118,10 @@ class TexasHoldemGame:
             required_action = -2
         self.logger.debug(f" ------------- Start betting round ------------- ")
         # max 100 
-        while required_action < 100:
-            # print('ho', required_action)
+        while required_action != 100:
+            print('ho', required_action)
+            if required_action > 9:
+                1 / 0
             for player in self.table.players_game:
                 self.logger.debug(f"{player.name} is up and currently has {player.total_bet_betting_round} in the betting round pot")
                 self.logger.debug(f'required_action {required_action}')
@@ -152,19 +153,14 @@ class TexasHoldemGame:
                 self.logger.debug(f"total bet is {player.total_bet_betting_round}")
 
                 # check if the betsize is bigger than the chips, if so correct by making it the max bet
-                # TODO Still have to figure out side pots 
-                player.chips.lose(player_bet)
-
                 if player.total_bet_betting_round > player.chips.amount:
                     self.logger.debug(f"{player.name} goes all in because {player.total_bet_betting_round} > {player.chips.amount}, so automatically the player is all in!!")
                     player.total_bet_betting_round = player.chips.amount
+                    player.chips.lose(player.chips.amount)
                 
                 elif player.total_bet_betting_round < max_bet:
-                    self.logger.debug(f"Player {player.name} folds as {player.total_bet_betting_round} is smaller than {max_bet} and loses his/her chips")
-                    self.table.players_game.remove(player)
-                    self.logger.debug(f"left are {self.table.players_game}")
-                    if len(self.table.players_game) < 2:
-                        break
+                    self.logger.debug(f"Player {player.name} folds as {player.total_bet_betting_round} is smaller than {max_bet} and NO all in. He/she loses his/her chips")
+                    player.folded = True
                 elif player.total_bet_betting_round == max_bet and player_bet == 0:
                     self.logger.debug(f"Player {player.name} checks with {player_bet} and has {player.chips.amount} chips left")
                 elif player.total_bet_betting_round == max_bet:
@@ -184,58 +180,159 @@ class TexasHoldemGame:
                 print('1', player.total_bet_betting_round)           
             if all(player.total_bet_betting_round == avg_bet for player in self.table.players_game):
                 self.logger.debug(f"Betting round over")
-                required_action = 9999
+                if len(self.table.pots) == 0:
+                    main_pot = Pot()
+                    main_pot.players = self.table.players_game
+                    self.table.pots.append(main_pot)
+                    self.logger.debug(f"No pot yet, so created {len(self.table.pots)} main pot")
+                self.check_for_side_pots()
+                required_action = 100
                 for player in self.table.players_game:
                     player.total_bet_betting_round = 0
                     self.logger.debug(f"Reset total bets {player.name} to {player.total_bet_betting_round}")
 
-    def pay_winners(self):
-        pot = sum(player.total_bet_game for player in self.table.players)
+    def check_for_side_pots(self):
+        
+        self.logger.debug(f"checking for side pots")
+
+        # for player in self.table.players_game:
+        #     if player.chips.amount == 0:
+
+        # get the minimum bet fromt he people that did not fold:
+        not_folded = []
         for player in self.table.players_game:
-            pot = self.devide_pot(pot)
-            if pot != 0:
-                self.devide_pot(pot)
+            # get all the minimum bet
+            if player.folded == False:
+                not_folded.append(player)
+        lowest_bet = min([player.total_bet_betting_round for player in not_folded])
+        check_for_side_pots = True
+        sidepot_created = False
+        while check_for_side_pots == True:
+            check_for_side_pots = False
+            for player in self.table.players_game: 
+                if player.total_bet_betting_round == lowest_bet:
+                    self.logger.debug(f"player {player.name} has the lowest bet of {lowest_bet}")
+                    if player.chips.amount == 0:
+                        self.logger.debug(f"player {player.name} went all in, side pot is needed")
+                        # fill up original pot & create side pot
+                        self.fill_current_pot(player)
+                        side_pot = Pot()
+                        self.table.pots.append(side_pot)
+                        sidepot_created = True
+                        check_for_side_pots = True
+                elif player.total_bet_betting_round == 0 and player.folded == False:
+                    self.logger.debug(f"Two players went all in with the minimum bet")
+            if sidepot_created == False:
+                self.logger.debug(f"No (more) sidepots created")
+                # just get a person that did not fold, as there are no sidepots his/her bet will be the same as the others.
+                self.fill_current_pot(not_folded[0])
+                for pot in self.table.pots:
+                    print(f'---------- pot {pot} is {pot.amount}')
+                return None
+            self.logger.debug(f"A sidepot was created")
+    
+    def fill_current_pot(self, lowest_player):
+        lowest_bet = lowest_player.total_bet_betting_round
+        current_pot = self.table.pots[-1]
+        # reset the participants
+        current_pot.players = []
+        # you HAVE TO use players here, as you can still get some of your big blind back if the person you beat has less chips than that.
+        for player in self.table.players:
+            # fill up current pot with folds
+            if player.total_bet_betting_round < lowest_bet:
+                current_pot.amount += player.total_bet_betting_round
+                player.total_bet_betting_round = 0
+                self.logger.debug(f"{player.name} folded as {player.total_bet_betting_round} < {lowest_bet}")
+                self.table.players_game.remove(player)
+                self.logger.debug(f"player removed, left are {self.table.players_game}")
+                if len(self.table.players_game) < 2:
+                    break
+                self.logger.debug(f"{player.name} bet is down to {player.total_bet_betting_round}")
+            # and with calls
             else:
-                break
-                
-        # Award the pot to the winner(s)
-        
-        # side pot
-
-        # can't bet more than you have.
-        self.determine_winner()
-
-    def devide_pot(self, pot):
-        winner_list = self.determine_winners()
-        self.logger.debug(f"1. we have the following winners {winner_list}.")
-        avg_bet = pot/len(self.table.players_game)
-        self.logger.debug(f"2. That betted on average {avg_bet}.")
-        # get the person with the lowest amount and see if he went all in
-        lowest_better = min(winner.total_bet_game for winner in winner_list)
-        self.logger.debug(f"3. lowest better was {lowest_better}.")
-
-        # not sure if relevant yet, but produces error if not works
-        if lowest_better.chips.amount == 0:
-            self.logger.debug(f"Looks like {lowest_better} went all-in")
-            main_pot = lowest_better*len(self.talbe.players_game)
-        
-        if lowest_better.total_bet_game < avg_bet:
-            self.logger.debug(f"we have a side pot of {main_pot}.")
+                current_pot.amount += player.total_bet_betting_round
+                player.total_bet_betting_round -= lowest_bet
+                # add them to the list if they call...
+                # exceptional situation. p1 BB 200 , p2 all in 120, p3 raise 400, p1 folds, but cannot distinguish. Need a fold indicator!
+                if player.folded == False:
+                    current_pot.players.append(player)
+        # side_pot.players.append(player)
+        # self.table.pots.append(side_pot)
+    
+    def pay_winners(self):
+        for pot in self.table.pots:
+            last_pot = self.table.pots[-1]
+            winner_list = self.determine_winners(last_pot.players)
+            bounty = last_pot.amount / len(winner_list)
             for winner in winner_list:
-                share = main_pot/len(winner_list)
-                winner.chips.win(share)
-            return pot - main_pot
-        else:
-            for winner in winner_list:
-                share = pot/len(winner_list)
-                winner.chips.win(share)
-            return 0
+                self.logger.debug(f"{winner.name} gets {bounty} chips")
+                winner.chips.win(bounty)
+            self.logger.debug(f"Removing {self.table.pots.pop()}, so {len(self.table.pots)} pots left")
 
-    def determine_winners(self):
+
+
+
+
+    # def pay_winners(self):
+    #     # print('-------------------------------------')
+    #     pot = sum(player.total_bet_game for player in self.table.players)
+    #     # for player in self.table.players:
+    #         # print(player.name, player.total_bet_game)
+    #     for player in self.table.players_game:
+    #         print('-------------------------------------')
+    #         pot = self.devide_pot(pot)
+    #         if pot != 0:
+    #             self.logger.debug(f"The side pot has been payed, in the pot remains {pot}")
+    #             self.devide_pot(pot)
+    #         else:
+    #             self.logger.debug(f"All the money has been payed")
+    #             print()
+    #             print()
+    #             break
+    #     # Award the pot to the winner(s)
+        
+    #     # side pot
+
+    #     # can't bet more than you have.
+
+    # def devide_pot(self, pot):
+    #     winner_list = self.determine_winners()
+    #     self.logger.debug(f"1. we have the following winners {winner_list}.")
+    #     avg_bet = pot/len(self.table.players_game)
+    #     self.logger.debug(f"2. That betted on average {avg_bet}.")
+    #     # get the person with the lowest amount and see if he went all in
+    #     lowest_better = min(winner_list, key=lambda winner: winner.total_bet_game)
+    #     self.logger.debug(f"3. lowest better was {lowest_better.name}.")
+
+    #     # not sure if relevant yet, but produces error if not works so that is handy
+    #     if lowest_better.chips.amount == 0:
+    #         main_pot = lowest_better.total_bet_game*len(self.table.players_game)
+    #         self.logger.debug(f"Looks like {lowest_better.name} went all-in and deserves {main_pot} chips!")
+    #         # TODO case when equal and both have equal hands
+        
+    #     if lowest_better.total_bet_game < avg_bet:
+    #         self.logger.debug(f"we have a side pot of {main_pot}.")
+    #         for winner in winner_list:
+    #             share = main_pot/len(winner_list)
+    #             winner.chips.win(share)
+    #         for player in self.table.players:
+    #             self.logger.debug(f"{player.name} has {player.chips.amount} left")
+    #         self.logger.debug(f"Looks like {lowest_better.name} went all-in and deserves {main_pot} chips!")
+    #         return pot - main_pot
+    #     else:
+    #         self.logger.debug(f"the pot can be devided.")
+    #         for winner in winner_list:
+    #             share = pot/len(winner_list)
+    #             winner.chips.win(share)
+    #             for player in self.table.players:
+    #                 self.logger.debug(f"{player.name} has {player.chips.amount} left")
+    #         return 0
+
+    def determine_winners(self, pot_players):
         # Determine the best hand for each player
         # dict_example = {}
         winner_list = []
-        for player in self.table.players_game:
+        for player in pot_players:
             player.set_best_hand(self.get_hand_rank(player))
             self.logger.debug(f"{player.name} highest hand is {player.best_hand}")
         ## player_hands = {player: self.get_best_hand(player) for player in self.table.players}
@@ -285,8 +382,10 @@ class TexasHoldemGame:
         return winner_list
 
     def clean_up(self):
+        print('++++++++++++=  cleaning time')
         # reset game --> needs to be refactored
         for player in self.table.players:
+            print(f'player {player.name} has {player.chips.amount} chips')
             # remove players who have 0 chips
             if player.chips.amount <= 0:
                 self.table.players.remove(player)
@@ -300,19 +399,10 @@ class TexasHoldemGame:
         
         # move dealer button --> needs to be refactored
         self.table.change_dealer_and_blinds()
-        self.logger.debug(f"Player {player.name} is out of chips and leaves the table")
-
-    # def is_royal_flush(self, sorted_hand):
-    #     self.logger.debug("Checking for Royal Flush...")
-    #     if self.is_straight_flush(sorted_hand) and sorted_hand[0].rank == 'A':# incorrect, i think this is wrong as a person could have A, 10 with 9, 8, 7, 6, 5 on the board
-    #         self.logger.debug(f"Found Royal Flush!")
-    #         return True
-    #     else:
-    #         self.logger.debug(f"No Royal Flush")
 
 
     def is_royal_or_straight_flush(self, sorted_hand):
-        print(f"3. {id(sorted_hand)} {sorted_hand}")
+        # print(f"3. {id(sorted_hand)} {sorted_hand}")
         self.logger.debug("Checking for Royal and/or Straight Flush...")
         for the_suit in ['♠','♥','♦','♣']:
             # omdat als ie nou een niet suited eentje naar beneden gaat? Dat sluit nu nog niks uit...
@@ -322,10 +412,11 @@ class TexasHoldemGame:
                     suited_list.append(hand)
             # print(f'suited list {suited_list}')
             straight_suited_counter = 0
-            if suited_list[0].rank == 'A':
-                # self.logger.debug(f'Found an ace')
-                # USE + instead of .append as this doesn't mutate the original list.
-                suited_list + [Card(rank='1', suit=the_suit)]
+            if len(suited_list) != 0:
+                if suited_list[0].rank == 'A':
+                    # self.logger.debug(f'Found an ace')
+                    # USE + instead of .append as this doesn't mutate the original list.
+                    suited_list + [Card(rank='1', suit=the_suit)]
             # self.logger.debug(f'New list: {suited_list}')
             for i in range(len(suited_list)-1):
                 if self.card_rank_value(suited_list[i].rank) == self.card_rank_value(suited_list[i+1].rank) + 1:
@@ -343,32 +434,6 @@ class TexasHoldemGame:
                     
             self.logger.debug("No straight flush was Found.")
             return False           
-
-
-            # for i in range(3):
-            #     # there is got to be a smarter way to do this...
-            #     if self.card_rank_value(sorted_hand[i].rank) \
-            #     == self.card_rank_value(sorted_hand[i + 1].rank) + 1 \
-            #     == self.card_rank_value(sorted_hand[i + 2].rank) + 2 \
-            #     == self.card_rank_value(sorted_hand[i + 3].rank) + 3 \
-            #     == self.card_rank_value(sorted_hand[i + 4].rank) + 4 and \
-            #     suit == sorted_hand[i].suit == sorted_hand[i + 1].suit == sorted_hand[i + 2].suit \
-            #     == sorted_hand[i + 3].suit == sorted_hand[i + 4].suit or \
-            #     self.card_rank_value(sorted_hand[i].rank) - 13 \
-            #     == self.card_rank_value(sorted_hand[i + 1].rank) + 1 \
-            #     == self.card_rank_value(sorted_hand[i + 2].rank) + 2 \
-            #     == self.card_rank_value(sorted_hand[i + 3].rank) + 3 \
-            #     == self.card_rank_value(sorted_hand[i + 4].rank) + 4 and \
-            #     suit == sorted_hand[i].suit == sorted_hand[i + 1].suit == sorted_hand[i + 2].suit \
-            #     == sorted_hand[i + 3].suit == sorted_hand[i + 4].suit:
-
-
-        # self.logger.debug("Checking for Straight Flush...")
-        # if self.is_straight(sorted_hand) and self.is_flush(sorted_hand):
-        #     self.logger.debug(f"Found Straight Flush.")
-        #     return True
-        # else:
-        #     self.logger.debug(f"No Straight Flush")
 
     def is_four_of_a_kind(self, sorted_hand):
         self.logger.debug("Checking for Four of a Kind...")
@@ -444,7 +509,7 @@ class TexasHoldemGame:
         return False
 
     def is_three_of_a_kind(self, sorted_hand):
-        print(f"-------------{sorted_hand}")
+        # print(f"-------------{sorted_hand}")
         self.logger.debug("Checking for Three of a Kind...")
         for i in range(len(sorted_hand) - 2):
             if sorted_hand[i].rank == sorted_hand[i + 1].rank == sorted_hand[i + 2].rank:
@@ -461,6 +526,8 @@ class TexasHoldemGame:
         return False
 
     def is_two_pair(self, sorted_hand):
+        # we need to make sure this is mutable as this gets called by is_full_house
+        sorted_hand = sorted_hand.copy()
         self.logger.debug("Checking for Two Pair...")
         pairs = 0
         for i in range(len(sorted_hand) - 3):
@@ -479,7 +546,7 @@ class TexasHoldemGame:
                 second_pair_rank = sorted_hand[i].rank
                 sorted_hand.remove(sorted_hand[i])
                 sorted_hand.remove(sorted_hand[i])
-                self.logger.debug(f"rest is now {sorted_hand}")
+                # self.logger.debug(f"rest is now {sorted_hand}")
                 handscore = [2, first_pair_rank, second_pair_rank, sorted_hand[0].rank, None, None]
                 return handscore
             # fill the rest with first, second and third kicker
@@ -496,7 +563,7 @@ class TexasHoldemGame:
                 pair_rank = sorted_hand[i].rank
                 sorted_hand.remove(sorted_hand[i])
                 sorted_hand.remove(sorted_hand[i])
-                self.logger.debug(f"7-2={sorted_hand}")
+                # self.logger.debug(f"7-2={sorted_hand}")
                 
                 # fill the rest with first, second and third kicker
                 handscore = [1, pair_rank, sorted_hand[0].rank, sorted_hand[1].rank, sorted_hand[2].rank, None]
@@ -515,14 +582,14 @@ class TexasHoldemGame:
         sorted_hand = sorted(all_cards, key=lambda card: self.card_rank_value(card.rank), reverse=True)
         self.logger.debug(f"...Checking for different hand Ranks.. for {sorted_hand}")
         # hier wordt een kopietje gemaakt omdat ie anders de orginele list pakt
-        print(f"1.        {id(sorted_hand)} {sorted_hand}")
+        # print(f"1.        {id(sorted_hand)} {sorted_hand}")
         sorted_hand = sorted_hand.copy()
-        print(f"2.        {id(sorted_hand)} {sorted_hand}")
+        # print(f"2.        {id(sorted_hand)} {sorted_hand}")
         hand_rank = self.is_royal_or_straight_flush(sorted_hand)
-        print(f"4.        {id(sorted_hand)} {sorted_hand}")
+        # print(f"4.        {id(sorted_hand)} {sorted_hand}")
         if hand_rank == False:
             hand_rank = self.is_four_of_a_kind(sorted_hand)
-        print(f"5.        {id(sorted_hand)} {sorted_hand}")
+        # print(f"5.        {id(sorted_hand)} {sorted_hand}")
         if hand_rank == False:
             hand_rank = self.is_full_house(sorted_hand)
         if hand_rank == False:
@@ -538,7 +605,7 @@ class TexasHoldemGame:
         if hand_rank == False:
             self.logger.debug("Return high card...")
             hand_rank = [0, sorted_hand[0].rank, sorted_hand[1].rank, sorted_hand[2].rank, sorted_hand[3].rank, sorted_hand[4].rank]
-        print(f"9.        {id(sorted_hand)} {sorted_hand}")
+        # print(f"9.        {id(sorted_hand)} {sorted_hand}")
         return hand_rank
 
 

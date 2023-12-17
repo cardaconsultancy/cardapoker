@@ -16,15 +16,17 @@ class Chips:
         self.logger.debug(f"{amount} chip(s) is/are lost")
         self.amount -= amount
 
-# class Pot:
-#     def __init__(self, amount=0):
-#         self.amount = amount
+class Pot:
+    def __init__(self, amount=0):
+        self.number = 0
+        self.amount = amount
+        self.players= []
 
-#     def win(self, amount):
-#         self.amount += amount
+    def in_pot(self, amount):
+        self.amount += amount
 
-#     def lose(self, amount):
-#         self.amount -= amount
+    def out_pot(self, amount):
+        self.amount -= amount
 
 class Deck:
     """A standard deck of playing cards."""

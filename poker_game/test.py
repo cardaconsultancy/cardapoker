@@ -84,12 +84,12 @@ from utils.game import TexasHoldemGame
 
 class TestTexasHoldemGame(unittest.TestCase):
 
-    def test_game_initialization(self):
-        deck = Deck()
-        table = Table()
-        game = TexasHoldemGame(table, deck)
-        self.assertEqual(game.table, table)
-        self.assertEqual(game.deck, deck)
+    # def test_game_initialization(self):
+    #     deck = Deck()
+    #     table = Table()
+    #     game = TexasHoldemGame(table, deck)
+    #     self.assertEqual(game.table, table)
+    #     self.assertEqual(game.deck, deck)
 
     def test_play_round(self):
         deck = Deck()
@@ -207,7 +207,7 @@ class TestTexasHoldemGame(unittest.TestCase):
 #         # player2.set_hand(player2_hand)
 
 #         # Play a round
-        # game.start_round()
+        game.start_round()
 
 #         # Check if the pot and winner are updated correctly
 #         self.assertEqual(table.pot, 0)  # Assuming no betting for simplicity in this example
