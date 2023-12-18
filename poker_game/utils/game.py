@@ -152,7 +152,7 @@ class TexasHoldemGame:
                 player.total_bet_betting_round = player.total_bet_betting_round + player_bet
                 self.logger.debug(f"total bet is {player.total_bet_betting_round}")
 
-                # check if the betsize is bigger than the chips, if so correct by making it the max bet
+                # check if the betsize is bigger than the chips, if so correct by making it the max bet 
                 if player.total_bet_betting_round > player.chips.amount:
                     self.logger.debug(f"{player.name} goes all in because {player.total_bet_betting_round} > {player.chips.amount}, so automatically the player is all in!!")
                     player.total_bet_betting_round = player.chips.amount
