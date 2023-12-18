@@ -10,9 +10,11 @@ class Player:
         self.chips = chips if chips else Chips()
         self.best_hand = []
         self.total_bet_betting_round = 0
-        self.total_bet_game = 0
+        self.total_in_pots_this_game = 0
+        self.total_bet = 0
         self.hand_score = [0, 0, 0, 0, 0, 0]
         self.folded = False
+        self.all_in = False
 
     def receive_card(self, card):
         self.logger.debug(f"{self.name} gets a {card.rank} of {card.suit}.")
@@ -38,6 +40,7 @@ class Player:
     
     # standard bet is 10, override below
     def bet(self, betsize):
+        print("The standard parent class is called, no modification has been done")
         # do this in game so that errors in modification don't mess this up
         # self.chips.lose(10)
         return betsize
@@ -46,16 +49,16 @@ class Player:
 def aggressive_player_decorator(player_class):
     class AggressivePlayer(player_class):
         def bet(self, betsize=None):
-            # Aggressive players bet more
+            print("Aggressive players go all in at first chance")
             return 100
         # Additional methods or overrides can go here
     return AggressivePlayer
 
 def conservative_player_decorator(player_class):
     class ConservativePlayer(player_class):
-        def bet(self, betsize=None):
-            # Conservative players bet less
-            return 50
+        def bet(self, betsize):
+            print("Conservative players only call")
+            return betsize
         # Additional methods or overrides can go here
     return ConservativePlayer
 
@@ -86,7 +89,7 @@ def create_player(name, style):
 
     return DecoratedPlayer
 
-# @poker_player_decorator
+# The child class, which will function as a template.
 class ActualPlayerTemplate(Player):
     def __init__(self, name, chips = None):
         # Call the constructor of the base class (Player)
