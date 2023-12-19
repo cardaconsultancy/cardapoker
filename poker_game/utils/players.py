@@ -112,7 +112,7 @@ class ActualPlayerTemplate(Player):
     #         self.logger.debug(f"{self.name} says: let's make that pot 20!")
     #         self.bet((20-pot)/players)
 
-def create_player(name, style, chips=100):
+def create_player(name, style, chips=Chips(100)):
     if style == 'aggressive':
         DecoratedPlayer = aggressive_player_decorator(ActualPlayerTemplate)
     elif style == 'conservative':
