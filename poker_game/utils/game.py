@@ -270,12 +270,13 @@ class TexasHoldemGame:
         counter = 1
         while any(player.total_bet_betting_round != 0 for player in self.table.players) and counter < 5:
             
-            # get the lowest bet
-            lowest_bet = min([player.total_bet_betting_round for player in not_folded])
-            self.logger.debug(f"Lowest bet is {lowest_bet}")
+            # get the lowest bet in folded, need to check for 0 also as we reduce the total_betting_round
+            lowest_bet = min([player.total_bet_betting_round for player in not_folded if player.total_bet_betting_round != 0])
+            self.logger.debug(f"1. Lowest bet is {lowest_bet}")
             
             # check if there is only 1 person not all in amongst the non-folders, reduce his/her bet by the difference with the max bidder.
             if len([player for player in not_folded if not player.all_in]) == 1:
+                self.logger.debug(f"2. Only one player not all in")
 
                 # Find the player who is not all-in: the folded 60
                 non_all_in_player = next(player for player in not_folded if not player.all_in)
@@ -294,17 +295,21 @@ class TexasHoldemGame:
 
             # check if the players all betted the same amount, if so take shortcut (also necessary to prevent loop):
             if lowest_bet == max([player.total_bet_betting_round for player in not_folded]):
-                self.logger.debug(f"Every player is in with the same amount")
+                self.logger.debug(f"99. Every player is in with the same amount")
                 # check_for_side_pots = False
                 self.fill_current_pot(not_folded[0])
                 return None
             
             counter += 1
-            print('keep looping for more side pots')
+            print('Looping for more side pots')
             # check_for_side_pots = False
 
             # for every player that has not folded already:
             for player in not_folded[:]:
+                print('check player:', player.name)
+                print('nr of players in not_folded:', len(not_folded))
+                print(player.total_bet_betting_round)
+                print('lowest bet: ', lowest_bet)
 
                 # check if they have the lowest bid
                 if player.total_bet_betting_round == lowest_bet:
@@ -330,25 +335,21 @@ class TexasHoldemGame:
                 #     self.logger.debug(f"{player.name} also went all in with the minimum bet")
                 #     not_folded.remove(player)
                 #     print(f'the rest of the list {not_folded}')
-                if sidepot_created == False:
-                    self.logger.debug(f"No (more) sidepots created")
-                    # just get a person that did not fold, as there are no sidepots his/her bet will be the same as the others.
-                    self.fill_current_pot(not_folded[0])
-                    for pot in self.table.pots:
-                        print(f'---------- pot {pot} is {pot.amount}')
-                    return None
+            if sidepot_created == False:
+                self.logger.debug(f"No (more) sidepots created")
+                # just get a person that did not fold, as there are no sidepots his/her bet will be the same as the others.
+                self.fill_current_pot(not_folded[0])
+                for pot in self.table.pots:
+                    print(f'---------- pot {pot} is {pot.amount}')
+                return None
                         # get the minimum bet fromt he people that did not fold:
             
-            # get a new minimum
-            lowest_bet = min([player.total_bet_betting_round for player in not_folded])
-            check_for_side_pots = True
-            self.logger.debug(f"new lowest bet == {lowest_bet}")
-
+            # check_for_side_pots = True
             self.logger.debug(f"A sidepot was created")
     
 
     def fill_current_pot(self, lowest_player):
-        self.logger.debug(f"Fill the current pot")
+        self.logger.debug(f"-- Fill the current pot --")
         lowest_bet = lowest_player.total_bet_betting_round
         current_pot = self.table.pots[-1]
         # reset the participants
@@ -362,10 +363,11 @@ class TexasHoldemGame:
 
                 # if the player has folded with more than was required, save that for the next pot.
             if player.total_bet_betting_round >= lowest_bet:
-                self.logger.debug(f"{player.name} has betted more than was necessary for this pot")      
+                self.logger.debug(f"{player.name} has betted enough, check if it is more than was necessary for this pot")      
 
                 # fill the pot with the minimum bet
                 current_pot.amount += lowest_bet
+                self.logger.debug(f"the new pot holds {current_pot.amount} chips")
                 
                 # reduce the betting amount with the lowest bet
                 player.total_bet_betting_round = player.total_bet_betting_round - lowest_bet
@@ -376,7 +378,7 @@ class TexasHoldemGame:
                     current_pot.players.append(player)
             
             # if they have less betted than the lowest bet
-            if player.total_bet_betting_round < lowest_bet:
+            elif player.total_bet_betting_round < lowest_bet:
                 self.logger.debug(f"{player.name} bet ({player.total_bet_betting_round}) is lower than {lowest_bet} and hence this person will always be folding because we checked for this before")
 
 
@@ -407,7 +409,7 @@ class TexasHoldemGame:
                 # player.total_bet_betting_round -= lowest_bet
 
                 current_pot.amount += player.total_bet_betting_round
-                self.logger.debug(f"{player.name} bet is down to {player.total_bet_betting_round}")
+                self.logger.debug(f"{player.name} bet is {player.total_bet_betting_round}")
                 # add them to the list if they call
                 current_pot.players.append(player)
                 

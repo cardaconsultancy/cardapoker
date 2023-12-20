@@ -22,7 +22,7 @@ class TestTexasHoldemGame(unittest.TestCase):
         player3.total_bet_betting_round = 10
         
         pot.players = [player1, player2, player3]
-        pot.amount = 100
+        pot.amount = 0
 
         table.pots.append(pot)
 
