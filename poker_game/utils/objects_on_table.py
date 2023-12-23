@@ -10,7 +10,7 @@ class Chips:
         self.amount = amount
 
     def win(self, amount):
-        self.logger.debug(f"{amount} chip(s) is/are given back")
+        self.logger.debug(f"{amount} chip(s) is/are awarded to the winner")
         self.amount += amount
 
     # create a seperate function for the rare event that a player actually gets chips back because the opposing player went all in and has less chips than the original bet.

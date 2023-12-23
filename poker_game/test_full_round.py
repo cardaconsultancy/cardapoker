@@ -9,10 +9,10 @@ class TestTexasHoldemGame(unittest.TestCase):
         deck = Deck()
         table = Table()
         game = TexasHoldemGame(table, deck)
-
-        player1 = create_player("John Doe", 'aggressive', Chips(100))
-        player2 = Player("Jan", Chips(100))
-        player3 = Player("Piet", Chips(100))
+        
+        player1 = create_player("Grietje", 'raises_with_aces_reduces_with_12345', Chips(100))
+        player2 = create_player("Jan", 'conservative', Chips(100))
+        player3 = create_player("Martin", 'conservative', Chips(100))
         
         table.add_player(player1)
         table.add_player(player2)

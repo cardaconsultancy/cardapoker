@@ -13,6 +13,7 @@ class Player:
         self.total_in_pots_this_game = 0
         self.total_bet = 0
         self.hand_score = [0, 0, 0, 0, 0, 0]
+        self.raised_called_or_checked_this_round = False
         self.folded = False
         self.all_in = False
 
@@ -29,8 +30,8 @@ class Player:
     def set_best_hand(self, hand_rank):
         self.best_hand = hand_rank
 
-    def response(self, max_total_bet_size):
-        self.logger.debug(f"{self.name} must do his/her thing: the bet is {max_total_bet_size} and he/she already has {self.total_bet_betting_round} in the pot")
+    def response(self, max_total_bet_size, hand, tablecards):
+        self.logger.debug(f"{self.name} must do his/her thing: the bet is {max_total_bet_size} and he/she already has {self.total_bet_betting_round} in the pot and {self.chips.amount} left.")
         # this is the function that should be shared
         
         # simple call function
@@ -62,11 +63,30 @@ def conservative_player_decorator(player_class):
         # Additional methods or overrides can go here
     return ConservativePlayer
 
+
+def raises_with_aces_reduces_with_12345(player_class):
+    class Raises_with_aces_reduces_with_12345Player(player_class):
+        def bet(self, betsize, hand, table):
+            for card in hand:
+                if card.suit == 'A':
+                    betsize = betsize * 2 
+                    print("Ace is raise!")
+                elif card.suit in '12345':
+                    print("that is a low card!")
+                    betsize = betsize * 2
+                else:
+                    print('Boring!')
+            return betsize
+        # Additional methods or overrides can go here
+    return Raises_with_aces_reduces_with_12345Player
+
 # Instantiate a player with a specific playing style
 def create_player(name, style):
     if style == 'aggressive':
         DecoratedPlayer = aggressive_player_decorator(ActualPlayerTemplate)
     elif style == 'conservative':
+        DecoratedPlayer = conservative_player_decorator(ActualPlayerTemplate)
+    elif style == 'raises_with_aces_reduces_with_12345':
         DecoratedPlayer = conservative_player_decorator(ActualPlayerTemplate)
     else:
         DecoratedPlayer = ActualPlayerTemplate  # No decoration
@@ -117,6 +137,8 @@ def create_player(name, style, chips=Chips(100)):
         DecoratedPlayer = aggressive_player_decorator(ActualPlayerTemplate)
     elif style == 'conservative':
         DecoratedPlayer = conservative_player_decorator(ActualPlayerTemplate)
+    elif style == 'raises_with_aces_calls_with_pictures':
+        DecoratedPlayer = raises_with_aces_calls_with_pictures(ActualPlayerTemplate)
     else:
         DecoratedPlayer = ActualPlayerTemplate  # No decoration
 

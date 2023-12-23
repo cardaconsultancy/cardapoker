@@ -5,7 +5,7 @@ from utils.objects_on_table import Deck, Chips, Card, Pot
 from utils.game import TexasHoldemGame
 
 class TestTexasHoldemGame(unittest.TestCase):
-    def test_play_round(self):
+    def test_play_round(self, p1bet):
         deck = Deck()
         table = Table()
         pot = Pot()
@@ -13,11 +13,10 @@ class TestTexasHoldemGame(unittest.TestCase):
         player1 = create_player("John Doe", Chips(50))
         player2 = Player("Jan", Chips(0))
         player3 = Player("Piet", Chips(0))
-        player1.total_bet_betting_round = 100
         player2.all_in = True
         player3.all_in = True
 
-        player1.total_bet_betting_round = 50
+        player1.total_bet_betting_round = p1bet
         player2.total_bet_betting_round = 50
         player3.total_bet_betting_round = 10
         
@@ -32,6 +31,12 @@ class TestTexasHoldemGame(unittest.TestCase):
 
         game = TexasHoldemGame(table, deck)
         game.check_for_side_pots()
+
+        # check if pots are the sum of the bets
+        self.assertEqual(3, sum([player1.total_bet_betting_round, player2.total_bet_betting_round, player3.total_bet_betting_round]))
+
+        # check if all bets are reduced to zero in the end
+        self.assertEqual(0, sum([player1.total_bet_betting_round, player2.total_bet_betting_round, player3.total_bet_betting_round]))
 
 
 if __name__ == '__main__':
