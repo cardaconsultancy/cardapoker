@@ -122,12 +122,51 @@ from collections import deque
 
 
 
-testlist = [1,2,3]
-print(id(testlist), testlist)
-def change_testlist(the_list):
-    the_list = the_list + [4]
-    print(id(testlist), testlist)
-change_testlist(testlist)
-print(id(testlist), testlist)
-testlist.append(4)
-print(id(testlist), testlist)
+# testlist = [1,2,3]
+# print(id(testlist), testlist)
+# def change_testlist(the_list):
+#     the_list = the_list + [4]
+#     print(id(testlist), testlist)
+# change_testlist(testlist)
+# print(id(testlist), testlist)
+# testlist.append(4)
+# print(id(testlist), testlist)
+
+class Player:
+    def __init__(self, name, folded, all_in):
+        self.name = name
+        self.folded = folded
+        self.all_in = all_in
+
+def get_next_player(players, current_index):
+    """
+    Gets the next player in the list who hasn't folded or gone all-in.
+
+    :param players: List of Player objects.
+    :param current_index: Index of the current player.
+    :return: Next Player object or None if no such player exists.
+    """
+    num_players = len(players)
+    next_index = (current_index + 1) % num_players
+
+    while next_index != current_index:
+        if not players[next_index].folded and not players[next_index].all_in:
+            return players[next_index]
+        next_index = (next_index + 1) % num_players
+
+    return None
+
+# Example usage
+players = [
+    Player("Alice", False, False),
+    Player("Bob", True, False),
+    Player("Charlie", False, True),
+    Player("Diana", False, False)
+]
+
+current_player_index = 0  # Assuming Alice is the current player
+next_player = get_next_player(players, current_player_index)
+if next_player:
+    print(f"The next player is {next_player.name}.")
+else:
+    print("No next player available.")

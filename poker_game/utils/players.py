@@ -36,11 +36,12 @@ class Player:
         
         # simple call function
         amount_to_call = max_total_bet_size - self.total_bet_betting_round
-        amount_to_bet = self.bet(amount_to_call)
+        amount_to_bet = self.bet(amount_to_call, hand, tablecards)
         return(amount_to_bet)
     
     # standard bet is 10, override below
     def bet(self, betsize):
+        self.logger.debug(f"The standard parent class is called, no modification has been done.")
         print("The standard parent class is called, no modification has been done")
         # do this in game so that errors in modification don't mess this up
         # self.chips.lose(10)
@@ -49,33 +50,33 @@ class Player:
 ## decorators which people can fill in <-- other option would be to directly change the child class.
 def aggressive_player_decorator(player_class):
     class AggressivePlayer(player_class):
-        def bet(self, betsize=None):
-            print("Aggressive players go all in at first chance")
+        def bet(self, betsize, hand, table):
+            self.logger.debug(f"Aggressive players go all in at first chance")
             return 100
         # Additional methods or overrides can go here
     return AggressivePlayer
 
 def conservative_player_decorator(player_class):
     class ConservativePlayer(player_class):
-        def bet(self, betsize):
-            print("Conservative players only call")
+        def bet(self, betsize, hand, table):
+            self.logger.debug(f"Conservative players only call")
             return betsize
         # Additional methods or overrides can go here
     return ConservativePlayer
 
-
-def raises_with_aces_reduces_with_12345(player_class):
+def raises_with_aces_reduces_with_12345_decorator(player_class):
     class Raises_with_aces_reduces_with_12345Player(player_class):
         def bet(self, betsize, hand, table):
+            self.logger.debug(f"I am an Ace Raiser!")
             for card in hand:
                 if card.suit == 'A':
                     betsize = betsize * 2 
                     print("Ace is raise!")
                 elif card.suit in '12345':
                     print("that is a low card!")
-                    betsize = betsize * 2
+                    betsize = betsize / 2
                 else:
-                    print('Boring!')
+                    print('that is an average card!')
             return betsize
         # Additional methods or overrides can go here
     return Raises_with_aces_reduces_with_12345Player
@@ -87,7 +88,7 @@ def create_player(name, style):
     elif style == 'conservative':
         DecoratedPlayer = conservative_player_decorator(ActualPlayerTemplate)
     elif style == 'raises_with_aces_reduces_with_12345':
-        DecoratedPlayer = conservative_player_decorator(ActualPlayerTemplate)
+        DecoratedPlayer = raises_with_aces_reduces_with_12345_decorator(ActualPlayerTemplate)
     else:
         DecoratedPlayer = ActualPlayerTemplate  # No decoration
 
@@ -137,8 +138,8 @@ def create_player(name, style, chips=Chips(100)):
         DecoratedPlayer = aggressive_player_decorator(ActualPlayerTemplate)
     elif style == 'conservative':
         DecoratedPlayer = conservative_player_decorator(ActualPlayerTemplate)
-    elif style == 'raises_with_aces_calls_with_pictures':
-        DecoratedPlayer = raises_with_aces_calls_with_pictures(ActualPlayerTemplate)
+    elif style == 'raises_with_aces_reduces_with_12345':
+        DecoratedPlayer = raises_with_aces_reduces_with_12345_decorator(ActualPlayerTemplate)
     else:
         DecoratedPlayer = ActualPlayerTemplate  # No decoration
 

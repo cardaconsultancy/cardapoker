@@ -29,6 +29,7 @@ class TexasHoldemGame:
         return '123456789TJQKA'.index(rank) + 1
     
     def start_game(self, raise_blinds, nr_of_rounds):
+        self.table.dealer = self.table.players_game[0]
         game_on = True
         while game_on == True:
             for raising_time in range(0, raise_blinds):
@@ -45,7 +46,7 @@ class TexasHoldemGame:
         self.table.community_cards = []
 
         # move the dealer button
-        self.logger.debug(f"the dealer is {self.table.dealer_seat}.")
+        self.logger.debug(f"the dealer is {self.table.dealer}.")
 
         # create a temporary deque to easily rotate 
         self.table.players_game = deque(self.table.players)
@@ -61,9 +62,10 @@ class TexasHoldemGame:
 
         # Betting Round 1
         self.logger.debug(f"Players can make their first bet.")
-        self.betting_round(first=True)
+        self.betting_round(preflop_round=True)
         if self.check_if_rest_folded_and_pay() == True:
             return True
+        
         self.logger.debug(f"Bets are made") 
         self.logger.debug(f"Total betted {sum(player.total_in_pots_this_game for player in self.table.players)}.")
 
@@ -130,126 +132,279 @@ class TexasHoldemGame:
         # self.logger.debug(f"The winner is {winner.name}!!!")
 
 
-    def betting_round(self, first = False):
-        print()
-        print()
-        print()
-        required_action = 0
+    def get_next_player(self, current_player):
+        """
+        Gets the next player in the list who hasn't folded or gone all-in.
+        """
+        num_players = len(self.table.players_game)
 
-        if first == True:
-            # self.table.players_game[0].bet(self.table.blind_size)
-            self.table.players_game[0].total_bet_betting_round += self.table.blind_size
-            self.logger.debug(f"Player {self.table.players_game[0].name} has the small blind of {self.table.players_game[0].total_bet_betting_round}")
-            self.table.players_game[0].chips.lose(self.table.blind_size)
-            self.table.players_game[0].total_bet_betting_round = (self.table.blind_size)
-            self.table.players_game[0].total_in_pots_this_game = (self.table.blind_size)
+        # Find the index of the current player by name if no index given
+        if type(current_player) == int:
+            current_index = current_player
+        else:
+            current_index = next((i for i, player in enumerate(self.table.players_game) if player == current_player), None)
+        if current_index is None:
+            return None
 
-            # self.table.players_game[1].bet(self.table.blind_size*2)
-            self.table.players_game[1].total_bet_betting_round += self.table.blind_size*2
-            self.logger.debug(f"Player {self.table.players_game[1].name} has the big blind of {self.table.players_game[1].total_bet_betting_round}")
-            self.table.players_game[1].chips.lose(self.table.blind_size*2)
-            self.table.players_game[1].total_bet_betting_round = (self.table.blind_size*2)
-            self.table.players_game[1].total_in_pots_this_game = (self.table.blind_size*2)
+        next_index = (current_index + 1) % num_players
 
-            required_action = -2
+        while next_index != current_index:
+            if not self.table.players_game[next_index].folded and not self.table.players_game[next_index].all_in:
+                self.logger.debug(f"The next player is {self.table.players_game[next_index].name}.")
+                return self.table.players_game[next_index]
+            next_index = (next_index + 1) % num_players
+
+    def betting_round(self, preflop_round = False):
+        print()
+        self.logger.debug(f"The dealer is {self.table.dealer.name}.")
+        # print()
+        # required_action = 0
+
+        # if first == True:
+        #     # self.table.players_game[0].bet(self.table.blind_size)
+        #     self.table.players_game[self.table.dealer+1].total_bet_betting_round += self.table.blind_size
+        #     self.logger.debug(f"Player {self.table.players_game[self.table.dealer+1].name} has the small blind of {self.table.players_game[self.table.dealer+1].total_bet_betting_round}")
+        #     self.table.players_game[self.table.dealer+1].chips.lose(self.table.blind_size)
+        #     self.table.players_game[self.table.dealer+1].total_bet_betting_round = (self.table.blind_size)
+        #     self.table.players_game[self.table.dealer+1].total_in_pots_this_game = (self.table.blind_size)
+
+        #     # self.table.players_game[1].bet(self.table.blind_size*2)
+        #     self.table.players_game[self.table.dealer+2].total_bet_betting_round += self.table.blind_size*2
+        #     self.logger.debug(f"Player {self.table.players_game[self.table.dealer+2].name} has the big blind of {self.table.players_game[self.table.dealer+2].total_bet_betting_round}")
+        #     self.table.players_game[self.table.dealer+2].chips.lose(self.table.blind_size*2)
+        #     self.table.players_game[self.table.dealer+2].total_bet_betting_round = (self.table.blind_size*2)
+        #     self.table.players_game[self.table.dealer+2].total_in_pots_this_game = (self.table.blind_size*2)
+        #     required_action = -2
+        # else:
+        #     full_round_player = self.table.players_game[self.table.dealer]
+        #     self.logger.debug(f"The game ends when {full_round_player.name} is about to get his turn again")
+
+
         self.logger.debug(f" ------------- Start betting round ------------- ")
         # max 100 
-        action_required = True
-        while action_required == True:
-            action_required = all(player.folded == True or player.raised_called_or_checked_this_round == True or player.all_in == True for player in self.table.players_game)
-            print('ho', required_action)
-            # if required_action > 9:
-            #     1 / 0
-            for player in self.table.players_game:
-                self.logger.debug(f"{player.name} is up and currently has {player.total_bet_betting_round} in the betting round pot")
-                self.logger.debug(f'required_action {required_action}')
-                # for playerprint in self.table.players_game:
-                #     print('-------', playerprint.total_bet_betting_round)
-                if required_action == -2:
-                    self.logger.debug(f'skipping {player.name} as he/she has the small blind')
-                    required_action += 1
-                    continue
-                if required_action == -1:
-                    self.logger.debug(f'skipping {player.name} as he/she has the big blind')
-                    required_action += 1
-                    continue
-                self.logger.debug(f"{player.name} is up.")
-                bet_sizes = [player.total_bet_betting_round for player in self.table.players_game]
-                self.logger.debug(f'bet sizes {bet_sizes}')
-                # get info for response
-                max_bet = max(bet_sizes)
-                self.logger.debug(f"Max bet size = {max_bet}")
-                
-                # ugly but this prevents the users from making mistakes (or cheating) by this functionality in their standard function.
-                ################## user call #####################
-                player_bet = player.response(max_bet, player.hand, self.table.community_cards)
-                # print(f'the player bet is {player_bet}')
-                ##################################################
+        all_are_done = False
 
-                self.logger.debug(f"total bet was {player.total_bet_betting_round}")
-                # new_bet = player.total_bet_betting_round + player_bet
-                self.logger.debug(f"total bet is {player.total_bet_betting_round + player_bet}")
+        # do we have to initialise it here or is there a smarter way to make this while loop work?
+        last_raiser = self.table.dealer
+        player = self.get_next_player(last_raiser)
+
+        # create a second indicator that helps with letting the BB have another turn
+        # create another variable for if it is the first_bet
+        BB_can_have_another_go = False
+        first_bet = True
+        if preflop_round == True:
+            BB_can_have_another_go = True
+            first_bet = False
+
+        counter = 0
+        while player != last_raiser and counter <10:
+            if first_bet == True and preflop_round == False:
+                last_raiser = player
+                self.logger.debug(f"this is the first round and so {last_raiser.name} is the last raiser")
+                first_bet = False
+            print('____________________________', last_raiser.name)
+
+            counter += 1
+            
+            self.logger.debug(f"{player.name} is up and currently has {player.total_bet_betting_round} in the betting round pot")
+            # self.logger.debug(f'required_action {required_action}')
+
+            # check if player has the big or small blind
+            # for player in self.table.players_game:
+            #     self.logger.debug(f"{player.name} is up and currently has {player.total_bet_betting_round} in the betting round pot")
+            #     self.logger.debug(f'required_action {required_action}')
+            #     for playerprint in self.table.players_game:
+            #         print('-------', playerprint.total_bet_betting_round)
+
+            # if required_action == -2:
+            #     self.logger.debug(f'skipping {player.name} as he/she has the small blind')
+            #     required_action += 1
+            #     continue
+            # if required_action == -1:
+            #     self.logger.debug(f'skipping {player.name} as he/she has the big blind')
+            #     required_action += 1
+            #     full_round_player = self.table.players_game[0]
+            #     last_raiser = player
+            #     continue
+
+            # This takes care of the exception: this is the player on which the bet has to end in the first round, regardless of what he/she does
+            # if no one else raises, this is where it ends.
+            # last_raiser = player
+
+            if preflop_round == True:
+                player.total_bet_betting_round += self.table.blind_size
+                self.logger.debug(f"Player {player.name} has the small blind of {player.total_bet_betting_round}")
+                player.chips.lose(self.table.blind_size)
+                player.total_bet_betting_round = (self.table.blind_size)
+                player.total_in_pots_this_game = (self.table.blind_size)
+
+                player = self.get_next_player(player)
+                player.total_bet_betting_round += self.table.blind_size*2
+                self.logger.debug(f"Player {player.name} has the big blind of {player.total_bet_betting_round}")
+                player.chips.lose(self.table.blind_size*2)
+                player.total_bet_betting_round = (self.table.blind_size*2)
+                player.total_in_pots_this_game = (self.table.blind_size*2)
+
+                # to get the max bet? Can also be changed.
+                last_raiser = player
+                self.logger.debug(f"The last raiser is now {player.name} with {player.total_bet_betting_round}")
+
+                # use the Big Blind indicator for the situation where the BB can bet twice.
+                preflop_round = False
+
+                player = self.get_next_player(player)
+
+            self.logger.debug(f"{player.name} is up.")
+            # bet_sizes = [player.total_bet_betting_round for player in self.table.players_game]
+            # self.logger.debug(f'bet sizes {bet_sizes}')
+            # check if all in or folded
+            if not player.all_in or player.folded:
+                # add the 'first' rule to account for the time when a person has a big blind and is the last raiser.
+                if player != last_raiser or (player == last_raiser and BB_can_have_another_go == True):
+                    self.logger.debug(f"{player.name} is not the last raiser of had the BB")
+                    # get info for response
+                    # max_bet = max(bet_sizes)
+                    max_bet = last_raiser.total_bet_betting_round
+                    self.logger.debug(f"-------- {player.name} has to match {max_bet} from last raiser {last_raiser.name}")
+                    
+                    for gambler in self.table.players_game:
+                        print(gambler.name, gambler.total_bet_betting_round)
+
+                    # ugly but this prevents the users from making mistakes (or cheating) by this functionality in their standard function.
+                    ################## user call #####################
+                    player_bet = player.response(max_bet, player.hand, self.table.community_cards)
+                    # print(f'the player bet is {player_bet}')
+                    ##################################################
+
+                    for gambler in self.table.players_game:
+                        print(gambler.name, gambler.total_bet_betting_round)
+
+                    self.logger.debug(f"total bet was {player.total_bet_betting_round}")
+                    # new_bet = player.total_bet_betting_round + player_bet
+                    self.logger.debug(f"total bet is {player.total_bet_betting_round + player_bet}")
 
                 # check if the betsize is bigger than the chips, if so correct by making it the max bet 
-                if player.total_bet_betting_round + player_bet >= player.total_bet_betting_round + player.chips.amount:
-                    self.logger.debug(f"{player.name} goes all in because {player.total_bet_betting_round + player_bet} >= {player.total_bet_betting_round + player.chips.amount}, so automatically the player is all in!!")
-                    player_bet = player.chips.amount
-                    # what is left and what is bet is the all in
-                    player.chips.lose(player.chips.amount)
-                    player.total_bet_betting_round += (player_bet)
-                    player.total_in_pots_this_game += (player_bet)
-                    self.logger.debug(f"{player.name} new bet is {player.total_bet_betting_round}.")
-                    player.all_in = True
-                
-                elif player.total_bet_betting_round + player_bet < max_bet:
-                    player.chips.lose(player.chips.amount)
-                    self.logger.debug(f"Player {player.name} folds as {player.total_bet_betting_round + player_bet} is smaller than {max_bet} and NO all in. He/she loses his/her chips")
-                    # add to total_bet as this must be added to the pot (don't remove yet from player_list)
-                    player.total_bet_betting_round += (player_bet)
-                    player.total_in_pots_this_game += (player_bet)
-                    player.folded = True
+                    if player.total_bet_betting_round + player_bet >= player.total_bet_betting_round + player.chips.amount:
+                        self.logger.debug(f"{player.name} goes all in because {player.total_bet_betting_round + player_bet} >= {player.total_bet_betting_round + player.chips.amount}, so automatically the player is all in!!")
+                        player_bet = player.chips.amount
+                        # what is left and what is bet is the all in
+                        player.chips.lose(player.chips.amount)
+                        player.total_bet_betting_round += (player_bet)
+                        player.total_in_pots_this_game += (player_bet)
+                        self.logger.debug(f"{player.name} new bet is {player.total_bet_betting_round}.")
+                        player.all_in = True
 
-                elif player.total_bet_betting_round + player_bet == max_bet and player_bet == 0:
-                    # print(player.name, player.chips.amount, '????????????????????????')
-                    # player.chips.lose(player.total_bet_betting_round)
-                    # player.total_bet_betting_round += player_bet
-                    # player.total_in_pot_this_game += player.total_bet_betting_round
-                    player.raised_called_or_checked_this_round = True
-                    self.logger.debug(f"Player {player.name} checks with {player_bet} and has {player.chips.amount} chips left")
+                        # check if the all in player is raising (seems better than to check for all options if player is all in)
+                        if player.total_bet_betting_round + player_bet < max_bet:
+                            last_raiser = player
+                            self.logger.debug(f"----{player.name} is the last raiser")
 
-                elif player.total_bet_betting_round + player_bet == max_bet:
-                    player.chips.lose(player_bet)
-                    print(player_bet)
-                    print(player.total_bet_betting_round)
-                    player.total_in_pots_this_game += player_bet
-                    player.total_bet_betting_round += player_bet
-                    player.raised_called_or_checked_this_round = True
-                    self.logger.debug(f"Player {player.name} calls with {player_bet}, making the total {player.total_bet_betting_round} this round and {player.total_in_pots_this_game} this game. He/she has {player.chips.amount} chips left")
+                    # Folding
+                    elif player.total_bet_betting_round + player_bet < max_bet:
+                        player.chips.lose(player.chips.amount)
+                        self.logger.debug(f"Player {player.name} folds as {player.total_bet_betting_round + player_bet} is smaller than {max_bet} and NO all in. He/she loses his/her chips")
+                        # add to total_bet as this must be added to the pot (don't remove yet from player_list)
+                        player.total_bet_betting_round += (player_bet)
+                        player.total_in_pots_this_game += (player_bet)
+                        player.folded = True
 
-                elif player.total_bet_betting_round + player_bet > max_bet:
-                    player.chips.lose(player_bet)
-                    player.total_bet_betting_round += player_bet
-                    player.total_in_pots_this_game += player_bet
-                    player.raised_called_or_checked_this_round = True
-                    self.logger.debug(f"Player {player.name} throws in {player_bet}, raising to {player.total_bet_betting_round} and has {player.chips.amount} chips left")
-        
-                player.total_bet += player.total_in_pots_this_game
-                required_action += 1
+                    # Checking
+                    elif player.total_bet_betting_round + player_bet == max_bet and player_bet == 0:
+                        # print(player.name, player.chips.amount, '????????????????????????')
+                        # player.chips.lose(player.total_bet_betting_round)
+                        # player.total_bet_betting_round += player_bet
+                        # player.total_in_pot_this_game += player.total_bet_betting_round
+                        player.raised_called_or_checked_this_round = True
+                        self.logger.debug(f"Player {player.name} checks with {player_bet} and has {player.chips.amount} chips left")
 
-            bet_sizes = [player.total_bet_betting_round for player in self.table.players_game]
-            # avg_bet = sum(bet_sizes) / len(self.table.players_game)
-            max_bet = max(bet_sizes)
+
+                    # Calling
+                    elif player.total_bet_betting_round + player_bet == max_bet:
+                        player.chips.lose(player_bet)
+                        print(player_bet)
+                        print(player.total_bet_betting_round)
+                        player.total_in_pots_this_game += player_bet
+                        player.total_bet_betting_round += player_bet
+                        player.raised_called_or_checked_this_round = True
+                        self.logger.debug(f"Player {player.name} calls with {player_bet}, making the total {player.total_bet_betting_round} this round and {player.total_in_pots_this_game} this game. He/she has {player.chips.amount} chips left")
+
+                    # Raising
+                    elif player.total_bet_betting_round + player_bet > max_bet:
+                        player.chips.lose(player_bet)
+                        player.total_bet_betting_round += player_bet
+                        player.total_in_pots_this_game += player_bet
+                        player.raised_called_or_checked_this_round = True
+                        self.logger.debug(f"Player {player.name} throws in {player_bet}, raising to {player.total_bet_betting_round} and has {player.chips.amount} chips left")
+                        last_raiser = player
+                        self.logger.debug(f"----{player.name} is the last raiser")
+                    
+                    # remove the special status of Big Blind is removed if we continue
+                    if player == last_raiser and BB_can_have_another_go == True:
+                        BB_can_have_another_go = False
+
+                    player.total_bet += player.total_in_pots_this_game
+                    # required_action += 1
+
+                    # set first to False to make sure that we select the last raiser next time.
+                    # first = False
+                # else:
+                #     self.logger.debug(f"Player {player.name} was the last raiser")
+                #     all_are_done = True
+                # update the all_are_done
+            else:
+                self.logger.debug(f"Player {player.name} has folded or is all in")
+
             self.logger.debug(f'total bet: {player.total_bet_betting_round}')
             self.logger.debug(f'NR of players in game = {len(self.table.players_game)}')
-            for player in self.table.players_game:
-                print('1', player.total_bet_betting_round, player.chips.amount)           
+            self.logger.debug(f"-- The player was {player.name}")
+            # The player who has the small blind makes the first bet in poker, which is why we can get the next one directly
+            player = self.get_next_player(player)
+            self.logger.debug(f"-- The next player is {player.name}")
 
-            for player in self.table.players_game:
-                print(player.name)
-                print(player.folded, player.raised_called_or_checked_this_round, player.all_in)
+            if player == last_raiser:
+                print("IT SHOULD END HERE")
+
+                # sugg
+                # playernr = 0
+                # while not all_are_done:
+                #     player = playerlist[playernr]
+                #     if not folded or all in:
+                #         # works in two man heads up
+                #         if not last_raiser:
+                #             do action
+                #             if raise:
+                #                 update last_raiser = player
+                #         else:
+                #             all_are_done = True
+                #     playernr += 1
+                #     
+                # 
+                
+                # this is incorrect, someone could check and then someone raises
+                # rather than making a complex average, just check whether someone has raised (a seperate attribute) and the rest hasn't folded
+                # if so continue
+
+            # all_are_done = all(player.folded == True or player.raised_called_or_checked_this_round == True or player.all_in == True for player in self.table.players_game)
+
+            # bet_sizes = [player.total_bet_betting_round for player in self.table.players_game]
+            # avg_bet = sum(bet_sizes) / len(self.table.players_game)
+            # max_bet = max(bet_sizes)
+
+        for player in self.table.players_game:
+            print('1', player.total_bet_betting_round, player.chips.amount)           
+
+        for player in self.table.players_game:
+            print(player.name)
+            print(player.folded, player.raised_called_or_checked_this_round, player.all_in)
 
         # all players are either all in or folded or have called/checked/raised
         self.logger.debug(f"Betting round over")
+
+        # create pots
+        self.create_pots()
+
+    def create_pots(self):
+        self.logger.debug(f"Start to create pot(s)")
         if len(self.table.pots) == 0:
             main_pot = Pot()
             main_pot.players = self.table.players_game
@@ -497,8 +652,7 @@ class TexasHoldemGame:
             return None
         # move dealer button --> needs to be refactored
         else:
-            self.table.change_dealer_and_blinds()
-
+            self.table.dealer = self.get_next_player(self.table.dealer)
 
     def is_royal_or_straight_flush(self, sorted_hand):
         # print(f"3. {id(sorted_hand)} {sorted_hand}")

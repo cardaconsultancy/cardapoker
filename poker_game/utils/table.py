@@ -1,5 +1,6 @@
 import logging
 from collections import deque
+from utils.players import Player
 
 class Table:
     def __init__(self):
@@ -10,7 +11,7 @@ class Table:
         self.players_game = deque()
         # self.seats = {}
         self.blind_size = 1
-        self.dealer_seat = 0
+        self.dealer = 0
         self.small_blind_seat = 1
         self.big_blind_seat = 2
 
@@ -29,19 +30,19 @@ class Table:
         #         self.logger.info(f"{player} got added to table on seat {chair}")
         #         break
     
-    def change_dealer_and_blinds(self):
-        # this produces problems if someone leaves, the blind doesn't get transferred.
-        self.logger.info(f"The current dealer was seating on seat {self.dealer_seat}")
-        # Loop over table using helper function to determine next dealer
-        # self.dealer_seat = next_player(self.seats, self.dealer_seat)
-        self.dealer_seat += 1
-        self.small_blind_seat += 1
-        self.big_blind_seat += 1
-        self.logger.info(f"The new dealer nr is {self.dealer_seat}")
-        # Next person is small blind
-        # self.small_blind_seat = next_player(self.seats, self.dealer_seat)
-        # Next person is big blind
-        # self.big_blind_seat = next_player(self.seats, self.small_blind_seat)
+    # def change_dealer_and_blinds(self):
+    #     # this produces problems if someone leaves, the blind doesn't get transferred.
+    #     self.logger.info(f"The current dealer was seating on seat {self.dealer_seat}")
+    #     # Loop over table using helper function to determine next dealer
+    #     # self.dealer_seat = next_player(self.seats, self.dealer_seat)
+    #     self.dealer_seat += 1
+    #     self.small_blind_seat += 1
+    #     self.big_blind_seat += 1
+    #     self.logger.info(f"The new dealer nr is {self.dealer_seat}")
+    #     # Next person is small blind
+    #     # self.small_blind_seat = next_player(self.seats, self.dealer_seat)
+    #     # Next person is big blind
+    #     # self.big_blind_seat = next_player(self.seats, self.small_blind_seat)
 
     def increase_blinds(self):
         self.blind_size = self.blind_size * 2
