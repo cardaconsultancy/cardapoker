@@ -224,7 +224,7 @@ class TexasHoldemGame:
             #     self.logger.debug(f'skipping {player.name} as he/she has the big blind')
             #     required_action += 1
             #     full_round_player = self.table.players_game[0]
-            #     last_raiser = player
+            #     last_raiser = player 
             #     continue
 
             # This takes care of the exception: this is the player on which the bet has to end in the first round, regardless of what he/she does

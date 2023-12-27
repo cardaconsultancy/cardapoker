@@ -1,9 +1,3 @@
-# create more tests for other sets
-# Pot Class with people and chips that we init for each time a new pot is made
-# For pot in pots, do evaluate
-# tournament logic
-# big blind gets extra bet opportunity --> i believe this automatically happens
-
 # cut up logic in parts
 # TODO : Integrate player feedback logic
 # create an GPT that can help players set up their player
