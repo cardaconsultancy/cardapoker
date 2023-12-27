@@ -19,8 +19,12 @@ class Chips:
         self.amount += amount
 
     def lose(self, amount):
-        self.logger.debug(f"{amount} chip(s) is/are lost")
-        self.amount -= amount
+        if amount <= self.amount:
+            self.logger.debug(f"{amount} chip(s) is/are lost")
+            self.amount -= amount
+        else:
+            self.logger.debug(f"THIS PLAYER IS ALL INNNNNNNNNN!!!!!!!!!!!")
+            return False
 
 class Pot:
     def __init__(self, amount=0):

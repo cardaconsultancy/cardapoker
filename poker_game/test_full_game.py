@@ -18,7 +18,7 @@ class TestTexasHoldemGame(unittest.TestCase):
         table.add_player(player2)
         table.add_player(player3)
 
-        game.start_game(20, 30)
+        game.start_game(20)
 
 
 if __name__ == '__main__':
