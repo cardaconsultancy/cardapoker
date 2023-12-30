@@ -19,7 +19,7 @@ class Chips:
         self.amount += amount
 
     def lose(self, amount):
-        if amount <= self.amount:
+        if amount < self.amount:
             self.logger.debug(f"{amount} chip(s) is/are lost")
             self.amount -= amount
         else:

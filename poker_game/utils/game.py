@@ -1,7 +1,11 @@
-from utils.objects_on_table import Card, Pot, Deck
+# TODO: when BB has not enough chips, the other players should be calling the BB and not his max bet
+from utils.evaluate_hand import evaluate_hand, get_hand_rank, card_rank_value
+from utils.objects_on_table import Pot, Deck
 import logging
 from operator import attrgetter
 from collections import deque
+from utils.next_player import get_next_player
+from utils.pot_management import create_pots, check_for_side_pots, fill_current_pot, check_if_rest_folded_and_pay
 
 class TexasHoldemGame:
     winners = []
@@ -23,16 +27,12 @@ class TexasHoldemGame:
         self.deck = deck
         self.logger = logging.getLogger(__name__)
     
-    def card_rank_value(self, rank):
-        if rank == None:
-           return 0
-        return '123456789TJQKA'.index(rank) + 1
-    
-    def start_game(self, raise_blinds=20):
+    def start_game(self, rounds_before_raise_blinds=20):
         self.table.dealer = self.table.players_game[0]
         game_on = True
+        number_of_rounds = 1
         while game_on == True:
-            for raising_time in range(0, raise_blinds):
+            for raising_time in range(0, rounds_before_raise_blinds):
                 print()
                 print() 
                 print()
@@ -41,6 +41,9 @@ class TexasHoldemGame:
                 game_on = self.start_round()
                 self.logger.debug(f'Blinds raised {raising_time} times')
             self.table.increase_blinds()
+            number_of_rounds += 1
+            if number_of_rounds > 10:
+                break
         return False
 
     def start_round(self):
@@ -68,7 +71,7 @@ class TexasHoldemGame:
         # Betting Round 1
         self.logger.debug(f"Players can make their first bet.")
         self.betting_round(preflop_round=True)
-        if self.check_if_rest_folded_and_pay() == True:
+        if check_if_rest_folded_and_pay(self.table) == True:
             return True
         
         self.logger.debug(f"Bets are made") 
@@ -90,7 +93,7 @@ class TexasHoldemGame:
             self.betting_round()
             self.logger.debug(f"Total is {sum(player.total_in_pots_this_game for player in self.table.players)}.")
         
-        if self.check_if_rest_folded_and_pay() == True:
+        if check_if_rest_folded_and_pay(self.table):
             return True
         
         # Deal the turn (one additional community card)
@@ -106,7 +109,7 @@ class TexasHoldemGame:
             self.betting_round()
             self.logger.debug(f"Total is {sum(player.total_in_pots_this_game for player in self.table.players)}.")
         
-        if self.check_if_rest_folded_and_pay() == True:
+        if check_if_rest_folded_and_pay(self.table):
             return True
         
         # Deal the river (one final community card)
@@ -122,7 +125,7 @@ class TexasHoldemGame:
             self.betting_round()
             self.logger.debug(f"Total is {sum(player.total_in_pots_this_game for player in self.table.players)}.")
         
-        if self.check_if_rest_folded_and_pay() == True:
+        if check_if_rest_folded_and_pay(self.table):
             return True
         
         # Determine the winner(s)
@@ -130,35 +133,11 @@ class TexasHoldemGame:
         self.pay_winners()
 
         # Clean up
-        self.clean_up()
+        clean_up(self.table)
 
         return True
         # winner = self.determine_winner()
         # self.logger.debug(f"The winner is {winner.name}!!!")
-
-
-    def get_next_player(self, current_player):
-        """
-        Gets the next player in the list who hasn't folded or gone all-in.
-        """
-        num_players = len(self.table.players_game)
-
-        # Find the index of the current player by name if no index given
-        if type(current_player) == int:
-            current_index = current_player
-        else:
-            current_index = next((i for i, player in enumerate(self.table.players_game) if player == current_player), None)
-        if current_index is None:
-            self.logger.debug(f"The current player is not found, probably he/she just left crying!")
-            return None
-
-        next_index = (current_index + 1) % num_players
-
-        while next_index != current_index:
-            if not self.table.players_game[next_index].folded and not self.table.players_game[next_index].all_in:
-                self.logger.debug(f"The next player is {self.table.players_game[next_index].name}.")
-                return self.table.players_game[next_index]
-            next_index = (next_index + 1) % num_players
 
     def betting_round(self, preflop_round = False):
         print()
@@ -169,6 +148,7 @@ class TexasHoldemGame:
         # if first == True:
         #     # self.table.players_game[0].bet(self.table.blind_size)
         #     self.table.players_game[self.table.dealer+1].total_bet_betting_round += self.table.blind_size
+        #     self.logger.debug(f"Player {self.table.players_game[self.table.dealer+1].name} has the small blind of {self.table.players_game[self.table.dealer+1].total_bet_betting_round}")
         #     self.logger.debug(f"Player {self.table.players_game[self.table.dealer+1].name} has the small blind of {self.table.players_game[self.table.dealer+1].total_bet_betting_round}")
         #     self.table.players_game[self.table.dealer+1].chips.lose(self.table.blind_size)
         #     self.table.players_game[self.table.dealer+1].total_bet_betting_round = (self.table.blind_size)
@@ -192,7 +172,7 @@ class TexasHoldemGame:
 
         # do we have to initialise it here or is there a smarter way to make this while loop work?
         last_raiser = self.table.dealer
-        player = self.get_next_player(last_raiser)
+        player = get_next_player(last_raiser, self.table)
 
         # create a second indicator that helps with letting the BB have another turn
         # create another variable for if it is the first_bet
@@ -202,8 +182,13 @@ class TexasHoldemGame:
             BB_can_have_another_go = True
             first_bet = False
 
+        for pl in self.table.players_game:
+            print('check: ', pl.name)
+
         counter = 0
         while player != last_raiser and counter <10:
+            for pl in self.table.players_game:
+                print('check: ', pl.name)
             if first_bet == True and preflop_round == False:
                 last_raiser = player
                 self.logger.debug(f"this is the first round and so {last_raiser.name} is the last raiser")
@@ -250,7 +235,7 @@ class TexasHoldemGame:
                     player.total_bet_betting_round = (self.table.blind_size)
                     player.total_in_pots_this_game = (self.table.blind_size)
 
-                player = self.get_next_player(player)
+                player = get_next_player(player, self.table)
                 player.total_bet_betting_round += self.table.blind_size*2
                 self.logger.debug(f"Player {player.name} has the big blind of {player.total_bet_betting_round}")
 
@@ -269,9 +254,12 @@ class TexasHoldemGame:
                 self.logger.debug(f"The last raiser is now {player.name} with {player.total_bet_betting_round}")
 
                 preflop_round = False
-                player = self.get_next_player(player)
+                print('1. checking??', player.name)
+                player = get_next_player(player, self.table)
+                print('2. checking??', player.name)
 
-            print('checking', self.table.players_game)
+            for pl in self.table.players_game:
+                print('check: ', pl.name)
             self.logger.debug(f"{player.name} is up.")
             # bet_sizes = [player.total_bet_betting_round for player in self.table.players_game]
             # self.logger.debug(f'bet sizes {bet_sizes}')
@@ -286,8 +274,7 @@ class TexasHoldemGame:
 
                     # check if betsize of lastraiser is lower than theirs 
                     # (this can happen if the SB or is higher than the chipsstack and player is the BB), if so make current player lastraiser
-                    print('huhhh????????')
-                    if max_bet > player.total_bet_betting_round:
+                    if max_bet < player.total_bet_betting_round:
                         self.logger.debug(f"Because {last_raiser.name}'s {max_bet} chips is less than {player.name}'s {player.total_bet_betting_round}, make this the last bet")
                         last_raiser = player
 
@@ -321,7 +308,7 @@ class TexasHoldemGame:
                         player.all_in = True
 
                         # check if the all in player is raising (seems better than to check for all options if player is all in)
-                        if player.total_bet_betting_round + player_bet < max_bet:
+                        if player.total_bet_betting_round > max_bet:
                             last_raiser = player
                             self.logger.debug(f"----{player.name} is the last raiser")
 
@@ -384,8 +371,7 @@ class TexasHoldemGame:
             self.logger.debug(f'NR of players in game = {len(self.table.players_game)}')
             self.logger.debug(f"-- The player was {player.name}")
             # The player who has the small blind makes the first bet in poker, which is why we can get the next one directly
-            player = self.get_next_player(player)
-            self.logger.debug(f"-- The next player is {player.name}")
+            player = get_next_player(player, self.table)
 
             if player == last_raiser:
                 print("IT SHOULD END HERE")
@@ -427,180 +413,7 @@ class TexasHoldemGame:
         self.logger.debug(f"Betting round over")
 
         # create pots
-        self.create_pots()
-
-    def create_pots(self):
-        self.logger.debug(f"Start to create pot(s)")
-        if len(self.table.pots) == 0:
-            main_pot = Pot()
-            main_pot.players = self.table.players_game
-            self.table.pots.append(main_pot)
-            self.logger.debug(f"No pot yet, so created {len(self.table.pots)} main pot")
-        self.check_for_side_pots()
-        required_action = 100
-
-        # reset the bets and raise/check/call status
-        for player in self.table.players_game:
-            player.total_in_pots_this_game += player.total_bet_betting_round
-            player.raised_called_or_checked_this_round = False
-            player.total_bet_betting_round = 0
-            self.logger.debug(f"Reset total bets {player.name} to {player.total_bet_betting_round}")
-
-    def check_if_rest_folded_and_pay(self):
-        at_least_two_not_folded = []
-        for player in self.table.players_game:
-            if player.folded == False:
-                at_least_two_not_folded.append(player)
-        if len(at_least_two_not_folded) < 2:
-            # skipp_all
-            for pot in self.table.pots:
-                at_least_two_not_folded[0].chips.win(pot.amount)
-            self.clean_up()
-            return 1
-
-    def check_for_side_pots(self):
-        # use total betting round as an indicator to get out of the loop. Keep reducing it untill every player has 0.
-
-        self.logger.debug(f"checking for side pots")
-
-        # get the minimum bet fromt he people that did not fold:
-        not_folded = []
-        for player in self.table.players_game:
-            # get all the minimum bet
-            if player.folded == False:
-                not_folded.append(player)
-        # check_for_side_pots = True
-        sidepot_created = False
-        counter = 1
-        while any(player.total_bet_betting_round != 0 for player in self.table.players):
-            
-            # get the lowest bet in folded, need to check for 0 also as we reduce the total_betting_round
-            lowest_bet = min([player.total_bet_betting_round for player in not_folded if player.total_bet_betting_round != 0])
-            self.logger.debug(f"1. Lowest bet is {lowest_bet}")
-            
-            # throw error if len not folded > 2
-            if len(not_folded) > 2:
-                AssertionError
-
-            # check if there is only 1 person not all in amongst the non-folders, reduce his/her bet by the difference with the max bidder.
-            if len([player for player in not_folded if not player.all_in]) == 1:
-                self.logger.debug(f"2. Only one player not all in")
-
-                # Find the player who is not all-in: the folded 60
-                non_all_in_player = next(player for player in not_folded if not player.all_in)
-                # print(non_all_in_player.name)
-
-                # Find the max bet among all-in players: 600
-                all_in_bet = max(player.total_bet_betting_round for player in not_folded if player.all_in)
-                # print(all_in_bet, non_all_in_player.total_bet_betting_round)
-
-                # This is the only case in which we give players back money in mid game as we cannot guarantee who joins:
-                non_all_in_player.chips.give_back(non_all_in_player.total_bet_betting_round - all_in_bet)
-
-                # Adjust the bet of the non all-in player
-                non_all_in_player.total_bet_betting_round = all_in_bet
-                self.logger.debug(f"As {non_all_in_player.name} was the only one not all in, his/her bet got reduced by {non_all_in_player.total_bet_betting_round - all_in_bet}")
-
-            # check if the players all betted the same amount, if so take shortcut (also necessary to prevent loop):
-            if lowest_bet == max([player.total_bet_betting_round for player in not_folded]):
-                self.logger.debug(f"99. Every player is in with the same amount")
-                # check_for_side_pots = False
-                self.fill_current_pot(not_folded[0])
-                return None
-            
-            counter += 1
-            print('Looping for more side pots')
-            # check_for_side_pots = False
-
-            # for every player that has not folded already:
-            for player in not_folded[:]:
-                print('check player:', player.name)
-                print('nr of players in not_folded:', len(not_folded))
-                print(player.total_bet_betting_round)
-                print('lowest bet: ', lowest_bet)
-
-                # check if they have the lowest bid
-                if player.total_bet_betting_round == lowest_bet:
-                    self.logger.debug(f"player {player.name} has the lowest bet of {lowest_bet}")
-
-                    # check if the lowest gambling player went all in
-                    if player.all_in == True:
-                        self.logger.debug(f"player {player.name} went all in, side pot is needed")
-                        # fill up original pot & create side pot
-                        self.fill_current_pot(player)
-                        side_pot = Pot()
-
-                        # do this in the fill current pot
-                        # side_pot.players = not_folded
-
-                        self.table.pots.append(side_pot)
-                        sidepot_created = True
-                        # check_for_side_pots = True
-                        # player.folded = True
-                        # not_folded.remove(player)
-                        # print(f'the rest of the list {not_folded}')
-                # elif player.total_bet_betting_round == 0 and player.folded == False:
-                #     self.logger.debug(f"{player.name} also went all in with the minimum bet")
-                #     not_folded.remove(player)
-                #     print(f'the rest of the list {not_folded}')
-            if sidepot_created == False:
-                self.logger.debug(f"No (more) sidepots created")
-                # just get a person that did not fold, as there are no sidepots his/her bet will be the same as the others.
-                self.fill_current_pot(not_folded[0])
-                for pot in self.table.pots:
-                    print(f'---------- pot {pot} is {pot.amount}')
-                return None
-                        # get the minimum bet fromt he people that did not fold:
-            
-            # check_for_side_pots = True
-            self.logger.debug(f"A sidepot was created")
-    
-
-    def fill_current_pot(self, lowest_player):
-        self.logger.debug(f"-- Fill the current pot --")
-        lowest_bet = lowest_player.total_bet_betting_round
-        current_pot = self.table.pots[-1]
-        # reset the participants
-        current_pot.players = []
-        # you HAVE TO use players here, as you can still get some of your big blind back if the person you beat has less chips than that.
-        # and p1 can raise to 60, p2 goes all in with 10, p3 raises to 600, p4 calls, p1 folds. Then p1 fills pot 1 AND the main pot.
-        for player in self.table.players:
-
-            # if the player has folded or called with more than was required, save that for the next pot.
-            if player.total_bet_betting_round >= lowest_bet:
-                self.logger.debug(f"{player.name} has betted enough, check if it is more than was necessary for this pot")
-
-                # fill the pot with the minimum bet
-                current_pot.amount += lowest_bet
-                self.logger.debug(f"the new pot holds {current_pot.amount} chips")
-                
-                # reduce the betting amount with the lowest bet
-                player.total_bet_betting_round = player.total_bet_betting_round - lowest_bet
-
-                # if player folded, he or she does not take part in any of the winnings
-                if player.folded == False:
-                    self.logger.debug(f"Player {player.name} has not folded and will be part of the winnings.")
-                    current_pot.players.append(player)
-            
-            # if they have less betted than the lowest bet
-            elif player.total_bet_betting_round < lowest_bet:
-                self.logger.debug(f"{player.name} bet ({player.total_bet_betting_round}) is lower than {lowest_bet} and hence this person will always be folding because we checked for this before")
-
-                # increase the amount in the pot
-                current_pot.amount += player.total_bet_betting_round
-                self.logger.debug(f"the new pot holds {current_pot.amount} chips")
-
-                # reduce the betting amount to 0
-                player.total_bet_betting_round = 0
-                self.logger.debug(f"{player.name} bet is down to {player.total_bet_betting_round}")
-
-                current_pot.amount += player.total_bet_betting_round
-                self.logger.debug(f"{player.name} bet is {player.total_bet_betting_round}")
-                # add them to the list if they call
-                current_pot.players.append(player)
-                
-        # side_pot.players.append(player)
-        # self.table.pots.append(side_pot)
+        create_pots(self.table)
     
     def pay_winners(self):
         for pot in self.table.pots:
@@ -617,7 +430,7 @@ class TexasHoldemGame:
         # dict_example = {}
         winner_list = []
         for player in pot_players:
-            player.set_best_hand(self.get_hand_rank(player))
+            player.set_best_hand(get_hand_rank(player, self.table))
             self.logger.debug(f"{player.name} highest hand is {player.best_hand}")
             self.logger.debug(f"- {player.name} has hand {player.best_hand}")
             # create a list of players
@@ -633,7 +446,7 @@ class TexasHoldemGame:
                 if metric == 0:
                     metric_list.append(player.best_hand[metric])
                 else:
-                    metric_list.append(self.card_rank_value(player.best_hand[metric]))
+                    metric_list.append(card_rank_value(player.best_hand[metric]))
                 # print('-----------', metric_list)
             max_metric = max(metric_list)
             mask = []
@@ -659,258 +472,3 @@ class TexasHoldemGame:
             for winner in winner_list:
                 self.logger.debug(f"- {winner.name}")
         return winner_list
-
-    def get_next_dealer_and_delete_losers(self):
-        # wat als de dealer al naar huis is? (moet die informatie hebben)
-        # wat als de volgende al naar huis is? (moet het daarna wel verwijderen)
-        self.table.dealer
-        self.table.players
-
-    def clean_up(self):
-        self.logger.debug(f'cleaning time{self.table.players}')
-
-        # get the dealer location, this has to happen here because:
-        # dealer could be the one left
-
-        for player in self.table.players:
-            print(f'player {player.name} has {player.chips.amount} chips')
-            player.hand = []
-            player.total_bet_game = 0
-            player.folded = False
-            player.all_in = False
-            if player.chips.amount == 0:
-                self.table.players.remove(player)
-                self.logger.debug(f"{player.name} has no chips left and leaves the table crying")
-        # Create a new list that only includes the players you want to keep
-        self.table.players_game = self.table.players
-        self.table.community_cards = []
-        self.table.pots = []
-        # self.table.players = [player for player in self.table.players if player.chips.amount > 0]
-        if len(self.table.players) == 1:
-            print(f'THE WINNER IS {self.table.players[0].name}')
-            return None
-        # move dealer button --> needs to be refactored
-        else:
-            self.table.dealer = self.get_next_player(self.table.dealer)
-
-    def is_royal_or_straight_flush(self, sorted_hand):
-        # print(f"3. {id(sorted_hand)} {sorted_hand}")
-        self.logger.debug("Checking for Royal and/or Straight Flush...")
-        for the_suit in ['♠','♥','♦','♣']:
-            # omdat als ie nou een niet suited eentje naar beneden gaat? Dat sluit nu nog niks uit...
-            suited_list = []
-            for hand in sorted_hand:
-                if hand.suit == the_suit:
-                    suited_list.append(hand)
-            # print(f'suited list {suited_list}')
-            straight_suited_counter = 0
-            if len(suited_list) != 0:
-                if suited_list[0].rank == 'A':
-                    # self.logger.debug(f'Found an ace')
-                    # USE + instead of .append as this doesn't mutate the original list.
-                    suited_list + [Card(rank='1', suit=the_suit)]
-            # self.logger.debug(f'New list: {suited_list}')
-            for i in range(len(suited_list)-1):
-                if self.card_rank_value(suited_list[i].rank) == self.card_rank_value(suited_list[i+1].rank) + 1:
-                    print(f'******* {self.card_rank_value(suited_list[i].rank)} = {self.card_rank_value(suited_list[i+1].rank) + 1}')
-                    straight_suited_counter += 1
-                    if straight_suited_counter == 4:
-                        self.logger.debug(f"Straight Flush was Found with suit {the_suit}!!")
-                        handscore = [8, suited_list[i - 3].rank, None, None, None, None]
-                        if sorted_hand[i].rank == 'A':
-                            self.logger.debug('... a Royal one!!!')
-                        return handscore
-                elif self.card_rank_value(suited_list[i].rank) - self.card_rank_value(suited_list[i+1].rank) > 2:
-                    # print("too big of a gap")
-                    straight_suited_counter = 0 
-                    
-            self.logger.debug("No straight flush was Found.")
-            return False           
-
-    def is_four_of_a_kind(self, sorted_hand):
-        self.logger.debug("Checking for Four of a Kind...")
-        for i in range(len(sorted_hand) - 3):
-            if sorted_hand[i].rank == sorted_hand[i + 1].rank == sorted_hand[i + 2].rank == sorted_hand[i + 3].rank:
-                self.logger.debug("Four of a Kind found!")
-                quads_rank = sorted_hand[i].rank
-                # it is OK to change this list as we are sure that it is four of a kind at this point
-                sorted_hand.remove(sorted_hand[i])
-                sorted_hand.remove(sorted_hand[i])
-                sorted_hand.remove(sorted_hand[i])
-                sorted_hand.remove(sorted_hand[i])
-                self.logger.debug(f"rest is now {sorted_hand}")
-                return [7, quads_rank, sorted_hand[0].rank, None, None, None]
-        self.logger.debug("No Four of a Kind.")
-        return False
-
-
-    def is_full_house(self, sorted_hand):
-        self.logger.debug("Checking for Full House...")
-        first_handscore = self.is_three_of_a_kind(sorted_hand)
-        if first_handscore != False:
-            self.logger.debug("Checking for another Pair...")
-            for i in range(len(sorted_hand) - 1):
-                if sorted_hand[i].rank == sorted_hand[i + 1].rank and sorted_hand[i].rank != first_handscore[1]:
-                    self.logger.debug("Found a full house!")
-                    return [6, first_handscore[1], sorted_hand[i].rank, None, None, None]
-        self.logger.debug(f"No Full House")
-        return False
-
-
-    def is_flush(self, sorted_hand):
-        self.logger.debug("Checking for Flush...")
-        handscore = [5]
-        for suit in ['♠','♥','♦','♣']:
-            for card in sorted_hand:
-                if card.suit == suit:
-                    handscore.append(card.rank)
-                    if len(handscore) == 6:
-                        self.logger.debug("Flush was Found!")
-                        return handscore
-            handscore = [5]
-        return False
-
-
-    def is_straight(self, sorted_hand):
-        self.logger.debug("Checking for Straight...")
-        
-        # as there are nog 8 cards with the extra Ace possibility, needs different solving for straight flush
-        straight_counter = 0
-        if sorted_hand[0].rank == 'A':
-            # self.logger.debug(f'Found an ace')
-            ace_suit = sorted_hand[0].suit
-            # self.logger.debug(f'old list: {sorted_hand}')
-            sorted_hand.append(Card(rank='1', suit=ace_suit))
-            # self.logger.debug(f'New list: {sorted_hand}')
-        for i in range(len(sorted_hand)-1):
-            # just an extra card for each ace
-            # print("----", self.card_rank_value(sorted_hand[i].rank))
-            if self.card_rank_value(sorted_hand[i].rank) == self.card_rank_value(sorted_hand[i+1].rank) + 1:
-                # print("==", self.card_rank_value(sorted_hand[i+1].rank) + 1, straight_counter)
-                straight_counter += 1
-                if straight_counter == 4:
-                    self.logger.debug("Straight was Found!")
-                    handscore = [4, sorted_hand[i-3].rank, None, None, None, None]
-                    return handscore
-
-            else: #self.card_rank_value(sorted_hand[i].rank) - self.card_rank_value(sorted_hand[i+1].rank) > 2:
-                # print(f'{self.card_rank_value(sorted_hand[i+1].rank)} too big')
-                straight_counter = 0
-
-        self.logger.debug("No straight found!")
-        return False
-
-    def is_three_of_a_kind(self, sorted_hand):
-        # print(f"-------------{sorted_hand}")
-        self.logger.debug("Checking for Three of a Kind...")
-        for i in range(len(sorted_hand) - 2):
-            if sorted_hand[i].rank == sorted_hand[i + 1].rank == sorted_hand[i + 2].rank:
-                self.logger.debug("Three of a Kind found!")
-                trips_rank = sorted_hand[i].rank
-                # we need to make sure this is mutable as this gets called by is_full_house
-                sorted_hand = sorted_hand.copy()
-                sorted_hand.remove(sorted_hand[i])
-                sorted_hand.remove(sorted_hand[i])
-                sorted_hand.remove(sorted_hand[i])
-                self.logger.debug(f"rest is now {sorted_hand}")
-                return [3, trips_rank, sorted_hand[0].rank, sorted_hand[1].rank, None, None]
-        self.logger.debug("No Three of a Kind.")
-        return False
-
-    def is_two_pair(self, sorted_hand):
-        # we need to make sure this is mutable as this gets called by is_full_house
-        sorted_hand = sorted_hand.copy()
-        self.logger.debug("Checking for Two Pair...")
-        pairs = 0
-        for i in range(len(sorted_hand) - 3):
-            if sorted_hand[i].rank == sorted_hand[i + 1].rank and pairs == 0:
-                self.logger.debug("First pair found...")
-
-                # remove the two cards to easily access the kickers                
-                first_pair_rank = sorted_hand[i].rank
-                sorted_hand.remove(sorted_hand[i])
-                sorted_hand.remove(sorted_hand[i])
-                self.logger.debug(f"rest is now {sorted_hand}")
-
-                pairs += 1
-            if sorted_hand[i].rank == sorted_hand[i + 1].rank and pairs == 1:
-                self.logger.debug("Two pair found!")
-                second_pair_rank = sorted_hand[i].rank
-                sorted_hand.remove(sorted_hand[i])
-                sorted_hand.remove(sorted_hand[i])
-                # self.logger.debug(f"rest is now {sorted_hand}")
-                handscore = [2, first_pair_rank, second_pair_rank, sorted_hand[0].rank, None, None]
-                return handscore
-            # fill the rest with first, second and third kicker
-        self.logger.debug(f"No two Pair!")
-        return False
-    
-    def is_one_pair(self, sorted_hand):
-        self.logger.debug("Checking for One Pair...")
-        for i in range(len(sorted_hand) - 1):
-            if sorted_hand[i].rank == sorted_hand[i + 1].rank:
-                self.logger.debug("One Pair found!")
-
-                # remove the two cards to easily access the kickers
-                pair_rank = sorted_hand[i].rank
-                sorted_hand.remove(sorted_hand[i])
-                sorted_hand.remove(sorted_hand[i])
-                # self.logger.debug(f"7-2={sorted_hand}")
-                
-                # fill the rest with first, second and third kicker
-                handscore = [1, pair_rank, sorted_hand[0].rank, sorted_hand[1].rank, sorted_hand[2].rank, None]
-                self.logger.debug(f"Handscore = {handscore}")
-                return handscore
-        self.logger.debug("No One Pair.")
-        return False
-
-    def display_table(self):
-        for player in self.table.players:
-            print(f"{player.name}'s hand: {player.show_hand()}")
-
-        print(f"Community cards: {', '.join(map(str, self.table.community_cards))}")
-
-    def evaluate_hand(self, all_cards):
-        sorted_hand = sorted(all_cards, key=lambda card: self.card_rank_value(card.rank), reverse=True)
-        self.logger.debug(f"...Checking for different hand Ranks.. for {sorted_hand}")
-        # hier wordt een kopietje gemaakt omdat ie anders de orginele list pakt
-        # print(f"1.        {id(sorted_hand)} {sorted_hand}")
-        sorted_hand = sorted_hand.copy()
-        # print(f"2.        {id(sorted_hand)} {sorted_hand}")
-        hand_rank = self.is_royal_or_straight_flush(sorted_hand)
-        # print(f"4.        {id(sorted_hand)} {sorted_hand}")
-        if hand_rank == False:
-            hand_rank = self.is_four_of_a_kind(sorted_hand)
-        # print(f"5.        {id(sorted_hand)} {sorted_hand}")
-        if hand_rank == False:
-            hand_rank = self.is_full_house(sorted_hand)
-        if hand_rank == False:
-            hand_rank = self.is_flush(sorted_hand)
-        if hand_rank == False:
-            hand_rank = self.is_straight(sorted_hand)
-        if hand_rank == False:
-            hand_rank = self.is_three_of_a_kind(sorted_hand)
-        if hand_rank == False:
-            hand_rank = self.is_two_pair(sorted_hand)
-        if hand_rank == False:
-            hand_rank = self.is_one_pair(sorted_hand)
-        if hand_rank == False:
-            self.logger.debug("Return high card...")
-            hand_rank = [0, sorted_hand[0].rank, sorted_hand[1].rank, sorted_hand[2].rank, sorted_hand[3].rank, sorted_hand[4].rank]
-        # print(f"9.        {id(sorted_hand)} {sorted_hand}")
-        return hand_rank
-
-
-    def get_hand_rank(self, player):
-        # print('self.table.community_cards: ', self.table.community_cards)
-        # print('player.hand: ', player.hand)
-        self.logger.debug(f"...Checking for different hand Ranks for {player.name }")
-
-        for card in self.table.community_cards:
-            self.logger.debug(f"On the table lies {card.rank} of {card.suit}.")
-        for card in player.hand:
-            self.logger.debug(f"   {player.name} has a {card.rank} of {card.suit}.")
-        all_cards = player.hand + [Card(card[0], card[1]) for card in self.table.community_cards]
-        hand_rank = self.evaluate_hand(all_cards)
-        self.logger.debug(f"The best hand is {hand_rank}")
-        return hand_rank
