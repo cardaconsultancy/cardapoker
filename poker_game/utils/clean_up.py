@@ -27,7 +27,7 @@ def clean_up(table):
         next_index = (next_index + 1) % num_players
     
     for player in table.players:
-        print(f'player {player.name} has {player.chips.amount} chips')
+        
         player.hand = []
         player.total_bet_game = 0
         player.total_bet_betting_round = 0
@@ -42,6 +42,6 @@ def clean_up(table):
     table.pots = []
     # table.players = [player for player in table.players if player.chips.amount > 0]
     if len(table.players) == 1:
-        print(f'THE WINNER IS {table.players[0].name}')
+        
         return None
     # move dealer button --> needs to be refactored

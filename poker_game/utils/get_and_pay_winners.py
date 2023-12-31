@@ -28,14 +28,12 @@ def determine_winners(pot_players, table):
         logger.debug(f"1. Metric nr {metric}")
         # get the max metric in hand rank
         metric_list = []
-        # print('-----------', metric_list)
         for player in winner_list:
             logger.debug(f"  2a. Player {player.name} with {player.best_hand}")
             if metric == 0:
                 metric_list.append(player.best_hand[metric])
             else:
                 metric_list.append(card_rank_value(player.best_hand[metric]))
-            # print('-----------', metric_list)
         max_metric = max(metric_list)
         mask = []
         for metric in metric_list:

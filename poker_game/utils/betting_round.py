@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 def betting_round(table, preflop_round = False):
-    print()
+    
     logger.debug(f"The dealer is {table.dealer.name}.")
 
     logger.debug(f" ------------- Start betting round ------------- ")
@@ -24,13 +24,13 @@ def betting_round(table, preflop_round = False):
         BB_can_have_another_go = True
         first_bet = False
 
-    for pl in table.players_game:
-        print('check: ', pl.name)
+    # for pl in table.players_game:
+        
 
     counter = 0
     while player != last_raiser and counter <10:
-        for pl in table.players_game:
-            print('check: ', pl.name)
+        # for pl in table.players_game:
+            
         if first_bet == True and preflop_round == False:
             last_raiser = player
             logger.debug(f"this is the first round and so {last_raiser.name} is the last raiser")
@@ -73,12 +73,12 @@ def betting_round(table, preflop_round = False):
             logger.debug(f"The last raiser is now {player.name} with {player.total_bet_betting_round}")
 
             preflop_round = False
-            print('1. checking??', player.name)
+            
             player = get_next_player(player, table)
-            print('2. checking??', player.name)
+            
 
-        for pl in table.players_game:
-            print('check: ', pl.name)
+        # for pl in table.players_game:
+            
         logger.debug(f"{player.name} is up.")
         # bet_sizes = [player.total_bet_betting_round for player in table.players_game]
         # logger.debug(f'bet sizes {bet_sizes}')
@@ -99,17 +99,17 @@ def betting_round(table, preflop_round = False):
 
                 logger.debug(f"-------- {player.name} has to match {max_bet} from last raiser {last_raiser.name}")
                 
-                for gambler in table.players_game:
-                    print(gambler.name, gambler.total_bet_betting_round)
+                # for gambler in table.players_game:
+                    
 
                 # ugly but this prevents the users from making mistakes (or cheating) by this functionality in their standard function.
                 ################## user call #####################
                 player_bet = player.response(max_bet, player.hand, table.community_cards)
-                # print(f'the player bet is {player_bet}')
+                # 
                 ##################################################
 
-                for gambler in table.players_game:
-                    print(gambler.name, gambler.total_bet_betting_round)
+                # for gambler in table.players_game:
+                    
 
                 logger.debug(f"total bet was {player.total_bet_betting_round}")
                 # new_bet = player.total_bet_betting_round + player_bet
@@ -142,7 +142,7 @@ def betting_round(table, preflop_round = False):
 
                 # Checking
                 elif player.total_bet_betting_round + player_bet == max_bet and player_bet == 0:
-                    # print(player.name, player.chips.amount, '????????????????????????')
+                    # 
                     # player.chips.lose(player.total_bet_betting_round)
                     # player.total_bet_betting_round += player_bet
                     # player.total_in_pot_this_game += player.total_bet_betting_round
@@ -152,8 +152,8 @@ def betting_round(table, preflop_round = False):
                 # Calling
                 elif player.total_bet_betting_round + player_bet == max_bet:
                     player.chips.lose(player_bet)
-                    print(player_bet)
-                    print(player.total_bet_betting_round)
+                    
+                    
                     player.total_in_pots_this_game += player_bet
                     player.total_bet_betting_round += player_bet
                     player.raised_called_or_checked_this_round = True
@@ -191,15 +191,15 @@ def betting_round(table, preflop_round = False):
         # The player who has the small blind makes the first bet in poker, which is why we can get the next one directly
         player = get_next_player(player, table)
 
-        if player == last_raiser:
-            print("IT SHOULD END HERE")
+        # if player == last_raiser:
+            
 
-    for player in table.players_game:
-        print('1', player.total_bet_betting_round, player.chips.amount)           
+    # for player in table.players_game:
+                   
 
-    for player in table.players_game:
-        print(player.name)
-        print(player.folded, player.raised_called_or_checked_this_round, player.all_in)
+    # for player in table.players_game:
+        
+        
 
     # all players are either all in or folded or have called/checked/raised
     logger.debug(f"Betting round over")

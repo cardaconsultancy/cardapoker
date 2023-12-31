@@ -9,7 +9,6 @@ def card_rank_value(rank):
     return '123456789TJQKA'.index(rank) + 1
 
 def is_royal_or_straight_flush(sorted_hand):
-    # print(f"3. {id(sorted_hand)} {sorted_hand}")
     logger.debug("Checking for Royal and/or Straight Flush...")
     for the_suit in ['♠','♥','♦','♣']:
         # omdat als ie nou een niet suited eentje naar beneden gaat? Dat sluit nu nog niks uit...
@@ -17,7 +16,7 @@ def is_royal_or_straight_flush(sorted_hand):
         for hand in sorted_hand:
             if hand.suit == the_suit:
                 suited_list.append(hand)
-        # print(f'suited list {suited_list}')
+        # 
         straight_suited_counter = 0
         if len(suited_list) != 0:
             if suited_list[0].rank == 'A':
@@ -27,7 +26,6 @@ def is_royal_or_straight_flush(sorted_hand):
         # logger.debug(f'New list: {suited_list}')
         for i in range(len(suited_list)-1):
             if card_rank_value(suited_list[i].rank) == card_rank_value(suited_list[i+1].rank) + 1:
-                print(f'******* {card_rank_value(suited_list[i].rank)} = {card_rank_value(suited_list[i+1].rank) + 1}')
                 straight_suited_counter += 1
                 if straight_suited_counter == 4:
                     logger.debug(f"Straight Flush was Found with suit {the_suit}!!")
@@ -36,7 +34,7 @@ def is_royal_or_straight_flush(sorted_hand):
                         logger.debug('... a Royal one!!!')
                     return handscore
             elif card_rank_value(suited_list[i].rank) - card_rank_value(suited_list[i+1].rank) > 2:
-                # print("too big of a gap")
+                # 
                 straight_suited_counter = 0 
                 
         logger.debug("No straight flush was Found.")
@@ -99,9 +97,9 @@ def is_straight(sorted_hand):
         # logger.debug(f'New list: {sorted_hand}')
     for i in range(len(sorted_hand)-1):
         # just an extra card for each ace
-        # print("----", card_rank_value(sorted_hand[i].rank))
+        # )
         if card_rank_value(sorted_hand[i].rank) == card_rank_value(sorted_hand[i+1].rank) + 1:
-            # print("==", card_rank_value(sorted_hand[i+1].rank) + 1, straight_counter)
+            #  + 1, straight_counter)
             straight_counter += 1
             if straight_counter == 4:
                 logger.debug("Straight was Found!")
@@ -109,14 +107,14 @@ def is_straight(sorted_hand):
                 return handscore
 
         else: #card_rank_value(sorted_hand[i].rank) - card_rank_value(sorted_hand[i+1].rank) > 2:
-            # print(f'{card_rank_value(sorted_hand[i+1].rank)} too big')
+            # } too big')
             straight_counter = 0
 
     logger.debug("No straight found!")
     return False
 
 def is_three_of_a_kind(sorted_hand):
-    # print(f"-------------{sorted_hand}")
+    # 
     logger.debug("Checking for Three of a Kind...")
     for i in range(len(sorted_hand) - 2):
         if sorted_hand[i].rank == sorted_hand[i + 1].rank == sorted_hand[i + 2].rank:
@@ -179,24 +177,14 @@ def is_one_pair(sorted_hand):
     logger.debug("No One Pair.")
     return False
 
-def display_table(table):
-    for player in table.players:
-        print(f"{player.name}'s hand: {player.show_hand()}")
-
-    print(f"Community cards: {', '.join(map(str, table.community_cards))}")
-
 def evaluate_hand(all_cards):
     sorted_hand = sorted(all_cards, key=lambda card: card_rank_value(card.rank), reverse=True)
     logger.debug(f"...Checking for different hand Ranks.. for {sorted_hand}")
-    # hier wordt een kopietje gemaakt omdat ie anders de orginele list pakt
-    # print(f"1.        {id(sorted_hand)} {sorted_hand}")
+
     sorted_hand = sorted_hand.copy()
-    # print(f"2.        {id(sorted_hand)} {sorted_hand}")
     hand_rank = is_royal_or_straight_flush(sorted_hand)
-    # print(f"4.        {id(sorted_hand)} {sorted_hand}")
     if hand_rank == False:
         hand_rank = is_four_of_a_kind(sorted_hand)
-    # print(f"5.        {id(sorted_hand)} {sorted_hand}")
     if hand_rank == False:
         hand_rank = is_full_house(sorted_hand)
     if hand_rank == False:
@@ -212,13 +200,10 @@ def evaluate_hand(all_cards):
     if hand_rank == False:
         logger.debug("Return high card...")
         hand_rank = [0, sorted_hand[0].rank, sorted_hand[1].rank, sorted_hand[2].rank, sorted_hand[3].rank, sorted_hand[4].rank]
-    # print(f"9.        {id(sorted_hand)} {sorted_hand}")
     return hand_rank
 
 
 def get_hand_rank(player, table):
-    # print('table.community_cards: ', table.community_cards)
-    # print('player.hand: ', player.hand)
     logger.debug(f"...Checking for different hand Ranks for {player.name }")
 
     for card in table.community_cards:
