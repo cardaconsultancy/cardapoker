@@ -1,36 +1,12 @@
-import logging
-
 from poker_game.utils.next_player import get_next_player
 from poker_game.utils.pot_management import create_pots
+import logging
 
 logger = logging.getLogger(__name__)
 
 def betting_round(table, preflop_round = False):
     print()
     logger.debug(f"The dealer is {table.dealer.name}.")
-    # print()
-    # required_action = 0
-
-    # if first == True:
-    #     # table.players_game[0].bet(table.blind_size)
-    #     table.players_game[table.dealer+1].total_bet_betting_round += table.blind_size
-    #     logger.debug(f"Player {table.players_game[table.dealer+1].name} has the small blind of {table.players_game[table.dealer+1].total_bet_betting_round}")
-    #     logger.debug(f"Player {table.players_game[table.dealer+1].name} has the small blind of {table.players_game[table.dealer+1].total_bet_betting_round}")
-    #     table.players_game[table.dealer+1].chips.lose(table.blind_size)
-    #     table.players_game[table.dealer+1].total_bet_betting_round = (table.blind_size)
-    #     table.players_game[table.dealer+1].total_in_pots_this_game = (table.blind_size)
-
-    #     # table.players_game[1].bet(table.blind_size*2)
-    #     table.players_game[table.dealer+2].total_bet_betting_round += table.blind_size*2
-    #     logger.debug(f"Player {table.players_game[table.dealer+2].name} has the big blind of {table.players_game[table.dealer+2].total_bet_betting_round}")
-    #     table.players_game[table.dealer+2].chips.lose(table.blind_size*2)
-    #     table.players_game[table.dealer+2].total_bet_betting_round = (table.blind_size*2)
-    #     table.players_game[table.dealer+2].total_in_pots_this_game = (table.blind_size*2)
-    #     required_action = -2
-    # else:
-    #     full_round_player = table.players_game[table.dealer]
-    #     logger.debug(f"The game ends when {full_round_player.name} is about to get his turn again")
-
 
     logger.debug(f" ------------- Start betting round ------------- ")
     # max 100 
@@ -64,29 +40,6 @@ def betting_round(table, preflop_round = False):
         counter += 1
         
         logger.debug(f"{player.name} is up and currently has {player.total_bet_betting_round} in the betting round pot")
-        # logger.debug(f'required_action {required_action}')
-
-        # check if player has the big or small blind
-        # for player in table.players_game:
-        #     logger.debug(f"{player.name} is up and currently has {player.total_bet_betting_round} in the betting round pot")
-        #     logger.debug(f'required_action {required_action}')
-        #     for playerprint in table.players_game:
-        #         print('-------', playerprint.total_bet_betting_round)
-
-        # if required_action == -2:
-        #     logger.debug(f'skipping {player.name} as he/she has the small blind')
-        #     required_action += 1
-        #     continue
-        # if required_action == -1:
-        #     logger.debug(f'skipping {player.name} as he/she has the big blind')
-        #     required_action += 1
-        #     full_round_player = table.players_game[0]
-        #     last_raiser = player 
-        #     continue
-
-        # This takes care of the exception: this is the player on which the bet has to end in the first round, regardless of what he/she does
-        # if no one else raises, this is where it ends.
-        # last_raiser = player
 
         if preflop_round == True:
             player.total_bet_betting_round += table.blind_size
@@ -240,32 +193,6 @@ def betting_round(table, preflop_round = False):
 
         if player == last_raiser:
             print("IT SHOULD END HERE")
-
-            # sugg
-            # playernr = 0
-            # while not all_are_done:
-            #     player = playerlist[playernr]
-            #     if not folded or all in:
-            #         # works in two man heads up
-            #         if not last_raiser:
-            #             do action
-            #             if raise:
-            #                 update last_raiser = player
-            #         else:
-            #             all_are_done = True
-            #     playernr += 1
-            #     
-            # 
-            
-            # this is incorrect, someone could check and then someone raises
-            # rather than making a complex average, just check whether someone has raised (a seperate attribute) and the rest hasn't folded
-            # if so continue
-
-        # all_are_done = all(player.folded == True or player.raised_called_or_checked_this_round == True or player.all_in == True for player in table.players_game)
-
-        # bet_sizes = [player.total_bet_betting_round for player in table.players_game]
-        # avg_bet = sum(bet_sizes) / len(table.players_game)
-        # max_bet = max(bet_sizes)
 
     for player in table.players_game:
         print('1', player.total_bet_betting_round, player.chips.amount)           
