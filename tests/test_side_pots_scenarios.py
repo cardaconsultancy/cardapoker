@@ -1,8 +1,9 @@
 import unittest
-from utils.players import Player, ActualPlayerTemplate, create_player
-from utils.table import Table
-from utils.objects_on_table import Deck, Chips, Card, Pot
-from utils.game import TexasHoldemGame
+from poker_game.utils.players import Player, ActualPlayerTemplate, create_player
+from poker_game.utils.table import Table
+from poker_game.utils.objects_on_table import Deck, Chips, Card, Pot
+from poker_game.utils.game import TexasHoldemGame
+from poker_game.utils.pot_management import check_for_side_pots
 
 import unittest
 
@@ -99,7 +100,7 @@ class TestTexasHoldemGame(unittest.TestCase):
                 table.add_player(player3)
 
                 game = TexasHoldemGame(table, deck)
-                game.check_for_side_pots()
+                check_for_side_pots(table)
 
                 # check if all bets are reduced to zero in the end
                 self.assertEqual(sum([player.total_bet_betting_round for player in pot.players]), 0)

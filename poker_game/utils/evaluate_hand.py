@@ -1,4 +1,4 @@
-from utils.objects_on_table import Card
+from .objects_on_table import Card
 import logging
 logger = logging.getLogger(__name__)
 

@@ -1,8 +1,8 @@
 import unittest
-from utils.players import Player
-from utils.table import Table
-from utils.objects_on_table import Deck, Chips, Pot, Card
-from utils.game import TexasHoldemGame
+from poker_game.utils.players import Player
+from poker_game.utils.table import Table
+from poker_game.utils.objects_on_table import Deck, Chips, Pot, Card
+from poker_game.utils.game import TexasHoldemGame
 
 class TestTexasHoldemGame(unittest.TestCase):
 

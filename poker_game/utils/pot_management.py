@@ -1,5 +1,5 @@
-from utils.objects_on_table import Pot
-from utils.clean_up import clean_up
+from .objects_on_table import Pot
+from .clean_up import clean_up
 import logging
 
 logger = logging.getLogger(__name__)
@@ -102,7 +102,7 @@ def check_for_side_pots(table):
                 if player.all_in == True:
                     logger.debug(f"player {player.name} went all in, side pot is needed")
                     # fill up original pot & create side pot
-                    fill_current_pot(player)
+                    fill_current_pot(player, table)
                     side_pot = Pot()
 
                     # do this in the fill current pot
@@ -121,7 +121,7 @@ def check_for_side_pots(table):
         if sidepot_created == False:
             logger.debug(f"No (more) sidepots created")
             # just get a person that did not fold, as there are no sidepots his/her bet will be the same as the others.
-            fill_current_pot(not_folded[0])
+            fill_current_pot(not_folded[0], table)
             for pot in table.pots:
                 print(f'---------- pot {pot} is {pot.amount}')
             return None

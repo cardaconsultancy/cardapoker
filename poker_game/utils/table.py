@@ -1,6 +1,6 @@
 import logging
 from collections import deque
-from utils.players import Player
+from .players import Player
 
 class Table:
     def __init__(self):
@@ -11,7 +11,7 @@ class Table:
         self.players_game = deque()
         # self.seats = {}
         self.blind_size = 1
-        self.dealer = 0
+        self.dealer = None # Initially, there is no dealer
         self.small_blind_seat = 1
         self.big_blind_seat = 2
 
@@ -23,6 +23,15 @@ class Table:
     def add_player(self, player):
         self.players.append(player)
         self.players_game.append(player)
+        # If this is the first player added, set them as the dealer
+        if len(self.players) == 1:
+            self.set_dealer(0)
+    
+    def set_dealer(self, index):
+        if 0 <= index < len(self.players):
+            self.dealer = self.players[index]
+        else:
+            self.logger.error("Invalid index for dealer")
         # for chair in self.seats:
         #     if self.seats[chair] == None:
         #         self.seats[chair] = player

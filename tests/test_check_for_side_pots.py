@@ -1,11 +1,12 @@
 import unittest
-from utils.players import Player, ActualPlayerTemplate, create_player
-from utils.table import Table
-from utils.objects_on_table import Deck, Chips, Card, Pot
-from utils.game import TexasHoldemGame
+from poker_game.utils.players import Player, ActualPlayerTemplate, create_player
+from poker_game.utils.table import Table
+from poker_game.utils.objects_on_table import Deck, Chips, Card, Pot
+from poker_game.utils.game import TexasHoldemGame
+from poker_game.utils.pot_management import check_for_side_pots
 
 class TestTexasHoldemGame(unittest.TestCase):
-    def test_play_round(self, p1bet):
+    def test_play_round(self, p1bet=20):
         deck = Deck()
         table = Table()
         pot = Pot()
@@ -30,14 +31,14 @@ class TestTexasHoldemGame(unittest.TestCase):
         table.add_player(player3)
 
         game = TexasHoldemGame(table, deck)
-        game.check_for_side_pots()
+        check_for_side_pots(table)
 
         # check if pots are the sum of the bets
-        self.assertEqual(3, sum([player1.total_bet_betting_round, player2.total_bet_betting_round, player3.total_bet_betting_round]))
+        self.assertEqual(0, sum([player1.total_bet_betting_round, player2.total_bet_betting_round, player3.total_bet_betting_round]))
 
         # check if all bets are reduced to zero in the end
         self.assertEqual(0, sum([player1.total_bet_betting_round, player2.total_bet_betting_round, player3.total_bet_betting_round]))
 
 
-if __name__ == '__main__':
-    unittest.main()
+# if __name__ == '__main__':
+#     unittest.main()

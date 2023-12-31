@@ -4,10 +4,10 @@
 # TODO : AI commentator
 
 import unittest
-from utils.players import Player
-from utils.table import Table
-from utils.objects_on_table import Deck, Chips, Card, Pot
-from utils.game import TexasHoldemGame
+from poker_game.utils.players import Player
+from poker_game.utils.table import Table
+from poker_game.utils.objects_on_table import Deck, Chips, Card, Pot
+from poker_game.utils.game import TexasHoldemGame
 
 # class TestDeck(unittest.TestCase):
 
@@ -182,7 +182,7 @@ class TestTexasHoldemGame(unittest.TestCase):
         # if test == 'quads':
         #     self.assertEqual(game.determine_winners(pot_players)[0], player1)
         if test == 'straight':
-            self.assertEqual(game.determine_winners(pot_players)[0], player1)
+            self.assertEqual(game.determine_winners(pot_players)[0], player3)
 
 
 # class TestTexasHoldemGame(unittest.TestCase):

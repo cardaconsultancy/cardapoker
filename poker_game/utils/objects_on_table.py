@@ -44,10 +44,16 @@ class Deck:
     ranks = '23456789TJQKA'
     suits = '♠♥♦♣'
 
-    def __init__(self):
-        """Initialize a deck of cards and shuffle it."""
+    def __init__(self, seed=None):
+        """Initialize a deck of cards and shuffle it.
+
+        Args:
+            seed (int, optional): Seed for random number generator. Defaults to None.
+        """
         self.logger = logging.getLogger(__name__)
         self.cards = [Card(rank, suit) for suit in self.suits for rank in self.ranks]
+
+        random.seed(seed)  # Set the random seed
         random.shuffle(self.cards)
         self.dealt_cards = collections.deque()
         logging.basicConfig(level=logging.DEBUG)

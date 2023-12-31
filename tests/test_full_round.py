@@ -1,12 +1,12 @@
 import unittest
-from utils.players import Player, ActualPlayerTemplate, create_player
-from utils.table import Table
-from utils.objects_on_table import Deck, Chips, Card, Pot
-from utils.game import TexasHoldemGame
+from poker_game.utils.players import create_player
+from poker_game.utils.table import Table
+from poker_game.utils.objects_on_table import Deck, Chips, Card, Pot
+from poker_game.utils.game import TexasHoldemGame
 
 class TestTexasHoldemGame(unittest.TestCase):
     def test_play_round(self):
-        deck = Deck()
+        deck = Deck(seed=1)
         table = Table()
         game = TexasHoldemGame(table, deck)
 
