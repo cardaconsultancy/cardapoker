@@ -21,9 +21,6 @@ class TestTexasHoldemGame(unittest.TestCase):
             player1 = Player("Klaas", Chips(0))
             player2 = Player("Jan", Chips(0))
             player3 = Player("Piet", Chips(0))
-            player1.total_bet_game = 100 # all-in
-            player2.total_bet_game = 100 # all-in
-            player3.total_bet_game = 100 # all-in
 
         test_hands = 'p1 and p2 winner, p3 loser'
 

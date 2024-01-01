@@ -1,3 +1,4 @@
+from poker_game.utils.at_most_one_not_all_in_or_folded import check_at_most_one_not_all_in_or_folded
 from poker_game.utils.betting_round import betting_round
 from poker_game.utils.clean_up import clean_up
 from poker_game.utils.get_and_pay_winners import pay_winners
@@ -14,8 +15,8 @@ def start_round(table, seed=None):
     # Reset community cards at the beginning of each round
     table.community_cards = []
 
-    # move the dealer button
-    logger.debug(f"the dealer is {table.dealer}.")
+    # print the dealer button
+    logger.debug(f"the dealer is {table.dealer.name}.")
 
     # copy the player list to easily keep track of players
     # create a temporary deque to easily rotate 
@@ -47,7 +48,7 @@ def start_round(table, seed=None):
         logger.debug(f"On the table comes {card.rank} of {card.suit}.")
 
     # Betting Round 2: flop
-    if all(player.all_in or player.folded for player in table.players_game):
+    if check_at_most_one_not_all_in_or_folded:
         print('Everybody is all in, no more bets!')
     
     else:
@@ -63,7 +64,7 @@ def start_round(table, seed=None):
     logger.debug(f"On the table comes {table.community_cards[3].rank} of {table.community_cards[3].suit}.") 
 
     # Betting Round 3
-    if all(player.all_in or player.folded for player in table.players_game):
+    if check_at_most_one_not_all_in_or_folded:
         print('Everybody is all in, no more bets!')
     
     else:
@@ -79,7 +80,7 @@ def start_round(table, seed=None):
     logger.debug(f"On the table comes {table.community_cards[4].rank} of {table.community_cards[4].suit}.") 
 
     # Betting Round 4
-    if all(player.all_in or player.folded for player in table.players_game):
+    if check_at_most_one_not_all_in_or_folded:
         print('Everybody is all in, no more bets!')
     
     else:
@@ -97,4 +98,4 @@ def start_round(table, seed=None):
     # Clean up
     clean_up(table)
 
-    return True
+    return table

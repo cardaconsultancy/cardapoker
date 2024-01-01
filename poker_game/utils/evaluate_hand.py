@@ -172,7 +172,7 @@ def is_one_pair(sorted_hand):
             
             # fill the rest with first, second and third kicker
             handscore = [1, pair_rank, sorted_hand[0].rank, sorted_hand[1].rank, sorted_hand[2].rank, None]
-            logger.debug(f"Handscore = {handscore}")
+            # logger.debug(f"Handscore = {handscore}")
             return handscore
     logger.debug("No One Pair.")
     return False
@@ -212,5 +212,5 @@ def get_hand_rank(player, table):
         logger.debug(f"   {player.name} has a {card.rank} of {card.suit}.")
     all_cards = player.hand + [Card(card[0], card[1]) for card in table.community_cards]
     hand_rank = evaluate_hand(all_cards)
-    logger.debug(f"The best hand is {hand_rank}")
+    # logger.debug(f"The best hand is {hand_rank}")
     return hand_rank

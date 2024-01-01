@@ -6,13 +6,15 @@ logger = logging.getLogger(__name__)
 
 def create_pots(table):
     logger.debug(f"Start to create pot(s)")
+
+    # if there are no pots, create one.
     if len(table.pots) == 0:
         main_pot = Pot()
-        main_pot.players = table.players_game
+        main_pot.players = [player for player in table.players_game if player.folded == False]
         table.pots.append(main_pot)
         logger.debug(f"No pot yet, so created {len(table.pots)} main pot")
     check_for_side_pots(table)
-    required_action = 100
+
 
     # reset the bets and raise/check/call status
     for player in table.players_game:
@@ -22,14 +24,15 @@ def create_pots(table):
         logger.debug(f"Reset total bets {player.name} to {player.total_bet_betting_round}")
 
 def check_if_rest_folded_and_pay(table):
-    at_least_two_not_folded = []
+    at_least_two_not_folded_or_out = []
     for player in table.players_game:
         if player.folded == False:
-            at_least_two_not_folded.append(player)
-    if len(at_least_two_not_folded) < 2:
-        # skipp_all
+            at_least_two_not_folded_or_out.append(player)
+    if len(at_least_two_not_folded_or_out) < 2:
+        create_pots(table)
+        # skip all
         for pot in table.pots:
-            at_least_two_not_folded[0].chips.win(pot.amount)
+            at_least_two_not_folded_or_out[0].chips.win(pot.amount)
         clean_up()
         return 1
 
@@ -38,35 +41,37 @@ def check_for_side_pots(table):
 
     logger.debug(f"checking for side pots")
 
-    # get the minimum bet fromt he people that did not fold:
-    not_folded = []
-    for player in table.players_game:
-        # get all the minimum bet
-        if player.folded == False:
-            not_folded.append(player)
+
     # check_for_side_pots = True
     sidepot_created = False
     counter = 1
     while any(player.total_bet_betting_round != 0 for player in table.players):
-        
-        # get the lowest bet in folded, need to check for 0 also as we reduce the total_betting_round
-        lowest_bet = min([player.total_bet_betting_round for player in not_folded if player.total_bet_betting_round != 0])
+
+        # get the minimum bet fromt he people that did not fold:
+        not_folded_or_out = []
+        for player in table.players_game:
+            # get all the minimum bet, need to check for 0 also as we reduce the total_betting_round
+            if player.folded == False and player.total_bet_betting_round > 0:
+                not_folded_or_out.append(player)
+
+        # get the lowest bet in folded
+        lowest_bet = min([player.total_bet_betting_round for player in not_folded_or_out])
         logger.debug(f"1. Lowest bet is {lowest_bet}")
         
         # throw error if len not folded > 2
-        if len(not_folded) > 2:
+        if len(not_folded_or_out) > 2:
             AssertionError
 
         # check if there is only 1 person not all in amongst the non-folders, reduce his/her bet by the difference with the max bidder.
-        if len([player for player in not_folded if not player.all_in]) == 1:
+        if len([player for player in not_folded_or_out if not player.all_in]) == 1:
             logger.debug(f"2. Only one player not all in")
 
             # Find the player who is not all-in: the folded 60
-            non_all_in_player = next(player for player in not_folded if not player.all_in)
+            non_all_in_player = next(player for player in not_folded_or_out if not player.all_in)
             # print(non_all_in_player.name)
 
             # Find the max bet among all-in players: 600
-            all_in_bet = max(player.total_bet_betting_round for player in not_folded if player.all_in)
+            all_in_bet = max(player.total_bet_betting_round for player in not_folded_or_out if player.all_in)
             # print(all_in_bet, non_all_in_player.total_bet_betting_round)
 
             # This is the only case in which we give players back money in mid game as we cannot guarantee who joins:
@@ -77,10 +82,11 @@ def check_for_side_pots(table):
             logger.debug(f"As {non_all_in_player.name} was the only one not all in, his/her bet got reduced by {non_all_in_player.total_bet_betting_round - all_in_bet}")
 
         # check if the players all betted the same amount, if so take shortcut (also necessary to prevent loop):
-        if lowest_bet == max([player.total_bet_betting_round for player in not_folded]):
+        if lowest_bet == max([player.total_bet_betting_round for player in not_folded_or_out]):
             logger.debug(f"99. Every player is in with the same amount")
-            # check_for_side_pots = False
-            fill_current_pot(not_folded[0], table)
+
+            # get the first out of not_folded_or_out
+            fill_current_pot(not_folded_or_out[0], table)
             return None
         
         counter += 1
@@ -88,11 +94,11 @@ def check_for_side_pots(table):
         # check_for_side_pots = False
 
         # for every player that has not folded already:
-        for player in not_folded[:]:
-            print('check player:', player.name)
-            print('nr of players in not_folded:', len(not_folded))
-            print(player.total_bet_betting_round)
-            print('lowest bet: ', lowest_bet)
+        for player in not_folded_or_out[:]:
+            logger.debug('check player:', player.name)
+            logger.debug('nr of players in not_folded_or_out:', len(not_folded_or_out))
+            logger.debug(f'total bet (left) this round: {player.total_bet_betting_round}')
+            logger.debug('lowest bet: ', lowest_bet)
 
             # check if they have the lowest bid
             if player.total_bet_betting_round == lowest_bet:
@@ -103,25 +109,27 @@ def check_for_side_pots(table):
                     logger.debug(f"player {player.name} went all in, side pot is needed")
                     # fill up original pot & create side pot
                     fill_current_pot(player, table)
+                    logger.debug(f"after filling the pot {player.total_bet_betting_round} is left")
+
                     side_pot = Pot()
 
                     # do this in the fill current pot
-                    # side_pot.players = not_folded
+                    # side_pot.players = not_folded_or_out
 
                     table.pots.append(side_pot)
                     sidepot_created = True
                     # check_for_side_pots = True
                     # player.folded = True
-                    # not_folded.remove(player)
-                    # print(f'the rest of the list {not_folded}')
+                    # not_folded_or_out.remove(player)
+                    # print(f'the rest of the list {not_folded_or_out}')
             # elif player.total_bet_betting_round == 0 and player.folded == False:
             #     logger.debug(f"{player.name} also went all in with the minimum bet")
-            #     not_folded.remove(player)
-            #     print(f'the rest of the list {not_folded}')
+            #     not_folded_or_out.remove(player)
+            #     print(f'the rest of the list {not_folded_or_out}')
         if sidepot_created == False:
             logger.debug(f"No (more) sidepots created")
             # just get a person that did not fold, as there are no sidepots his/her bet will be the same as the others.
-            fill_current_pot(not_folded[0], table)
+            fill_current_pot(not_folded_or_out[0], table)
             for pot in table.pots:
                 print(f'---------- pot {pot} is {pot.amount}')
             return None

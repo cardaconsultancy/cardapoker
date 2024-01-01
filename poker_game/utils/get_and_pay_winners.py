@@ -3,16 +3,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def pay_winners(table):
-    for pot in table.pots:
-        last_pot = table.pots[-1]
-        winner_list = determine_winners(last_pot.players, table)
-        bounty = last_pot.amount / len(winner_list)
-        for winner in winner_list:
-            logger.debug(f"{winner.name} gets {bounty} chips")
-            winner.chips.win(bounty)
-        logger.debug(f"Removing {table.pots.pop()}, so {len(table.pots)} pots left")
-
 def determine_winners(pot_players, table):
     # Determine the best hand for each player
     # dict_example = {}
@@ -20,7 +10,6 @@ def determine_winners(pot_players, table):
     for player in pot_players:
         player.set_best_hand(get_hand_rank(player, table))
         logger.debug(f"{player.name} highest hand is {player.best_hand}")
-        logger.debug(f"- {player.name} has hand {player.best_hand}")
         # create a list of players
         winner_list.append(player)
 
@@ -51,10 +40,40 @@ def determine_winners(pot_players, table):
                 logger.debug(f"{winner_list[i].name} is in winner list")
         winner_list = relevant_winners
         if len(winner_list) == 1:
-            logger.debug(f"0. The winner is {winner_list[0].name}")
+            logger.debug(f"The winner is {winner_list[0].name}")
             break
     if len(winner_list) != 1:
-        logger.debug(f"0. There is a tie between winners:")
+        logger.debug(f"There is a tie between winners:")
         for winner in winner_list:
             logger.debug(f"- {winner.name}")
     return winner_list
+
+def pay_winners(table):
+    while table.pots:
+        last_pot = table.pots.pop()  # Remove and get the last pot
+        winner_list = determine_winners(last_pot.players, table)
+        
+        # Calculate the main bounty for each winner
+        bounty = last_pot.amount // len(winner_list)
+        remainder = last_pot.amount % len(winner_list)
+        
+        for winner in winner_list:
+            logger.debug(f"{winner.name} gets {bounty} chips")
+            winner.chips.win(bounty)
+        
+        # Distribute remainder chips
+        index = 0  # Start from the first winner
+        while remainder > 0:
+            logger.debug(f"There is a remainder of {remainder} chips")
+            # Prioritize last raiser if they are a winner
+            recipient = winner_list[index % len(winner_list)]
+            index += 1
+            logger.debug(f"{recipient.name} gets an extra chip")
+            recipient.chips.win(1)
+            remainder -= 1
+
+        # debugger
+        if sum(player.chips.amount for player in table.players) != 300:
+            print(sum(player.chips.amount for player in table.players))
+
+        logger.debug(f"Removing {last_pot}, so {len(table.pots)} pots left")

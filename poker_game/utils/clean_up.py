@@ -2,7 +2,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 def clean_up(table):
-    logger.debug(f'cleaning time{table.players}')
+    logger.debug(f'cleaning time for players {[player.name for player in table.players]}')
     
     """
     Gets the next player in the list who has more than 0 chips.
@@ -26,10 +26,10 @@ def clean_up(table):
             table.dealer = table.players[next_index]
         next_index = (next_index + 1) % num_players
     
-    for player in table.players:
-        
+    # loop over a copy of the list and remove all the people without money
+    for player in table.players[:]:
+        logger.debug(f"{player.name} has {player.chips.amount} chips left")
         player.hand = []
-        player.total_bet_game = 0
         player.total_bet_betting_round = 0
         player.folded = False
         player.all_in = False

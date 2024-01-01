@@ -24,6 +24,8 @@ class Chips:
             self.amount -= amount
         else:
             self.logger.debug(f"THIS PLAYER IS ALL INNNNNNNNNN!!!!!!!!!!!")
+            self.amount -= self.amount
+            self.logger.debug(f"{self.amount} chips left")
             return False
 
 class Pot:
@@ -55,7 +57,7 @@ class Deck:
 
         random.seed(seed)  # Set the random seed
         random.shuffle(self.cards)
-        self.dealt_cards = collections.deque()
+        # self.dealt_cards = collections.deque()
         logging.basicConfig(level=logging.DEBUG)
         self.logger.debug(f"A new deck with {len(self.cards)} cards.")
 
@@ -70,7 +72,7 @@ class Deck:
         # return dealt_cards
         dealt_card = self.cards.pop()
         # self.logger.debug(f"A {dealt_card.rank} of {dealt_card.suit} was dealt.")
-        self.dealt_cards.append(dealt_card)
+        # self.dealt_cards.append(dealt_card)
         return dealt_card
 
     def get_number_of_cards(self):
