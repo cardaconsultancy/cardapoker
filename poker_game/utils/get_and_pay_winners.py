@@ -50,7 +50,14 @@ def determine_winners(pot_players, table):
 
 def pay_winners(table):
     while table.pots:
+        logger.debug(f"There are {len(table.pots)} pots left")
+
         last_pot = table.pots.pop()  # Remove and get the last pot
+        logger.debug(f"There are {len(table.pots)} pots left after popping--------------------")
+        logger.debug(f"The current pot has {last_pot.amount}")
+        for player in last_pot.players:
+            print(player.name)
+
         winner_list = determine_winners(last_pot.players, table)
         
         # Calculate the main bounty for each winner
@@ -72,8 +79,8 @@ def pay_winners(table):
             recipient.chips.win(1)
             remainder -= 1
 
-        # debugger
-        if sum(player.chips.amount for player in table.players) != 300:
-            print(sum(player.chips.amount for player in table.players))
-
         logger.debug(f"Removing {last_pot}, so {len(table.pots)} pots left")
+        
+    # debugger
+    if sum(player.chips.amount for player in table.players) != 300:
+        print(sum(player.chips.amount for player in table.players))

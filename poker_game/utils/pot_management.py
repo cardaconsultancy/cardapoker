@@ -18,7 +18,7 @@ def create_pots(table):
 
     # reset the bets and raise/check/call status
     for player in table.players_game:
-        player.total_in_pots_this_game += player.total_bet_betting_round
+        # player.total_in_pots_this_game += player.total_bet_betting_round
         player.raised_called_or_checked_this_round = False
         player.total_bet_betting_round = 0
         logger.debug(f"Reset total bets {player.name} to {player.total_bet_betting_round}")
@@ -95,10 +95,10 @@ def check_for_side_pots(table):
 
         # for every player that has not folded already:
         for player in not_folded_or_out[:]:
-            logger.debug('check player:', player.name)
-            logger.debug('nr of players in not_folded_or_out:', len(not_folded_or_out))
-            logger.debug(f'total bet (left) this round: {player.total_bet_betting_round}')
-            logger.debug('lowest bet: ', lowest_bet)
+            # logger.debug(f'check player:{player.name}')
+            # logger.debug(f'nr of players in not_folded_or_out: {len(not_folded_or_out)}')
+            # logger.debug(f'total bet (left) this round: {player.total_bet_betting_round}')
+            # logger.debug(f'lowest bet: {lowest_bet}')
 
             # check if they have the lowest bid
             if player.total_bet_betting_round == lowest_bet:
@@ -168,6 +168,7 @@ def fill_current_pot(lowest_player, table):
         # if they have less betted than the lowest bet
         elif player.total_bet_betting_round < lowest_bet:
             logger.debug(f"{player.name} bet ({player.total_bet_betting_round}) is lower than {lowest_bet} and hence this person will always be folding because we checked for this before")
+            logger.debug(f"Player {player.name} has folded or is out of chips and will not be part of the winnings.")
 
             # increase the amount in the pot
             current_pot.amount += player.total_bet_betting_round
@@ -179,8 +180,6 @@ def fill_current_pot(lowest_player, table):
 
             current_pot.amount += player.total_bet_betting_round
             logger.debug(f"{player.name} bet is {player.total_bet_betting_round}")
-            # add them to the list if they call
-            current_pot.players.append(player)
             
     # side_pot.players.append(player)
     # table.pots.append(side_pot)

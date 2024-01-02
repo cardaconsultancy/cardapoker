@@ -10,18 +10,26 @@ def play_game(table, rounds_before_raise_blinds=20, seed=None):
     logger.debug(f'Player {table.dealer.name} gets the dealer button')
     game_on = True
     number_of_rounds = 1
-    while game_on == True:
+    blinds_raised = 0
+    while game_on:
         for raising_time in range(0, rounds_before_raise_blinds):            
-            logger.debug('')
-            logger.debug('')
-            logger.debug('')
+            logger.debug(f'')
+            logger.debug(f'')
+            logger.debug(f'')
             for player in table.players_game:
                 logger.debug(f'------- Player {player.name} has {player.chips.amount} ------') 
                 number_of_rounds += 1
                 if player.chips.amount == total_chips:
                     logger.debug(f"player {player.name} has won after {number_of_rounds} rounds!!!!")
-                    return True
-            game_on = start_round(table=table, seed=seed)
+                    return table
+            
+            # to create some quick variance over rounds while testing multiple rounds
+            if seed != None:
+                start_round(table=table, seed=seed*seed*number_of_rounds)
+            else:
+                start_round(table=table)
+        
         table.increase_blinds()
-        logger.debug(f'Blinds raised {raising_time} times')
+        blinds_raised += 1
+        logger.debug(f'Blinds raised {blinds_raised} times')
     return table

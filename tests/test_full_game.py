@@ -9,12 +9,12 @@ import logging
 logger = logging.getLogger(__name__)
 class TestTexasHoldemGame(unittest.TestCase):
     def test_play_round(self):
-        game_seed = 1
-        for game_seed in range(game_seed, 10):
+        game_seed = 100
+        for game_seed in range(game_seed, game_seed+20):
             table = Table()
 
             player1 = create_player("Grietje", 'raises_with_aces_reduces_with_12345', Chips(100))
-            player2 = create_player("Jan", 'conservative', Chips(100))
+            player2 = create_player("Jan", 'aggressive', Chips(100))
             player3 = create_player("Martin", 'conservative', Chips(100))
             
             table.add_player(player1)

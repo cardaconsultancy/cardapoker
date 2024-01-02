@@ -31,7 +31,7 @@ def is_royal_or_straight_flush(sorted_hand):
                     logger.debug(f"Straight Flush was Found with suit {the_suit}!!")
                     handscore = [8, suited_list[i - 3].rank, None, None, None, None]
                     if sorted_hand[i].rank == 'A':
-                        logger.debug('... a Royal one!!!')
+                        logger.debug(f'... a Royal one!!!')
                     return handscore
             elif card_rank_value(suited_list[i].rank) - card_rank_value(suited_list[i+1].rank) > 2:
                 # 
