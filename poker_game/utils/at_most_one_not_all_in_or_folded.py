@@ -4,8 +4,8 @@ def check_at_most_one_not_all_in_or_folded(table):
 
     # Check if at most one player is not all-in or folded
     if count_not_all_in_or_folded <= 1:
-        print("At most one player is not all-in or folded.")
+        # print("At most one player is not all-in or folded.")
         return True
     else:
-        print("More than one player is still active.")
+        # print("More than one player is still active.")
         return False

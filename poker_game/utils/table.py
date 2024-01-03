@@ -18,7 +18,7 @@ class Table:
     # def add_chair(self, nr_of_chairs):
     #     for chair in range(0,nr_of_chairs):
     #         self.seats[chair] = None
-    #         self.logger.debug(f"Seat added, current table has {len(self.seats)}")
+    #         #self.logger.debug(f"Seat added, current table has {len(self.seats)}")
 
     def add_player(self, player):
         self.players.append(player)

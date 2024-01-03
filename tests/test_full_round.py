@@ -25,7 +25,7 @@ class TestTexasHoldemGame(unittest.TestCase):
             expected_sum = sum([player.chips.amount for player in table.players])
 
             result = start_round(seed=round_seed, table=table)
-            logger.debug(f"round seed: {round_seed}")
+           #logger.debug(f"round seed: {round_seed}")
             self.assertEqual(sum([player.chips.amount for player in result.players]), expected_sum)
 
 if __name__ == '__main__':

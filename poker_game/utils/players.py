@@ -18,7 +18,7 @@ class Player:
         self.all_in = False
 
     def receive_card(self, card):
-        self.logger.debug(f"{self.name} gets a {card.rank} of {card.suit}.")
+        #self.logger.debug(f"{self.name} gets a {card.rank} of {card.suit}.")
         self.hand.append(card)
 
     def show_hand(self):
@@ -31,7 +31,7 @@ class Player:
         self.best_hand = hand_rank
 
     def response(self, max_total_bet_size, hand, tablecards):
-        self.logger.debug(f"{self.name} must do his/her thing: the bet is {max_total_bet_size} and he/she already has {self.total_bet_betting_round} in the pot and {self.chips.amount} left.")
+        #self.logger.debug(f"{self.name} must do his/her thing: the bet is {max_total_bet_size} and he/she already has {self.total_bet_betting_round} in the pot and {self.chips.amount} left.")
         # this is the function that should be shared
         
         # simple call function
@@ -41,7 +41,7 @@ class Player:
     
     # standard bet is 10, override below
     def bet(self, betsize, hand, tablecards):
-        self.logger.debug(f"The standard parent class is called, no modification has been done.")
+        #self.logger.debug(f"The standard parent class is called, no modification has been done.")
         print("The standard parent class is called, no modification has been done")
         # do this in game so that errors in modification don't mess this up
         # self.chips.lose(10)
@@ -51,7 +51,7 @@ class Player:
 def aggressive_player_decorator(player_class):
     class AggressivePlayer(player_class):
         def bet(self, betsize, hand, table):
-            self.logger.debug(f"Aggressive players go all in at first chance")
+            #self.logger.debug(f"Aggressive players go all in at first chance")
             return 100
         # Additional methods or overrides can go here
     return AggressivePlayer
@@ -59,7 +59,7 @@ def aggressive_player_decorator(player_class):
 def conservative_player_decorator(player_class):
     class ConservativePlayer(player_class):
         def bet(self, betsize, hand, table):
-            self.logger.debug(f"Conservative players only call")
+            #self.logger.debug(f"Conservative players only call")
             return betsize
         # Additional methods or overrides can go here
     return ConservativePlayer
@@ -67,16 +67,16 @@ def conservative_player_decorator(player_class):
 def raises_with_aces_reduces_with_12345_decorator(player_class):
     class Raises_with_aces_reduces_with_12345Player(player_class):
         def bet(self, betsize, hand, table):
-            self.logger.debug(f"I am an Ace Raiser!")
+            #self.logger.debug(f"I am an Ace Raiser!")
             for card in hand:
                 if card.suit == 'A':
                     betsize = betsize * 2 
-                    print("Ace is raise!")
+                    # print("Ace is raise!")
                 elif card.suit in '12345':
-                    print("that is a low card!")
+                    # print("that is a low card!")
                     betsize = betsize / 2
-                else:
-                    print('that is an average card!')
+                # else:
+                #     print('that is an average card!')
             return betsize
         # Additional methods or overrides can go here
     return Raises_with_aces_reduces_with_12345Player
@@ -128,9 +128,9 @@ class ActualPlayerTemplate(Player):
     # A more complex function can be added:
     
     # def bet_to_make_pot_20(self, previous_bet, pot, players):
-    #     self.logger.debug(f"{self.name} has to decide what to do.")
+    #     #self.logger.debug(f"{self.name} has to decide what to do.")
     #     if pot < 20 and self.hand != [Card('2', '♠'), Card('7', '♥')]:
-    #         self.logger.debug(f"{self.name} says: let's make that pot 20!")
+    #         #self.logger.debug(f"{self.name} says: let's make that pot 20!")
     #         self.bet((20-pot)/players)
 
 def create_player(name, style, chips=Chips(100)):
