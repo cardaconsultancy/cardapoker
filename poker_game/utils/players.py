@@ -185,6 +185,6 @@ def create_player(name, style, chips=Chips(100)):
     elif style == 'raises with aces reduces with 12345':
         DecoratedPlayer = raises_with_aces_reduces_with_12345_decorator(ActualPlayerTemplate)
     else:
-        DecoratedPlayer = ActualPlayerTemplate  # No decoration
+        DecoratedPlayer = ActualPlayerTemplate  # No decoration 
 
     return DecoratedPlayer(name, chips)
