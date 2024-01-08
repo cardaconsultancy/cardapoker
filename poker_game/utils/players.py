@@ -169,7 +169,7 @@ class ActualPlayerTemplate(Player):
     #     #self.logger.debug(f"{self.name} has to decide what to do.")
     #     if pot < 20 and self.hand != [Card('2', '♠'), Card('7', '♥')]:
     #         #self.logger.debug(f"{self.name} says: let's make that pot 20!")
-    #         self.bet((20-pot)/players)
+    #         self.bet((20-pot)/players) 
 
 def create_player(name, style, chips=Chips(100)):
     if style == 'aggressive':
