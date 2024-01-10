@@ -163,7 +163,7 @@ class ActualPlayerTemplate(Player):
         return betsize
         # OR make it more complex:
         # bet_to_make_pot_20()
-    # A more complex function can be added:
+    # A more complex function can be added: 
     
     # def bet_to_make_pot_20(self, previous_bet, pot, players):
     #     #self.logger.debug(f"{self.name} has to decide what to do.")
