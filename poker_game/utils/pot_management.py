@@ -47,7 +47,6 @@ def check_if_only_one_player_left(table):
         for player in table.players_game:
             winner.chips.win(player.total_bet_betting_round)
             player.total_bet_betting_round = 0
-
         return True
         
 def check_for_side_pots(table):
@@ -68,7 +67,7 @@ def check_for_side_pots(table):
             if player.folded == False and player.total_bet_betting_round > 0:
                 not_folded_or_out.append(player)
 
-        # get the lowest bet in folded
+        # get the lowest bet in not-folded
         lowest_bet = min([player.total_bet_betting_round for player in not_folded_or_out])
         logger.debug(f"1. Lowest bet is {lowest_bet}")
         

@@ -22,7 +22,7 @@ def play_game(table, rounds_before_raise_blinds=20, seed=None):
                 logger.debug(f'------- Player {player.name} has {player.chips.amount} ------') 
                 if player.chips.amount == total_chips:
                     logger.debug(f"player {player.name} has won after {number_of_rounds} rounds!!!!")
-                    return table, number_of_rounds
+                    return player.name, number_of_rounds
             print(f'next round: {number_of_rounds}')
 
             # to create some quick variance over rounds while testing multiple rounds

@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 def betting_round_completed(table, preflop_round = False):
     
-    logger.debug(f" ------------- Start betting round ------------- ")
+    logger.debug(f" ------------- Start betting round  ------------- ")
     # max 100 
     all_are_done = False
 
@@ -48,6 +48,7 @@ def betting_round_completed(table, preflop_round = False):
 
             player = get_next_player(player, table)
             player.total_bet_betting_round += table.blind_size*2
+            logger.debug(f"Player {player.name} has the Big blind of {player.total_bet_betting_round}")
 
             if table.blind_size*2 >= player.chips.amount:
                 logger.debug(f"Player {player.name} is all in")

@@ -1,4 +1,4 @@
 Cardapoker
 
 -- Goal --
-The goal of this project is to 
+The goal of this project is to create a poker environment
