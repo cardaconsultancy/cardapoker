@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 def betting_round_completed(table, preflop_round = False):
     
-    logger.debug(f" ------------- Start betting round  ------------- ")
+    logger.debug(f" ------------- Start betting round ------------- ")
     # max 100 
     all_are_done = False
 

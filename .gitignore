@@ -1,2 +1,4 @@
 gitignore_archive/
 gitig/
+openai/
+test_openai.py

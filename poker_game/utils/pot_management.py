@@ -22,9 +22,16 @@ def create_pots(table):
         player.total_bet_betting_round = 0
         logger.debug(f"Reset total bets {player.name} to {player.total_bet_betting_round}")
 
+
+
 def check_if_rest_folded_and_pay(table):
     at_least_two_not_folded_or_out = []
     for player in table.players_game:
+        
+        # Questionable whether to use the 'folded' criteria here, as it does not create a necessary pot for 
+        # the situation where there is a folded player that has betted more than one pot.
+        # Alternative would be to change the payout system.
+        
         if player.folded == False:
             at_least_two_not_folded_or_out.append(player)
     if len(at_least_two_not_folded_or_out) < 2:
@@ -33,6 +40,7 @@ def check_if_rest_folded_and_pay(table):
         for pot in table.pots:
             at_least_two_not_folded_or_out[0].chips.win(pot.amount)
             print('does this ever run now??????')
+            AttributeError()
         clean_up()
         return 1
 
@@ -54,13 +62,12 @@ def check_for_side_pots(table):
 
     logger.debug(f"checking for side pots")
 
-
     # check_for_side_pots = True
     sidepot_created = False
     counter = 1
     while any(player.total_bet_betting_round != 0 for player in table.players):
 
-        # get the minimum bet fromt he people that did not fold:
+        # get the minimum bet from the people that did not fold:
         not_folded_or_out = []
         for player in table.players_game:
             # get all the minimum bet, need to check for 0 also as we reduce the total_betting_round
@@ -77,7 +84,7 @@ def check_for_side_pots(table):
         if len(not_folded_or_out) < 2:
             raise Exception("this should have been caught earlier on")
 
-        # check if there is only 1 person not all in amongst the non-folders (and the other one is, reduce his/her bet by the difference with the max bidder.
+        # check if there is only 1 person not all in amongst the non-folders (and the other one is, reduce his/her bet by the difference with the max bidder).
         elif len([player for player in not_folded_or_out if not player.all_in]) == 1 and len([player for player in not_folded_or_out if player.all_in]) == 1:
             logger.debug(f"2. Only one player not all in")
 
@@ -85,7 +92,7 @@ def check_for_side_pots(table):
             non_all_in_player = next(player for player in not_folded_or_out if not player.all_in)
             # print(non_all_in_player.name)
 
-            # Find the max bet among all-in players: 600
+            # Find the max bet among all-in players
             all_in_bet = max(player.total_bet_betting_round for player in not_folded_or_out if player.all_in)
             # print(all_in_bet, non_all_in_player.total_bet_betting_round)
 
@@ -93,8 +100,8 @@ def check_for_side_pots(table):
             non_all_in_player.chips.give_back(non_all_in_player.total_bet_betting_round - all_in_bet)
 
             # Adjust the bet of the non all-in player
+            logger.debug(f"As {non_all_in_player.name} was the only one not all in, his/her will be reduced by {non_all_in_player.total_bet_betting_round - all_in_bet}")
             non_all_in_player.total_bet_betting_round = all_in_bet
-            logger.debug(f"As {non_all_in_player.name} was the only one not all in, his/her bet got reduced by {non_all_in_player.total_bet_betting_round - all_in_bet}")
 
         # check if the players all betted the same amount, if so take shortcut (also necessary to prevent loop):
         if lowest_bet == max([player.total_bet_betting_round for player in not_folded_or_out]):
