@@ -1,4 +1,4 @@
 gitignore_archive/
 gitig/
-openai/
+openai_client/
 test_openai.py

@@ -1,7 +1,7 @@
 from poker_game.utils.evaluate_hand import evaluate_hand, get_hand_rank
-from .objects_on_table import Chips
+# from .objects_on_table import Chips
 import logging
-
+from openai_client.test_openai import client 
 
 class Player:
     def __init__(self, name, chips):
@@ -128,6 +128,32 @@ def careful_calculator_decorator(player_class):
             return betsize
         # Additional methods or overrides can go here
     return careful_calculator_Player
+
+
+def chatgpt35_decorator(player_class):
+    class chatgpt35(player_class):
+        def bet(self, betsize, hand, table):
+
+            table.players 
+
+            prompt = "6 players. Nr chips per person: 1000"\
+            "You are the fouth player after the dealer."\
+            "First round. You get a jack of hearts and a queen of hearts."\
+            "Player 2 small blind: 1 chip. Player 3 big blind: 2 chips."\
+            "Your turn. What do you do? Pick one option."
+
+            chat_completion = client.chat.completions.create(
+                messages = [
+                    {
+                        "role":"user",
+                        "content": prompt
+                    }
+                ],
+                model="gpt-3.5-turbo"
+            )
+            print(chat_completion)
+        # Additional methods or overrides can go here
+    return chatgpt35
 
 
 #########################################################################################
