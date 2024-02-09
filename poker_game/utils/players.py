@@ -46,7 +46,7 @@ class Player:
         print("The standard parent class is called, no modification has been done")
         # do this in game so that errors in modification don't mess this up
         # self.chips.lose(10)
-        return betsize
+        return betsize 
 
 #########################################################################################
 
