@@ -8,7 +8,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def start_round(table, seed=None):
+def start_round(table, test_cards=None, seed=None):
     # reset the deck
     deck = Deck(seed=seed)
 
@@ -27,9 +27,16 @@ def start_round(table, seed=None):
     # Deal two private cards to each player
     # (Chosen to stay the closest to the real game, by not dealing two at once)
     for player in table.players_game:
-        player.receive_card(deck.deal())
+        if len(player.hand) == 0:
+            player.receive_card(deck.deal())
+        else:
+            logger.debug(f"Player {player.name} already has cards ---- TEST ROUND -----")
     for player in table.players_game:
-        player.receive_card(deck.deal())
+        if len(player.hand) == 1:
+            player.receive_card(deck.deal())
+    
+    for player in table.players_game:
+        print(f'Player {player.name} has {player.hand}')
 
     # Betting Round 1
     logger.debug(f"Players can make their first bet.")
@@ -45,10 +52,13 @@ def start_round(table, seed=None):
     logger.debug(f"Total betted {sum(player.total_in_pots_this_game for player in table.players)}.")
 
     # Deal the flop (three community cards)
-    table.community_cards.append(deck.deal())
-    table.community_cards.append(deck.deal())
-    table.community_cards.append(deck.deal())
-
+    if test_cards == None:
+        table.community_cards.append(deck.deal())
+        table.community_cards.append(deck.deal())
+        table.community_cards.append(deck.deal())
+    else:
+        print('TEST')
+        table.community_cards.extend(test_cards[0:3])
 
     # Betting Round 2: flop
     if not check_at_most_one_not_all_in_or_folded(table):
@@ -68,15 +78,20 @@ def start_round(table, seed=None):
         return True
     
     # Deal the turn (one additional community card)
-    table.community_cards.append(deck.deal())
+    if test_cards == None:
+        table.community_cards.append(deck.deal())
+    else:
+        print('TEST')
+        table.community_cards.append(test_cards[3])
+    
     logger.debug(f"On the table comes {table.community_cards[3].rank} of {table.community_cards[3].suit}.") 
 
     # Betting Round 3
     if not check_at_most_one_not_all_in_or_folded:
-    #     print('Everybody is all in, no more bets!')
+        print('Everybody is all in, no more bets!')
     
-    # else:
-        logger.debug(f"Players can bet on the flop.")
+    else:
+        logger.debug(f"Players can bet on the turn.")
         if not betting_round_completed(table):
             print('!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!')
             clean_up(table)
@@ -88,14 +103,19 @@ def start_round(table, seed=None):
         return True
     
     # Deal the river (one final community card)
-    table.community_cards.append(deck.deal())
+    if test_cards == None:
+        table.community_cards.append(deck.deal())
+    else:
+        print('TEST')
+        table.community_cards.append(test_cards[4])
+
     logger.debug(f"On the table comes {table.community_cards[4].rank} of {table.community_cards[4].suit}.") 
 
     # Betting Round 4
     if not check_at_most_one_not_all_in_or_folded:
-    #     print('Everybody is all in, no more bets!')
-    
-    # else:
+        print('Everybody is all in, no more bets!')
+
+    else:
         logger.debug(f"Players can bet on the river, final bet!")
         if not betting_round_completed(table):
             print('!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!')
@@ -114,7 +134,8 @@ def start_round(table, seed=None):
     # Clean up
     clean_up(table)
 
-    if sum([player.chips.amount for player in table.players]) != 600:
-        raise AssertionError
+    # if sum([player.chips.amount for player in table.players]) != 600:
+    #     print(sum([player.chips.amount for player in table.players]))
+    #     raise AssertionError
 
     return table

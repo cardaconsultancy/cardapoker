@@ -1,5 +1,5 @@
 from poker_game.utils.evaluate_hand import evaluate_hand, get_hand_rank
-# from .objects_on_table import Chips
+from .objects_on_table import Chips
 import logging
 from openai_client.test_openai import client 
 
