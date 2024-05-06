@@ -8,6 +8,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# A full round of Texas Holdem
 def start_round(table, test_cards=None, seed=None):
     # reset the deck
     deck = Deck(seed=seed)
@@ -27,10 +28,14 @@ def start_round(table, test_cards=None, seed=None):
     # Deal two private cards to each player
     # (Chosen to stay the closest to the real game, by not dealing two at once)
     for player in table.players_game:
+
+        # in case of a test with predefined cards, we don't want to give
+        # the player any cards
         if len(player.hand) == 0:
             player.receive_card(deck.deal())
         else:
             logger.debug(f"Player {player.name} already has cards ---- TEST ROUND -----")
+    
     for player in table.players_game:
         if len(player.hand) == 1:
             player.receive_card(deck.deal())
@@ -41,7 +46,7 @@ def start_round(table, test_cards=None, seed=None):
     # Betting Round 1
     logger.debug(f"Players can make their first bet.")
     if not betting_round_completed(table, preflop_round=True):
-        print('!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!')
+        logger.debug(f'!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!')
         clean_up(table)
         return table
     if check_if_rest_folded_and_pay(table):
