@@ -1,0 +1,78 @@
+2024-05-14 15:25:39,072 - poker_game - INFO - New Game
+2024-05-14 15:25:39,073 - poker_game - INFO - Grietje-A♠A♥
+2024-05-14 15:25:39,073 - poker_game - INFO - Jan-2♠2♥
+2024-05-14 15:25:39,073 - poker_game - INFO - Martin-3♠3♥
+2024-05-14 15:25:39,073 - poker_game.utils.betting_round - INFO - TEST
+2024-05-14 15:25:39,073 - poker_game.utils.betting_round - INFO - SB-Jan-1
+2024-05-14 15:25:39,073 - poker_game.utils.betting_round - INFO - BB-Martin-2
+2024-05-14 15:25:39,073 - poker_game - INFO - 5♦7♣8♦
+2024-05-14 15:25:39,073 - poker_game.utils.betting_round - INFO - TEST
+2024-05-14 15:25:39,073 - poker_game - INFO - 9♣
+2024-05-14 15:25:39,073 - poker_game.utils.betting_round - INFO - TEST
+2024-05-14 15:25:39,074 - poker_game - INFO - T♣
+2024-05-14 15:25:39,074 - poker_game.utils.betting_round - INFO - TEST
+2024-05-14 15:26:05,346 - poker_game - INFO - New Game
+2024-05-14 15:26:05,347 - poker_game - INFO - Grietje-A♠A♥
+2024-05-14 15:26:05,347 - poker_game - INFO - Jan-2♠2♥
+2024-05-14 15:26:05,347 - poker_game - INFO - Martin-3♠3♥
+2024-05-14 15:26:05,347 - poker_game.utils.betting_round - INFO - TEST
+2024-05-14 15:26:05,347 - poker_game.utils.betting_round - INFO - SB-Jan-1
+2024-05-14 15:26:05,347 - poker_game.utils.betting_round - INFO - BB-Martin-2
+2024-05-14 15:26:05,347 - poker_game - INFO - 5♦7♣8♦
+2024-05-14 15:26:05,347 - poker_game.utils.betting_round - INFO - TEST
+2024-05-14 15:26:05,347 - poker_game - INFO - 9♣
+2024-05-14 15:26:05,347 - poker_game.utils.betting_round - INFO - TEST
+2024-05-14 15:26:05,348 - poker_game - INFO - T♣
+2024-05-14 15:26:05,348 - poker_game.utils.betting_round - INFO - TEST
+2024-05-14 15:27:19,959 - poker_game - INFO - New Game
+2024-05-14 15:27:19,960 - poker_game - INFO - Grietje-A♠A♥
+2024-05-14 15:27:19,960 - poker_game - INFO - Jan-2♠2♥
+2024-05-14 15:27:19,960 - poker_game - INFO - Martin-3♠3♥
+2024-05-14 15:27:19,960 - poker_game.utils.betting_round - INFO - TEST
+2024-05-14 15:27:19,960 - poker_game.utils.betting_round - INFO - SB-Jan-1
+2024-05-14 15:27:19,960 - poker_game.utils.betting_round - INFO - BB-Martin-2
+2024-05-14 15:27:19,960 - poker_game - INFO - 5♦7♣8♦
+2024-05-14 15:27:19,960 - poker_game.utils.betting_round - INFO - TEST
+2024-05-14 15:27:19,960 - poker_game - INFO - 9♣
+2024-05-14 15:27:19,960 - poker_game.utils.betting_round - INFO - TEST
+2024-05-14 15:27:19,961 - poker_game - INFO - T♣
+2024-05-14 15:27:19,961 - poker_game.utils.betting_round - INFO - TEST
+New Game
+Grietje-A♠A♥
+Jan-2♠2♥
+Martin-3♠3♥
+TEST
+SB-Jan-1
+BB-Martin-2
+5♦7♣8♦
+TEST
+9♣
+TEST
+T♣
+TEST
+New Game
+Grietje-A♠A♥
+Jan-2♠2♥
+Martin-3♠3♥
+TEST
+SB-Jan-1
+BB-Martin-2
+5♦7♣8♦
+TEST
+9♣
+TEST
+T♣
+TEST
+New Game
+Grietje-A♠A♥
+Jan-2♠2♥
+Martin-3♠3♥
+TEST
+SB-Jan-1
+BB-Martin-2
+5♦7♣8♦
+TEST
+9♣
+TEST
+T♣
+TEST

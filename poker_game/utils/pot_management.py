@@ -22,8 +22,6 @@ def create_pots(table):
         player.total_bet_betting_round = 0
         logger.debug(f"Reset total bets {player.name} to {player.total_bet_betting_round}")
 
-
-
 def check_if_rest_folded_and_pay(table):
     at_least_two_not_folded_or_out = []
     for player in table.players_game:

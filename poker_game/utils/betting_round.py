@@ -1,13 +1,17 @@
 from poker_game.utils.next_player import get_next_player
 from poker_game.utils.pot_management import check_if_only_one_player_left, create_pots
-import logging
+from poker_game.utils.logging_config import setup_logging
 
-logger = logging.getLogger(__name__)
+# Obtain the logger configured in logging_config.py
+logger = setup_logging()
 
+# A full round of Texas Holdem
 def betting_round_completed(table, preflop_round = False):
     
+    # make sure that this logs    
+    logger.info(f"TEST")
+    
     logger.debug(f" ------------- Start betting round ------------- ")
-    # max 100 
     all_are_done = False
 
     # do we have to initialise it here or is there a smarter way to make this while loop work?
@@ -15,14 +19,19 @@ def betting_round_completed(table, preflop_round = False):
     player = get_next_player(last_raiser, table)
 
     # create a second indicator that helps with letting the BB have another turn
-    # create another variable for if it is the first_bet
     SB_is_last_raiser_so_that_BB_can_have_another_go = False
+
+    # create another variable for if it is the first_bet
     first_bet = True
+    
     if preflop_round == True:
         SB_is_last_raiser_so_that_BB_can_have_another_go = True
         first_bet = False
 
+    # start the betting round
     while player != last_raiser:
+
+        # if this is the first bet and we are not in the preflop round, the last raiser is the one that sets the limit
         if first_bet == True and preflop_round == False:
             last_raiser = player
             logger.debug(f"this is the first bet and so {last_raiser.name} automatically is last raiser")
@@ -33,6 +42,9 @@ def betting_round_completed(table, preflop_round = False):
         if preflop_round == True:
             player.total_bet_betting_round += table.blind_size
             logger.debug(f"Player {player.name} has the small blind of {player.total_bet_betting_round}")
+            
+            # log turn
+            logger.info(f'SB-{player.name}-{player.total_bet_betting_round}')
             
             # check for all in
             if table.blind_size >= player.chips.amount:
@@ -49,6 +61,9 @@ def betting_round_completed(table, preflop_round = False):
             player = get_next_player(player, table)
             player.total_bet_betting_round += table.blind_size*2
             logger.debug(f"Player {player.name} has the Big blind of {player.total_bet_betting_round}")
+            
+            # log turn
+            logger.info(f'BB-{player.name}-{player.total_bet_betting_round}')
 
             if table.blind_size*2 >= player.chips.amount:
                 logger.debug(f"Player {player.name} is all in")
@@ -155,6 +170,8 @@ def betting_round_completed(table, preflop_round = False):
                 #     return True
                 if check_if_only_one_player_left(table):
                     return False
+                
+                # we don't want to remove the player from the game yet, as we need to put his/her chips in the pot
 
             # Checking
             elif player.total_bet_betting_round + player_bet == max_bet and player_bet == 0:
@@ -226,6 +243,10 @@ def betting_round_completed(table, preflop_round = False):
 
     # create pots
     create_pots(table)
+
+    # remove all players that have folded
+    table.players_game = [player for player in table.players_game if player.folded == False]
+    logger.debug(f"Players left in the game {[player.name for player in table.players_game]}")
 
     # completed betting round
     return True

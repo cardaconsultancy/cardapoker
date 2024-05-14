@@ -8,10 +8,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class TestTexasHoldemGame(unittest.TestCase):
     def test_play_round(self):
-        round_seed = 1
-        # for round_seed in range(round_seed, 30):
         table = Table()
 
         player1 = create_player("Grietje", 'raises_with_aces_reduces_with_12345', Chips(100))
@@ -30,8 +29,7 @@ class TestTexasHoldemGame(unittest.TestCase):
 
         expected_sum = sum([player.chips.amount for player in table.players])
 
-        result = start_round(seed=round_seed, table=table, test_cards = test_cards)
-        logger.debug(f"round seed: {round_seed}")
+        result = start_round(table=table, test_cards = test_cards)
         print(expected_sum)
         print(sum([player.chips.amount for player in result.players]))
         self.assertEqual(sum([player.chips.amount for player in result.players]), expected_sum)
