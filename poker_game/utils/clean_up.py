@@ -1,5 +1,5 @@
 import logging
-from poker_game.next_dealer import find_next_dealer
+from poker_game.utils.next_player import get_next_player
 
 # Retrieve the already configured logger
 logger = logging.getLogger('poker_game')
@@ -31,7 +31,7 @@ def clean_up(table):
     #     next_index = (next_index + 1) % num_players
     
     # Get the next dealer
-    table.dealer = find_next_dealer(starting_players=table.starting_players, active_players=table.players_game, current_dealer=table.dealer)
+    table.dealer = get_next_player(starting_players=table.starting_players, active_players=table.players_game, current_dealer=table.dealer)
     if table.dealer.folded == True: AssertionError()
 
     # loop over a copy of the list and remove all the people without money
