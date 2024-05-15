@@ -13,7 +13,7 @@ def betting_round_completed(table, preflop_round = False):
 
     # do we have to initialise it here or is there a smarter way to make this while loop work?
     last_raiser = table.dealer
-    player = get_next_player(last_raiser, table)
+    player = get_next_player(starting_players=table.starting_players, active_players=table.players_game, current_player=last_raiser)
 
     # create a second indicator that helps with letting the BB have another turn
     # SB_is_last_raiser_so_that_BB_can_have_another_go = False
@@ -60,7 +60,7 @@ def betting_round_completed(table, preflop_round = False):
                 player.total_in_pots_this_game = (table.blind_size)
                 player.chips.lose(table.blind_size)
 
-            player = get_next_player(player, table)
+            player = get_next_player(starting_players=table.starting_players, active_players=table.players_game, current_player=player)
             player.total_bet_betting_round += table.blind_size*2
             logger.debug(f"Player {player.name} has the Big blind of {player.total_bet_betting_round}")
             
@@ -83,7 +83,7 @@ def betting_round_completed(table, preflop_round = False):
 
             preflop_round = False
             
-            player = get_next_player(player, table)
+            player = get_next_player(starting_players=table.starting_players, active_players=table.players_game, current_player=player)
 
             last_raiser = player
             logger.debug(f"The last raiser is now {player.name} with {player.total_bet_betting_round}")
@@ -248,13 +248,13 @@ def betting_round_completed(table, preflop_round = False):
                 player = last_raiser
             else:
                 # The player who has the small blind makes the first bet in poker, which is why we can get the next one directly
-                player = get_next_player(player, table)
+                player = get_next_player(starting_players=table.starting_players, active_players=table.players_game, current_player=player)
 
                 if player == None:
                     player = last_raiser
         else:
             # The player who has the small blind makes the first bet in poker, which is why we can get the next one directly
-            player = get_next_player(player, table)
+            player = get_next_player(starting_players=table.starting_players, active_players=table.players_game, current_player=player)
 
             if player == None:
                 player = last_raiser
