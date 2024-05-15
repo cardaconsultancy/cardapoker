@@ -1,6 +1,5 @@
 # logging_config.py
 import logging
-logging.basicConfig(level=logging.DEBUG)
 
 def setup_logging():
     logger = logging.getLogger('poker_game')

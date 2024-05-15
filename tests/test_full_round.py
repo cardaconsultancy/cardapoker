@@ -4,10 +4,8 @@ from poker_game.utils.start_round import start_round
 from poker_game.utils.table import Table
 from poker_game.utils.objects_on_table import Deck, Chips, Card, Pot
 from poker_game.utils.game import TexasHoldemGame
-import logging
-
-logger = logging.getLogger(__name__)
-
+from poker_game.utils.logging_config import setup_logging
+setup_logging()
 
 class TestTexasHoldemGame(unittest.TestCase):
     def test_play_round(self):

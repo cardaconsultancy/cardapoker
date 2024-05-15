@@ -7,6 +7,7 @@ class Table:
         self.logger = logging.getLogger(__name__)
         self.community_cards = []
         self.players = []
+        self.starting_players = []
         self.pots = []
         self.players_game = deque()
         # self.seats = {}
@@ -21,6 +22,9 @@ class Table:
     #         #self.logger.debug(f"Seat added, current table has {len(self.seats)}")
 
     def add_player(self, player):
+
+        self.starting_players.append(player)
+        # I am not sure if we still need this one, but added starting players because we remove players and I need the reference
         self.players.append(player)
         self.players_game.append(player)
         # If this is the first player added, set them as the dealer

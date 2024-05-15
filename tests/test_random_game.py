@@ -4,27 +4,30 @@ from poker_game.utils.players import Player, ActualPlayerTemplate, create_player
 from poker_game.utils.table import Table
 from poker_game.utils.objects_on_table import Deck, Chips, Card
 from poker_game.utils.game import TexasHoldemGame
+from poker_game.utils.logging_config import setup_logging
 import logging
 
-logger = logging.getLogger(__name__)
+setup_logging()
+logger = logging.getLogger('poker_game')
+
 class TestTexasHoldemGame(unittest.TestCase):
     def test_play_round(self):
         winnerlist = []
         for game in range(1, 100):
             table = Table()
-            player1 = create_player("A", 'raises with aces reduces with 12345', Chips(100))
-            player2 = create_player("B", 'conservative', Chips(100))
-            player3 = create_player("C", 'conservative', Chips(100))
-            player4 = create_player("D", 'careful calculator', Chips(100))
-            player5 = create_player("E", 'aggressive', Chips(100))
-            player6 = create_player("F", 'always fold', Chips(100))
+            A = create_player("A", 'raises with aces reduces with 12345', Chips(100))
+            B = create_player("B", 'conservative', Chips(100))
+            C = create_player("C", 'conservative', Chips(100))
+            D = create_player("D", 'careful calculator', Chips(100))
+            E = create_player("E", 'aggressive', Chips(100))
+            F = create_player("F", 'always fold', Chips(100))
             
-            table.add_player(player1)
-            table.add_player(player2)
-            table.add_player(player3)
-            table.add_player(player4)
-            table.add_player(player5)
-            table.add_player(player6)
+            table.add_player(A)
+            table.add_player(B)
+            table.add_player(C)
+            table.add_player(D)
+            table.add_player(E)
+            table.add_player(F)
             
             expected_sum = sum([player.chips.amount for player in table.players])
 

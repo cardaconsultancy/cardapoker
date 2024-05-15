@@ -1,0 +1,92 @@
+%YAML 1.1
+---
+kind: ApplicationProject
+name: charlesatbrmg
+spec:
+  environment: stg
+  opex: teamsequoia
+  pii_level: 2
+  with_gke: true
+  enabled_apis:
+    - cloudtrace.googleapis.com
+    - bigquery.googleapis.com
+    - aiplatform.googleapis.com 
+  service_permissions:
+    "serviceAccount:charlesserviceacc":
+      roles:
+        - roles/cloudsql.client
+        - organizations/366839382793/roles/bigquery.dataReader
+        - organizations/366839382793/roles/bigquery.jobRunner
+  quota:
+    requests:
+      cpu: 50
+      memory: 64Gi
+    limits:
+      cpu: 150
+      memory: 128Gi
+  limitrange:
+    min:
+      cpu: 50m
+      memory: 64Mi
+    max:
+      cpu: 10
+      memory: 16Gi
+---
+kind: ServiceAccount
+name: charlesserviceacc
+spec:
+  enable_for_kubernetes: true
+---
+kind: Storage/Bucket
+name: bucketone
+spec:
+  visibility: public
+  data_sensitivity: medium
+  labels:
+    pii_data: true
+  permissions:
+    "serviceAccount:charlesserviceacc":
+      roles:
+        - organizations/366839382793/roles/storage.objectAdminSafe
+        - roles/storage.legacyBucketReader
+    # Optional - for easier local development
+    "group:teamsequoia@bol.com":
+      roles:
+        - organizations/366839382793/roles/storage.objectAdminSafe
+        - roles/storage.legacyBucketReader
+---
+kind: BigQuery/Dataset
+name: datasetone
+spec:
+  data_sensitivity: medium
+  dam_stock_exchange_sensitive: "medium"
+  dam_retailer_competition_sensitive: true
+  dam_permissive: false
+  labels:
+    pii_data: true
+  permissions:
+    "serviceAccount:charlesserviceacc":
+      roles:
+        - roles/bigquery.metadataViewer
+        - roles/bigquery.dataViewer
+        - organizations/366839382793/roles/bigquery.dataReader
+        - organizations/366839382793/roles/bigquery.dataWriter
+        - organizations/366839382793/roles/bigquery.dataOwner
+        - organizations/366839382793/roles/bigquery.dataOwnerDAM
+        - organizations/366839382793/roles/bigquery.jobViewer
+    # Optional - for easier local development
+    "group:teamsequoia@bol.com":
+      roles:
+        - roles/bigquery.metadataViewer
+        - roles/bigquery.dataViewer
+        - organizations/366839382793/roles/bigquery.dataReader
+        - organizations/366839382793/roles/bigquery.dataWriter
+        - organizations/366839382793/roles/bigquery.dataOwner
+        - organizations/366839382793/roles/bigquery.dataOwnerDAM
+        - organizations/366839382793/roles/bigquery.jobViewer
+---
+kind: Gitlab/Kubeconfig
+name: stg
+spec:
+  allowed_runners:
+    stg: {}

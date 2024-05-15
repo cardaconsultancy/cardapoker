@@ -4,17 +4,16 @@ from poker_game.utils.clean_up import clean_up
 from poker_game.utils.get_and_pay_winners import pay_winners
 from poker_game.utils.objects_on_table import Deck
 from poker_game.utils.pot_management import check_if_rest_folded_and_pay
-from poker_game.utils.logging_config import setup_logging
+import logging
 
-# Obtain the logger configured in logging_config.py
-logger = setup_logging()
-
+# Retrieve the already configured logger
+logger = logging.getLogger('poker_game')
 
 # A full round of Texas Holdem
 def start_round(table, test_cards=None, seed=None):
 
     # log new game
-    logger.info(f"New Game")
+    logger.info(f"--- New Game ---")
     print('haha')
     logger.debug(2^10)
     # reset the deck
@@ -33,6 +32,9 @@ def start_round(table, test_cards=None, seed=None):
     # (Chosen to stay the closest to the real game, by not dealing two at once)
     for player in table.players_game:
 
+        # log the amount of chips each player has
+        logger.info(f"{player.name}-chips-{player.chips.amount}")
+
         # in case of a test with predefined cards, we don't want to give
         # the player any cards
         if len(player.hand) == 0:
@@ -49,7 +51,8 @@ def start_round(table, test_cards=None, seed=None):
     for player in table.players_game:
 
         # I will separate logging and dashboarding in the future
-        logger.info(f'{player.name}-{player.hand[0].rank}{player.hand[0].suit}{player.hand[1].rank}{player.hand[1].suit}')
+        # logger.info(f'{player.name}-{player.hand[0].rank}{player.hand[0].suit}{player.hand[1].rank}{player.hand[1].suit}')
+        logger.info(f'{player.name}.hand = [Card("{player.hand[0].rank}", "{player.hand[0].suit}"), Card("{player.hand[1].rank}", "{player.hand[1].suit}")]')
         logger.debug(f'Player {player.name} has {player.hand}')
 
     # Betting Round 1, note that preflop_round is set to True
@@ -74,8 +77,9 @@ def start_round(table, test_cards=None, seed=None):
         table.community_cards.extend(test_cards[0:3])
 
     # log flop
-    logger.info(f'{table.community_cards[0].rank}{table.community_cards[0].suit}{table.community_cards[1].rank}{table.community_cards[1].suit}{table.community_cards[2].rank}{table.community_cards[2].suit}')
-
+    # logger.info(f'{table.community_cards[0].rank}{table.community_cards[0].suit}{table.community_cards[1].rank}{table.community_cards[1].suit}{table.community_cards[2].rank}{table.community_cards[2].suit}')
+    logger.info(f'[Card("{table.community_cards[0].rank}", "{table.community_cards[0].suit}"), Card("{table.community_cards[1].rank}", "{table.community_cards[1].suit}"), Card("{table.community_cards[2].rank}", "{table.community_cards[2].suit}"),')
+    
     # Betting Round 2: flop
     if not all_folded_or_all_in(table):
         logger.debug(f"Players can bet on the flop.")
@@ -103,7 +107,8 @@ def start_round(table, test_cards=None, seed=None):
         table.community_cards.append(test_cards[3])
     
     # log turn
-    logger.info(f'{table.community_cards[3].rank}{table.community_cards[3].suit}')
+    # logger.info(f'{table.community_cards[3].rank}{table.community_cards[3].suit}')
+    logger.info(f' Card("{table.community_cards[3].rank}", "{table.community_cards[3].suit}"),')
     logger.debug(f"On the table comes {table.community_cards[3].rank} of {table.community_cards[3].suit}.") 
 
     # Betting Round 3, the turn
@@ -134,7 +139,8 @@ def start_round(table, test_cards=None, seed=None):
         table.community_cards.append(test_cards[4])
 
     # log river
-    logger.info(f'{table.community_cards[4].rank}{table.community_cards[4].suit}')
+    # logger.info(f'{table.community_cards[4].rank}{table.community_cards[4].suit}')
+    logger.info(f' Card("{table.community_cards[4].rank}", "{table.community_cards[4].suit}")]')
     logger.debug(f"On the table comes {table.community_cards[4].rank} of {table.community_cards[4].suit}.") 
 
     # Betting Round 4, the river

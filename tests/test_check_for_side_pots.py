@@ -4,6 +4,8 @@ from poker_game.utils.table import Table
 from poker_game.utils.objects_on_table import Deck, Chips, Card, Pot
 from poker_game.utils.game import TexasHoldemGame
 from poker_game.utils.pot_management import check_for_side_pots
+from poker_game.utils.logging_config import setup_logging
+setup_logging()
 
 class TestTexasHoldemGame(unittest.TestCase):
     def test_play_round(self, p1bet=20):

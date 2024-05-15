@@ -1,8 +1,10 @@
 from .evaluate_hand import get_hand_rank, card_rank_value
 import logging
 
-logger = logging.getLogger(__name__)
+# Retrieve the already configured logger
+logger = logging.getLogger('poker_game')
 
+# Determine the winners of the round
 def determine_winners(pot_players, table):
     # Determine the best hand for each player
     # dict_example = {}
@@ -19,6 +21,7 @@ def determine_winners(pot_players, table):
         metric_list = []
         for player in winner_list:
             logger.debug(f"  2a. Player {player.name} with {player.best_hand}")
+            logger.info(f"{player.name}-{player.best_hand}")
             if metric == 0:
                 metric_list.append(player.best_hand[metric])
             else:
