@@ -59,7 +59,7 @@ class TestTexasHoldemGame(unittest.TestCase):
         player4.hand = [Card('3', '♥'), Card('K', '♣')] 
         player5.hand = [Card('8', '♥'), Card('8', '♠')] 
         player6.hand = [Card('K', '♦'), Card('T', '♠')] 
-# 7♦9♠K♥9♦4♦
+
         test_cards = [Card('7', '♦'), Card('9', '♠'), Card('K', '♥'), Card('9', '♦'), Card('4', '♦')] 
 
         expected_sum = sum([player.chips.amount for player in table.players])

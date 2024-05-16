@@ -5,6 +5,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 def create_pots(table):
+
+    """
+    This function creates pots for the table. It is called at the end of each round.
+    """
+
     logger.debug(f"Start to create pot(s)")
 
     # if there are no pots, create one.
@@ -13,6 +18,8 @@ def create_pots(table):
         main_pot.players = [player for player in table.players_game if player.folded == False]
         table.pots.append(main_pot)
         logger.debug(f"No pot yet, so created {len(table.pots)} main pot")
+
+    # creates side pots if needed, returns None 
     check_for_side_pots(table)
 
     # reset the bets and raise/check/call status
@@ -63,8 +70,20 @@ def check_for_side_pots(table):
     # check_for_side_pots = True
     sidepot_created = False
     counter = 1
+
+    # loop as long as there are people that have money to devide over the pots
     while any(player.total_bet_betting_round != 0 for player in table.players):
 
+        # check if there is only one person that has money left, then give back the money to the player.
+        if len([player for player in table.players if player.total_bet_betting_round != 0]) == 1:
+            logger.debug(f"Only one player has money left, the only time in the game we give money back")
+            # get the player that has money left and give it back
+            player = next(player for player in table.players if player.total_bet_betting_round != 0)
+            player.chips.give_back(player.total_bet_betting_round)
+            logger.debug(f"{player.name} got his/her {player.total_bet_betting_round} chips back")
+            player.total_bet_betting_round = 0
+            return None
+        
         # get the minimum bet from the people that did not fold:
         not_folded_or_out = []
         for player in table.players_game:
@@ -80,26 +99,31 @@ def check_for_side_pots(table):
         #     AssertionError
 
         if len(not_folded_or_out) < 2:
-            raise Exception("this should have been caught earlier on")
+            logger.debug(f"there are multiple people all in, but not enough players to create a side pot")
+            logger.debug(len([player for player in not_folded_or_out if not player.all_in]))
+            logger.debug(len([player for player in not_folded_or_out if player.all_in]))
 
-        # check if there is only 1 person not all in amongst the non-folders (and the other one is, reduce his/her bet by the difference with the max bidder).
-        elif len([player for player in not_folded_or_out if not player.all_in]) == 1 and len([player for player in not_folded_or_out if player.all_in]) == 1:
-            logger.debug(f"2. Only one player not all in")
+        # I think there is an easier way of doing this, by just checking if the side pot only has one player, then give back that money to the player.
 
-            # Find the player who is not all-in: the folded 60
-            non_all_in_player = next(player for player in not_folded_or_out if not player.all_in)
-            # print(non_all_in_player.name)
 
-            # Find the max bet among all-in players
-            all_in_bet = max(player.total_bet_betting_round for player in not_folded_or_out if player.all_in)
-            # print(all_in_bet, non_all_in_player.total_bet_betting_round)
+        # # check if there is only 1 person not all-in amongst the non-folders (and the other one is, reduce his/her bet by the difference with the max bidder).
+        # elif len([player for player in not_folded_or_out if not player.all_in]) == 1 and len([player for player in not_folded_or_out if player.all_in]) == 1:
+        #     logger.debug(f"2. Only one player not all in")
 
-            # This is the only case in which we give players back money in mid game as we cannot guarantee who joins:
-            non_all_in_player.chips.give_back(non_all_in_player.total_bet_betting_round - all_in_bet)
+        #     # Find the player who is not all-in: the folded 60
+        #     non_all_in_player = next(player for player in not_folded_or_out if not player.all_in)
+        #     # print(non_all_in_player.name)
 
-            # Adjust the bet of the non all-in player
-            logger.debug(f"As {non_all_in_player.name} was the only one not all in, his/her will be reduced by {non_all_in_player.total_bet_betting_round - all_in_bet}")
-            non_all_in_player.total_bet_betting_round = all_in_bet
+        #     # Find the max bet among all-in players
+        #     all_in_bet = max(player.total_bet_betting_round for player in not_folded_or_out if player.all_in)
+        #     # print(all_in_bet, non_all_in_player.total_bet_betting_round)
+
+        #     # This is the only case in which we give players back money in mid game as we cannot guarantee who joins:
+        #     non_all_in_player.chips.give_back(non_all_in_player.total_bet_betting_round - all_in_bet)
+
+        #     # Adjust the bet of the non all-in player
+        #     logger.debug(f"As {non_all_in_player.name} was the only one not all in, his/her will be reduced by {non_all_in_player.total_bet_betting_round - all_in_bet}")
+        #     non_all_in_player.total_bet_betting_round = all_in_bet
 
         # check if the players all betted the same amount, if so take shortcut (also necessary to prevent loop):
         if lowest_bet == max([player.total_bet_betting_round for player in not_folded_or_out]):
@@ -107,6 +131,8 @@ def check_for_side_pots(table):
 
             # get the first out of not_folded_or_out
             fill_current_pot(not_folded_or_out[0], table)
+            
+            # just an easy way to get out of the loop
             return None
         
         counter += 1
@@ -116,7 +142,7 @@ def check_for_side_pots(table):
         for player in not_folded_or_out[:]:
             logger.debug(f"check player:{player.name}")
             logger.debug(f"nr of players in not_folded_or_out: {len(not_folded_or_out)}")
-            logger.debug(f"total bet (left) this round: {player.total_bet_betting_round}")
+            logger.debug(f"{player.name} has {player.total_bet_betting_round} left to devide over the pot(s)")
             logger.debug(f"lowest bet: {lowest_bet}")
 
             # check if they have the lowest bid
@@ -128,7 +154,7 @@ def check_for_side_pots(table):
                     logger.debug(f"player {player.name} went all in, side pot is needed")
                     # fill up original pot & create side pot
                     fill_current_pot(player, table)
-                    logger.debug(f"after filling the pot {player.total_bet_betting_round} is left")
+                    logger.debug(f"after filling the pot, {player.name} has {player.total_bet_betting_round} left to put in other pots")
 
                     side_pot = Pot()
 
@@ -151,8 +177,9 @@ def check_for_side_pots(table):
             fill_current_pot(not_folded_or_out[0], table)
             # for pot in table.pots:
             #     print(f'---------- pot {pot} is {pot.amount}')
+
+            # just an easy way to get out of the loop
             return None
-                    # get the minimum bet fromt he people that did not fold:
         
         # check_for_side_pots = True
         logger.debug(f"A sidepot was created")
