@@ -1,7 +1,7 @@
 # cut up logic in parts
-# TODO : Integrate player feedback logic
+# TODO: Integrate player feedback logic
 # create an GPT that can help players set up their player
-# TODO : AI commentator
+# TODO: AI commentator
 
 import unittest
 from poker_game.utils.players import Player

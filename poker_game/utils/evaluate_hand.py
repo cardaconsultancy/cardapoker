@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 
 
 def card_rank_value(rank):
-    if rank == None:
+    if rank is None:
         return 0
     return '123456789TJQKA'.index(rank) + 1
 

@@ -32,7 +32,7 @@ def clean_up(table):
     
     # Get the next dealer
     table.dealer = get_next_player(starting_players=table.starting_players, active_players=table.players_game, current_player=table.dealer)
-    if table.dealer.folded == True: AssertionError()
+    if table.dealer.folded: AssertionError()
 
     # loop over a copy of the list and remove all the people without money
     for player in table.players[:]:
@@ -49,7 +49,9 @@ def clean_up(table):
     table.players_game = table.players
     table.community_cards = []
     table.pots = []
-    # table.players = [player for player in table.players if player.chips.amount > 0]
+    
+    # if there is only one player left, the game is over
     if len(table.players) == 1:
+        logger.debug(f"Only {table.players[0].name} is left, the game is over.")
         return None
     # move dealer button --> needs to be refactored

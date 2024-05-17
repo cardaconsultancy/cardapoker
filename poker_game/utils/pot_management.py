@@ -84,7 +84,7 @@ def check_for_side_pots(table):
             player.total_in_pots_this_game -= player.total_bet_betting_round
             logger.debug(f"{player.name} got his/her {player.total_bet_betting_round} chips back")
             player.total_bet_betting_round = 0
-            # remove the last pot, as it is empty
+            # remove the last pot, as it is empty  
             popped_pot = table.pots.pop()
             logger.debug(f"remove the last pot, as it is empty: {popped_pot.amount} chips. {len(table.pots)} pots left.")
             return None
@@ -131,7 +131,7 @@ def check_for_side_pots(table):
                 logger.debug(f"player {player.name} has the lowest bet of {lowest_bet}")
 
                 # check if there is at least one player that went all in (if multiple no problem)... 
-                if player.all_in == True:
+                if player.all_in:
                     logger.debug(f"player {player.name} went all in, side pot is needed")
                     # fill up original pot & create side pot
                     fill_current_pot(player, table)

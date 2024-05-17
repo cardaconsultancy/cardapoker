@@ -69,7 +69,7 @@ def start_round(table, test_cards=None, seed=None):
     logger.debug(f"Total betted {sum(player.total_in_pots_this_game for player in table.players)}.")
 
     # Deal the flop (three community cards) if no test cards are provided
-    if test_cards == None:
+    if test_cards is None:
         table.community_cards.append(deck.deal())
         table.community_cards.append(deck.deal())
         table.community_cards.append(deck.deal())
@@ -92,7 +92,8 @@ def start_round(table, test_cards=None, seed=None):
             clean_up(table)
             return table
         logger.debug(f"Total is {sum(player.total_in_pots_this_game for player in table.players)}.")
-    
+    else:
+        logger.debug(f"All but one are all in, so no more bets!")
     # TODO delete this line if not needed
     if check_if_rest_folded_and_pay(table):
         print('obsolete')
@@ -100,7 +101,7 @@ def start_round(table, test_cards=None, seed=None):
     
 
     # Deal the turn (one additional community card) if no test cards are provided
-    if test_cards == None:
+    if test_cards is None:
         table.community_cards.append(deck.deal())
     else:
         print('TEST')
@@ -115,24 +116,22 @@ def start_round(table, test_cards=None, seed=None):
 
     # Check if all players are all-in or folded
     if not all_but_one_folded_or_all_in:
-        print('Everybody is all in or folded, no more bets!')
-    
-    # If not all players are all-in or folded, start the betting round
-    else:
         logger.debug(f"Players can bet on the turn.")
         if not betting_round_completed(table):
             print('!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!')
             clean_up(table)
             return table
         logger.debug(f"Total is {sum(player.total_in_pots_this_game for player in table.players)}.")
-    
+    else:
+        logger.debug(f"All but one are all in, so no more bets!")
+
     # TODO delete this line if not needed
     if check_if_rest_folded_and_pay(table):
         print('obsolete')
         return True
     
     # Deal the river (one final community card)
-    if test_cards == None:
+    if test_cards is None:
         table.community_cards.append(deck.deal())
     else:
         print('TEST')
@@ -145,17 +144,15 @@ def start_round(table, test_cards=None, seed=None):
 
     # Betting Round 4, the river
     if not all_but_one_folded_or_all_in:
-        print('Everybody is all in, no more bets!')
-
-    # If not all players are all-in or folded, start the betting round
-    else:
         logger.debug(f"Players can bet on the river, final bet!")
         if not betting_round_completed(table):
             print('!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!')
             clean_up(table)
             return table
         logger.debug(f"Total is {sum(player.total_in_pots_this_game for player in table.players)}.")
-    
+    else:
+        logger.debug(f"All but one are all in, so no more bets!")
+            
     # TODO delete this line if not needed
     if check_if_rest_folded_and_pay(table):
         print('obsolete')
@@ -164,6 +161,11 @@ def start_round(table, test_cards=None, seed=None):
     # Determine the winner(s)
     logger.debug(f"Pay_the_winner(s)")
     pay_winners(table)
+
+    # debugger to identify errors in long simulations
+    if sum(player.chips.amount for player in table.players) != 600:
+        AttributeError("The total amount of chips is not 600")
+        print(sum(player.chips.amount for player in table.players))
 
     # Clean up
     clean_up(table)

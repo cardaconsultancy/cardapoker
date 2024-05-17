@@ -84,7 +84,8 @@ def pay_winners(table):
 
         logger.debug(f"Removing {last_pot}, so {len(table.pots)} pots left")
 
-    # debugger
+    # debugger to identify errors in long simulations
     if sum(player.chips.amount for player in table.players) != 600:
         AttributeError("The total amount of chips is not 600")
+        1/0
         print(sum(player.chips.amount for player in table.players))

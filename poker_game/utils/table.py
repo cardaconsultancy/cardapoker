@@ -37,7 +37,7 @@ class Table:
         else:
             self.logger.error("Invalid index for dealer")
         # for chair in self.seats:
-        #     if self.seats[chair] == None:
+        #     if self.seats[chair] is None:
         #         self.seats[chair] = player
         #         self.players.append(player)
         #         self.logger.info(f"{player} got added to table on seat {chair}")

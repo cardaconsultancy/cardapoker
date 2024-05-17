@@ -21,7 +21,7 @@ def betting_round_completed(table, preflop_round = False):
     # create another variable for if it is the first_bet
     first_bet = True
     
-    if preflop_round == True:
+    if preflop_round:
         # SB_is_last_raiser_so_that_BB_can_have_another_go = True
         first_bet = False
 
@@ -34,14 +34,14 @@ def betting_round_completed(table, preflop_round = False):
         
 
         # if this is the first bet and we are not in the preflop round, the first raiser is the one that sets the limit
-        if first_bet == True and preflop_round == False:
+        if first_bet  and preflop_round == False:
             last_raiser = player
             logger.debug(f"this is the first bet and so {last_raiser.name} automatically is last raiser")
             first_bet = False
         logger.debug(f" the current last raiser is {last_raiser.name} with {last_raiser.total_bet_betting_round} chips")
         logger.debug(f"{player.name} is up and currently has {player.total_bet_betting_round} in the betting round pot")
 
-        if preflop_round == True:
+        if preflop_round:
             player.total_bet_betting_round += table.blind_size
             logger.debug(f"Player {player.name} has the small blind of {player.total_bet_betting_round}")
             
@@ -102,7 +102,7 @@ def betting_round_completed(table, preflop_round = False):
 
             # This is a very confusing part of poker, where the last raiser can have another go when he/she is the big blind.
             # I Have entered a section here that keeps logs 
-            # if player == last_raiser and SB_is_last_raiser_so_that_BB_can_have_another_go == True:
+            # if player == last_raiser and SB_is_last_raiser_so_that_BB_can_have_another_go:
                 # I keep switching between these options, but for now, it is more convenient to have the last raiser logic
                 # separate from the highest bid due to big blinds being able to raise again.
                 # max_bet = last_raiser.total_bet_betting_round
@@ -218,7 +218,7 @@ def betting_round_completed(table, preflop_round = False):
             
             # I don't think I use this anymore
             # The special status of Big Blind is removed if we continue
-            # if player == last_raiser and SB_is_last_raiser_so_that_BB_can_have_another_go == True:
+            # if player == last_raiser and SB_is_last_raiser_so_that_BB_can_have_another_go:
             #     SB_is_last_raiser_so_that_BB_can_have_another_go = False
 
             # required_action += 1
@@ -250,13 +250,13 @@ def betting_round_completed(table, preflop_round = False):
                 # The player who has the small blind makes the first bet in poker, which is why we can get the next one directly
                 player = get_next_player(starting_players=table.starting_players, active_players=table.players_game, current_player=player)
 
-                if player == None:
+                if player is None:
                     player = last_raiser
         else:
             # The player who has the small blind makes the first bet in poker, which is why we can get the next one directly
             player = get_next_player(starting_players=table.starting_players, active_players=table.players_game, current_player=player)
 
-            if player == None:
+            if player is None:
                 player = last_raiser
         
     # all players are either all in or folded or have called/checked/raised

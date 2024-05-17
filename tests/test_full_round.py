@@ -1,6 +1,6 @@
 import unittest
 from poker_game.utils.players import create_player
-from poker_game.utils.start_round import start_round
+from poker_game.utils.play_round import start_round
 from poker_game.utils.table import Table
 from poker_game.utils.objects_on_table import Deck, Chips, Card, Pot
 from poker_game.utils.game import TexasHoldemGame

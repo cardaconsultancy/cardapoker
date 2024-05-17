@@ -1,6 +1,6 @@
 import logging
 
-from poker_game.utils.start_round import start_round
+from poker_game.utils.play_round import start_round
 
 logger = logging.getLogger(__name__)
 
