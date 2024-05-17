@@ -1,4 +1,4 @@
-from poker_game.utils.at_most_one_not_all_in_or_folded import all_folded_or_all_in
+from poker_game.utils.at_most_one_not_all_in_or_folded import all_but_one_folded_or_all_in
 from poker_game.utils.betting_round import betting_round_completed
 from poker_game.utils.clean_up import clean_up
 from poker_game.utils.get_and_pay_winners import pay_winners
@@ -81,7 +81,7 @@ def start_round(table, test_cards=None, seed=None):
     logger.info(f'[Card("{table.community_cards[0].rank}", "{table.community_cards[0].suit}"), Card("{table.community_cards[1].rank}", "{table.community_cards[1].suit}"), Card("{table.community_cards[2].rank}", "{table.community_cards[2].suit}"),')
     
     # Betting Round 2: flop
-    if not all_folded_or_all_in(table):
+    if not all_but_one_folded_or_all_in(table):
         logger.debug(f"Players can bet on the flop.")
 
         # Start the betting round and check if the betting round is completed
@@ -114,7 +114,7 @@ def start_round(table, test_cards=None, seed=None):
     # Betting Round 3, the turn
 
     # Check if all players are all-in or folded
-    if not all_folded_or_all_in:
+    if not all_but_one_folded_or_all_in:
         print('Everybody is all in or folded, no more bets!')
     
     # If not all players are all-in or folded, start the betting round
@@ -144,7 +144,7 @@ def start_round(table, test_cards=None, seed=None):
     logger.debug(f"On the table comes {table.community_cards[4].rank} of {table.community_cards[4].suit}.") 
 
     # Betting Round 4, the river
-    if not all_folded_or_all_in:
+    if not all_but_one_folded_or_all_in:
         print('Everybody is all in, no more bets!')
 
     # If not all players are all-in or folded, start the betting round

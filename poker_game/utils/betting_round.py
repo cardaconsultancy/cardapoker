@@ -244,7 +244,7 @@ def betting_round_completed(table, preflop_round = False):
             # this is the first time so remove this special status
             big_blind_player = None
             if max_bet == player.total_bet_betting_round:
-                logger.debug(f"Because this is the Big Blind and the {last_raiser.name}'s {max_bet} chips is less than {player.name}'s {player.total_bet_betting_round}, make this the last bet")
+                logger.debug(f"Because this is the Big Blind and the {last_raiser.name}'s {max_bet} chips is less than or equal to {player.name}'s {player.total_bet_betting_round}, make this the last bet")
                 player = last_raiser
             else:
                 # The player who has the small blind makes the first bet in poker, which is why we can get the next one directly

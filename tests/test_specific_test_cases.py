@@ -12,6 +12,29 @@ logger = logging.getLogger('poker_game')
 
 # this is a test where the person after the BB folds, making last raiser disappear
 class TestTexasHoldemGame(unittest.TestCase):
+    
+    def test_sum_error(self):
+        table = Table()
+        table.blind_size = 4
+        D = create_player("D", 'careful calculator', Chips(592))
+        F = create_player("F", 'always fold', Chips(8))    
+ 
+        table.add_player(F)
+        table.add_player(D) 
+
+        D.hand = [Card("9", "♣"), Card("8", "♦")]
+        F.hand = [Card("T", "♣"), Card("8", "♣")]  
+
+        test_cards = [Card("J", "♣"), Card("J", "♦"), Card("8", "♠"), Card("5", "♠"), Card("J", "♠")]
+
+        expected_sum = sum([player.chips.amount for player in table.players])
+
+        result = start_round(table=table, test_cards = test_cards)
+        print(expected_sum)
+        print(sum([player.chips.amount for player in result.players]))
+        self.assertEqual(sum([player.chips.amount for player in result.players]), expected_sum)
+        print('=======================hey---------\n\n')
+
     def test_fold_after_BB(self):
         table = Table()
 
@@ -69,6 +92,29 @@ class TestTexasHoldemGame(unittest.TestCase):
         print(sum([player.chips.amount for player in result.players]))
         self.assertEqual(sum([player.chips.amount for player in result.players]), expected_sum)
 
+    def test_equal_cards(self):
+        table = Table()
+
+        B = create_player("B", 'conservative', Chips(168))
+        E = create_player("E", 'aggressive', Chips(422))
+        F = create_player("F", 'always fold', Chips(10))
+        
+        table.add_player(B)
+        table.add_player(E)
+        table.add_player(F)
+
+        B.hand = [Card("5", "♣"), Card("8", "♥")]
+        E.hand = [Card("6", "♦"), Card("8", "♠")]
+        F.hand = [Card("9", "♣"), Card("Q", "♣")]
+
+        test_cards = [Card("Q", "♥"), Card("3", "♣"), Card("A", "♠"), Card("2", "♣"), Card("9", "♦")] 
+
+        expected_sum = sum([player.chips.amount for player in table.players])
+
+        result = start_round(table=table, test_cards = test_cards)
+        print(expected_sum)
+        print(sum([player.chips.amount for player in result.players]))
+        self.assertEqual(sum([player.chips.amount for player in result.players]), expected_sum)
 
 if __name__ == '__main__':
     unittest.main()

@@ -21,7 +21,7 @@ def determine_winners(pot_players, table):
         metric_list = []
         for player in winner_list:
             logger.debug(f"  2a. Player {player.name} with {player.best_hand}")
-            logger.info(f"{player.name}-{player.best_hand}")
+            logger.debug(f"{player.name}-{player.best_hand}")
             if metric == 0:
                 metric_list.append(player.best_hand[metric])
             else:
@@ -49,8 +49,9 @@ def determine_winners(pot_players, table):
     return winner_list
 
 def pay_winners(table):
+    logger.debug(f"1. There are {len(table.pots)} pots left")
     while table.pots:
-        logger.debug(f"There are {len(table.pots)} pots left")
+        logger.debug(f"2. There are {len(table.pots)} pots left")
 
         last_pot = table.pots.pop()  # Remove and get the last pot
         logger.debug(f"There are {len(table.pots)} pots left after popping--------------------")
@@ -66,6 +67,7 @@ def pay_winners(table):
         
         for winner in winner_list:
             logger.debug(f"{winner.name} gets {bounty} chips")
+            logger.info(f"{winner.name}-wins-{bounty}")
             winner.chips.win(bounty)
         
         # Distribute remainder chips
@@ -76,6 +78,7 @@ def pay_winners(table):
             recipient = winner_list[index % len(winner_list)]
             index += 1
             logger.debug(f"{recipient.name} gets an extra chip")
+            logger.info(f"{recipient.name} gets and extra chip")
             recipient.chips.win(1)
             remainder -= 1
 
@@ -83,4 +86,5 @@ def pay_winners(table):
 
     # debugger
     if sum(player.chips.amount for player in table.players) != 600:
+        AttributeError("The total amount of chips is not 600")
         print(sum(player.chips.amount for player in table.players))

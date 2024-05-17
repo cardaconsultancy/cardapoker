@@ -1,147 +1,17 @@
 --- New Game ---
-F-chips-97
-D-chips-199
-B-chips-304
-F.hand = [Card("3", "♥"), Card("3", "♣")]
-D.hand = [Card("Q", "♠"), Card("A", "♠")]
-B.hand = [Card("9", "♥"), Card("5", "♠")]
-SB-D-1
-BB-B-2
-F-F
-D-1-Call
-B-0-Check
-[Card("5", "♦"), Card("7", "♣"), Card("8", "♦"),
-D-0-Check
-B-0-Check
- Card("9", "♣"),
-D-0-Check
-B-0-Check
- Card("T", "♣")]
-D-0-Check
-B-0-Check
-D-[0, 'A', 'Q', 'T', '9', '8']
-B-[2, '9', '5', 'T', None, None]
-F-chips-97
-D-chips-197
-B-chips-306
---- New Game ---
-B-chips-50
-C-chips-50
-D-chips-260
-E-chips-90
-F-chips-100
-A-chips-50
-B.hand = [Card("2", "♦"), Card("T", "♦")]
-C.hand = [Card("2", "♣"), Card("A", "♦")]
-D.hand = [Card("3", "♥"), Card("K", "♣")]
-E.hand = [Card("8", "♥"), Card("8", "♠")]
-F.hand = [Card("K", "♦"), Card("T", "♠")]
-A.hand = [Card("4", "♣"), Card("6", "♠")]
-SB-C-1
-BB-D-2
-E-10-Raise
-F-F
-A-10-Call
-B-10-Call
-C-9-Call
-D-8-Call
-[Card("7", "♦"), Card("9", "♠"), Card("K", "♥"),
-C-0-Check
-D-0-Check
-E-10-Raise
-A-10-Call
-B-10-Call
-C-10-Call
-D-10-Call
- Card("9", "♦"),
-C-0-Check
+F-chips-8
+D-chips-592
+F.hand = [Card("T", "♣"), Card("8", "♣")]
+D.hand = [Card("9", "♣"), Card("8", "♦")]
+SB-D-4
+BB-F-8
+D-4-Call
+[Card("J", "♣"), Card("J", "♦"), Card("8", "♠"),
+ Card("5", "♠"),
 D-20-Raise
-E-F
-A-20-Call
-B-20-Call
-C-20-Call
- Card("4", "♦")]
-C-0-Check
-D-20-Raise
-A-10-AI
-B-10-AI
-C-10-AI
---- New Game ---
-F-chips-97
-D-chips-199
-B-chips-304
-F.hand = [Card("3", "♥"), Card("3", "♣")]
-D.hand = [Card("Q", "♠"), Card("A", "♠")]
-B.hand = [Card("9", "♥"), Card("5", "♠")]
-SB-D-1
-BB-B-2
-F-F
-D-1-Call
-B-0-Check
-[Card("5", "♦"), Card("7", "♣"), Card("8", "♦"),
+ Card("J", "♠")]
 D-0-Check
-B-0-Check
- Card("9", "♣"),
-D-0-Check
-B-0-Check
- Card("T", "♣")]
-D-0-Check
-B-0-Check
-D-[0, 'A', 'Q', 'T', '9', '8']
-B-[2, '9', '5', 'T', None, None]
-F-chips-97
-D-chips-197
-B-chips-306
---- New Game ---
-B-chips-50
-C-chips-50
-D-chips-260
-E-chips-90
-F-chips-100
-A-chips-50
-B.hand = [Card("2", "♦"), Card("T", "♦")]
-C.hand = [Card("2", "♣"), Card("A", "♦")]
-D.hand = [Card("3", "♥"), Card("K", "♣")]
-E.hand = [Card("8", "♥"), Card("8", "♠")]
-F.hand = [Card("K", "♦"), Card("T", "♠")]
-A.hand = [Card("4", "♣"), Card("6", "♠")]
-SB-C-1
-BB-D-2
-E-10-Raise
-F-F
-A-10-Call
-B-10-Call
-C-9-Call
-D-8-Call
-[Card("7", "♦"), Card("9", "♠"), Card("K", "♥"),
-C-0-Check
-D-0-Check
-E-10-Raise
-A-10-Call
-B-10-Call
-C-10-Call
-D-10-Call
- Card("9", "♦"),
-C-0-Check
-D-20-Raise
-E-F
-A-20-Call
-B-20-Call
-C-20-Call
- Card("4", "♦")]
-C-0-Check
-D-20-Raise
-A-10-AI
-B-10-AI
-C-10-AI
-D-[2, 'K', '9', '7', None, None]
-B-[5, 'T', '9', '7', '4', '2']
-C-[1, '9', 'A', 'K', '7', None]
-D-[2, 'K', '9', '7', None, None]
-A-[2, '9', '4', 'K', None, None]
-B-chips-220
-C-chips-0
-D-chips-210
-E-chips-70
-F-chips-100
-A-chips-0
+F-wins-0
+D-wins-0
+F-chips-0
+D-chips-584
