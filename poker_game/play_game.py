@@ -11,7 +11,7 @@ def play_game(table, rounds_before_raise_blinds=20, seed=None):
     game_on = True
     number_of_rounds = 1
     blinds_raised = 0
-    print('game on')
+    logger.debug('game on')
     while game_on:
         for raising_time in range(0, rounds_before_raise_blinds):            
             number_of_rounds += 1
@@ -23,7 +23,7 @@ def play_game(table, rounds_before_raise_blinds=20, seed=None):
                 if player.chips.amount == total_chips:
                     logger.debug(f"player {player.name} has won after {number_of_rounds} rounds!!!!")
                     return player.name, number_of_rounds
-            print(f'next round: {number_of_rounds}')
+            logger.debug(f'next round: {number_of_rounds}')
 
             # to create some quick variance over rounds while testing multiple rounds
             if seed != None:

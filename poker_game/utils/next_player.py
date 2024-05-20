@@ -10,11 +10,11 @@ def get_next_player(starting_players, active_players, current_player):
     """
 
     # Log the current player and active and starting players
-    logging.debug(f"Current player: {current_player.name}")
+    logger.debug(f"Current player: {current_player.name}")
     active_player_names = [player.name for player in active_players]
-    logging.debug(f"Active players: {active_player_names}")
+    logger.debug(f"Active players: {active_player_names}")
     starting_player_names = [player.name for player in starting_players]
-    logging.debug(f"Starting players: {starting_player_names}")
+    logger.debug(f"Starting players: {starting_player_names}")
 
     if not active_players or not starting_players:
         AssertionError('No active players or starting players found')
@@ -33,7 +33,7 @@ def get_next_player(starting_players, active_players, current_player):
         next_index = (current_index + 1 + i) % total_players
         next_player = starting_players[next_index]
         if next_player in active_players:
-            logging.debug(f"Next player: {next_player.name}")
+            logger.debug(f"Next player: {next_player.name}")
             return next_player
 
 

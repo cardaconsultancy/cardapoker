@@ -1,11 +1,13 @@
 from poker_game.utils.next_player import get_next_player
 from poker_game.utils.pot_management import check_if_only_one_player_left, create_pots
 import logging
+from poker_game.Timer import timeout
 
 # Retrieve the already configured logger
 logger = logging.getLogger('poker_game')
 
 # A full round of Texas Holdem
+@timeout(5)  # Set timeout to 5 seconds
 def betting_round_completed(table, preflop_round = False):
     
     logger.debug(f" ------------- Start betting round ------------- ")
@@ -31,7 +33,6 @@ def betting_round_completed(table, preflop_round = False):
     big_blind_player = None
 
     while player != last_raiser:
-        
 
         # if this is the first bet and we are not in the preflop round, the first raiser is the one that sets the limit
         if first_bet  and preflop_round == False:
@@ -45,9 +46,6 @@ def betting_round_completed(table, preflop_round = False):
             player.total_bet_betting_round += table.blind_size
             logger.debug(f"Player {player.name} has the small blind of {player.total_bet_betting_round}")
             
-            # log turn
-            logger.info(f'SB-{player.name}-{player.total_bet_betting_round}')
-            
             # check for all in
             if table.blind_size >= player.chips.amount:
                 logger.debug(f"Player {player.name} is all in")
@@ -60,15 +58,15 @@ def betting_round_completed(table, preflop_round = False):
                 player.total_in_pots_this_game = (table.blind_size)
                 player.chips.lose(table.blind_size)
 
+            # log SB if all in or not
+            logger.info(f'SB-{player.name}-{player.total_bet_betting_round}')
+
             player = get_next_player(starting_players=table.starting_players, active_players=table.players_game, current_player=player)
             player.total_bet_betting_round += table.blind_size*2
             logger.debug(f"Player {player.name} has the Big blind of {player.total_bet_betting_round}")
             
             # create a variable that keeps track of the big blind player. We do this so that we can name the next player automatically the last raiser without worrying about creating an indefinite loop.
             big_blind_player = player
-            
-            # log turn
-            logger.info(f'BB-{player.name}-{player.total_bet_betting_round}')
 
             if table.blind_size*2 >= player.chips.amount:
                 logger.debug(f"Player {player.name} is all in")
@@ -80,6 +78,9 @@ def betting_round_completed(table, preflop_round = False):
                 player.total_bet_betting_round = (table.blind_size*2)
                 player.total_in_pots_this_game = (table.blind_size*2)
                 player.chips.lose(table.blind_size*2)
+
+            # log BB if all in or not
+            logger.info(f'BB-{player.name}-{player.total_bet_betting_round}')
 
             preflop_round = False
             
@@ -132,7 +133,8 @@ def betting_round_completed(table, preflop_round = False):
             # new_bet = player.total_bet_betting_round + player_bet
             # logger.debug(f"total bet is {player.total_bet_betting_round + player_bet}")
 
-            # check if the betsize is bigger than the chips, if so correct by making it the max bet 
+            # All in
+            # Also check if the betsize is bigger than the chips, if so correct by making it the max bet 
             if player.total_bet_betting_round + player_bet >= player.total_bet_betting_round + player.chips.amount:
                 
                 # Log this event
@@ -235,32 +237,45 @@ def betting_round_completed(table, preflop_round = False):
             #     all_are_done = True
             # update the all_are_done
         
-        logger.debug(f'total bet: {player.total_bet_betting_round}')
-        logger.debug(f"-- The player was {player.name}")
+        logger.debug(f'total bet {player.name}: {player.total_bet_betting_round}')
         
-        # to prevent a future issue with they player after the big blind being automatically being the last raiser and folding:
+        # to prevent a future issue with the player after the big blind being automatically being the last raiser and folding:
+        # but this leads to the issue that the player after the BB might still need to call to a raise from the next player.
         if player == big_blind_player:
 
             # this is the first time so remove this special status
             big_blind_player = None
-            if max_bet == player.total_bet_betting_round:
-                logger.debug(f"Because this is the Big Blind and the {last_raiser.name}'s {max_bet} chips is less than or equal to {player.name}'s {player.total_bet_betting_round}, make this the last bet")
+            # get a new list of bet sizes from players that have not folded:
+            for gambler in table.players_game:
+                logger.debug('-------', gambler.name, gambler.total_bet_betting_round, gambler.folded)
+            bet_sizes = [gambler.total_bet_betting_round for gambler in table.players_game if gambler.folded == False]
+            logger.debug(f"the non folded bet sizes are {bet_sizes}")
+            min_bet = min(bet_sizes)
+            logger.debug(f"the min bet which is not folded is {min_bet}")
+                
+            if max_bet == player.total_bet_betting_round and min_bet == player.total_bet_betting_round:
+                logger.debug(f"Because this (1) is the Big Blind, (2) the {last_raiser.name}'s {max_bet} chips is less than or equal to {player.name}'s {player.total_bet_betting_round} and (3) the lowest bet is also {min_bet}, make this the last bet")
                 player = last_raiser
             else:
+                logger.debug(f"Because {player.name} (1) is the Big Blind, but (2) the {last_raiser.name}'s {max_bet} chips is less than or equal to {player.name}'s {player.total_bet_betting_round} and/or (3) there are other lower bets, continue as normal")
                 # The player who has the small blind makes the first bet in poker, which is why we can get the next one directly
+                logger.debug(f"-- The player was {player.name}")
                 player = get_next_player(starting_players=table.starting_players, active_players=table.players_game, current_player=player)
 
                 if player is None:
                     player = last_raiser
         else:
             # The player who has the small blind makes the first bet in poker, which is why we can get the next one directly
+            logger.debug(f"-- The player was {player.name}")
             player = get_next_player(starting_players=table.starting_players, active_players=table.players_game, current_player=player)
 
             if player is None:
                 player = last_raiser
         
     # all players are either all in or folded or have called/checked/raised
-    logger.debug(f"Betting round over")
+    logger.debug(f"Betting round over, because {player.name} is the last raiser {last_raiser.name} and all players have called/checked/raised or folded.")
+
+    # 1/0 # for debugg
 
     # create pots
     create_pots(table)
@@ -268,6 +283,8 @@ def betting_round_completed(table, preflop_round = False):
     # remove all players that have folded
     table.players_game = [player for player in table.players_game if player.folded == False]
     logger.debug(f"Players left in the game {[player.name for player in table.players_game]}")
+
+
 
     # completed betting round
     return True

@@ -1,3 +1,4 @@
+from poker_game.Timer import timeout
 from poker_game.utils.at_most_one_not_all_in_or_folded import all_but_one_folded_or_all_in
 from poker_game.utils.betting_round import betting_round_completed
 from poker_game.utils.clean_up import clean_up
@@ -10,11 +11,11 @@ import logging
 logger = logging.getLogger('poker_game')
 
 # A full round of Texas Holdem
+@timeout(5)  # Set timeout to 5 seconds
 def start_round(table, test_cards=None, seed=None):
 
     # log new game
     logger.info(f"--- New Game ---")
-    print('haha')
     logger.debug(2^10)
     # reset the deck
     deck = Deck(seed=seed)
@@ -33,7 +34,21 @@ def start_round(table, test_cards=None, seed=None):
     for player in table.players_game:
 
         # log the amount of chips each player has
-        logger.info(f"{player.name}-chips-{player.chips.amount}")
+        # logger.info(f"{player.name}-chips-{player.chips.amount}")
+        
+        #TODO: remove this lines when the game is stable
+        # for the ease of debugging
+        strategy_mapping = {
+            'AggressivePlayer': 'aggressive',
+            'SuperAggressivePlayer': 'super aggressive',
+            'ConservativePlayer': 'conservative',
+            'AlwaysFoldPlayer': 'always fold',
+            'Raises_with_aces_reduces_with_12345Player': 'raises with aces reduces with 12345',
+            'careful_calculator_Player': 'careful calculator',
+            'ActualPlayerTemplate': 'default'
+        }
+        'create logger info in the form of A = create_player("A", "raises with aces reduces with 12345", Chips(15))'
+        logger.info(f'{player.name} = create_player("{player.name}", "{strategy_mapping[player.__class__.__name__]}", Chips({player.chips.amount}))')
 
         # in case of a test with predefined cards, we don't want to give
         # the player any cards

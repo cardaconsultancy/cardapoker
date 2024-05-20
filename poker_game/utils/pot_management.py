@@ -1,3 +1,4 @@
+from poker_game.Timer import timeout
 from .objects_on_table import Pot
 from .clean_up import clean_up
 import logging
@@ -61,7 +62,8 @@ def check_if_only_one_player_left(table):
             winner.chips.win(player.total_bet_betting_round)
             player.total_bet_betting_round = 0
         return True
-        
+
+@timeout(5)  # Set timeout to 1 seconds        
 def check_for_side_pots(table):
     # use total betting round as an indicator to get out of the loop. Keep reducing it untill every player has 0.
 
@@ -84,9 +86,15 @@ def check_for_side_pots(table):
             player.total_in_pots_this_game -= player.total_bet_betting_round
             logger.debug(f"{player.name} got his/her {player.total_bet_betting_round} chips back")
             player.total_bet_betting_round = 0
-            # remove the last pot, as it is empty  
-            popped_pot = table.pots.pop()
-            logger.debug(f"remove the last pot, as it is empty: {popped_pot.amount} chips. {len(table.pots)} pots left.")
+            
+            # somehow, there is no pot created in this scenario... leading to an error as a full
+            # pot gets deleted. I will just add an if statement here for now.
+            # if the last pot is empty, remove it
+            if table.pots[-1].amount == 0:
+                popped_pot = table.pots.pop()
+                logger.debug(f"remove the last pot, as it is empty: {popped_pot.amount} chips. {len(table.pots)} pots left.")
+            else:
+                logger.debug(f"the last pot has a value of {table.pots[-1].amount} chips")
             return None
         
         # get the minimum bet from the people that did not fold:

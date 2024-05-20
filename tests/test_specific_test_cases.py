@@ -13,27 +13,105 @@ logger = logging.getLogger('poker_game')
 # this is a test where the person after the BB folds, making last raiser disappear
 class TestTexasHoldemGame(unittest.TestCase):
 
-    def test_F_is_not_allowed_to_fold_and_loses(self):
+    def test_last_player_has_no_call_because_they_called_before(self):
         table = Table()
-        table.blind_size = 20
-        C = create_player("C", 'conservative', Chips(590))
-        F = create_player("F", 'always fold', Chips(10))    
- 
+        table.blind_size = 4
+        B = create_player("B", "conservative", Chips(5))
+        C = create_player("C", "conservative", Chips(259))
+        D = create_player("D", "careful calculator", Chips(187))
+        E = create_player("E", "aggressive", Chips(52))
+        F = create_player("F", "always fold", Chips(97))
+        
+        table.add_player(F)
+        table.add_player(B)
         table.add_player(C)
-        table.add_player(F) 
-
-        C.hand = [Card("A", "♥"), Card("A", "♣")]
-        F.hand = [Card("4", "♠"), Card("T", "♠")] 
-
-        test_cards = [Card("A", "♥"), Card("A", "♦"), Card("8", "♠"), Card("5", "♠"), Card("J", "♠")]
-
+        table.add_player(D)
+        table.add_player(E)
+        
+        B.hand = [Card("T", "♠"), Card("5", "♥")]
+        C.hand = [Card("T", "♥"), Card("4", "♥")]
+        D.hand = [Card("4", "♠"), Card("A", "♦")]
+        E.hand = [Card("3", "♣"), Card("5", "♣")]
+        F.hand = [Card("J", "♠"), Card("7", "♣")]
+        test_cards = [Card("3", "♠"), Card("7", "♠"), Card("6", "♦"), Card("Q", "♠"), Card("5", "♠")]
         expected_sum = sum([player.chips.amount for player in table.players])
 
         result = start_round(table=table, test_cards = test_cards)
         print(expected_sum)
         print(sum([player.chips.amount for player in result.players]))
         self.assertEqual(sum([player.chips.amount for player in result.players]), expected_sum)
-        print('=======================hey---------\n\n')
+
+
+
+    # def test_not_adding_to_600_due_to_pot_removal(self):
+    #     table = Table()
+    #     table.blind_size = 4
+    #     D = create_player("D", "careful calculator", Chips(522))
+    #     E = create_player("E", "aggressive", Chips(77))
+    #     F = create_player("F", "always fold", Chips(1))
+
+    #     table.add_player(E)
+    #     table.add_player(F)
+    #     table.add_player(D)
+
+    #     D.hand = [Card("4", "♣"), Card("Q", "♠")]
+    #     E.hand = [Card("A", "♠"), Card("2", "♣")]
+    #     F.hand = [Card("9", "♣"), Card("7", "♣")]
+    #     test_cards = [Card("7", "♥"), Card("Q", "♣"), Card("4", "♠"), Card("Q", "♥"), Card("3", "♠")]
+    #     expected_sum = sum([player.chips.amount for player in table.players])
+
+    #     result = start_round(table=table, test_cards = test_cards)
+    #     print(expected_sum)
+    #     print(sum([player.chips.amount for player in result.players]))
+    #     self.assertEqual(sum([player.chips.amount for player in result.players]), expected_sum)
+
+    # def test_F_is_not_allowed_to_fold_and_loses(self):
+    #     table = Table()
+    #     table.blind_size = 20
+    #     A = create_player("A", 'raises with aces reduces with 12345', Chips(15))
+    #     B = create_player("B", 'conservative', Chips(182))
+    #     E = create_player("E", 'aggressive', Chips(399))
+    #     F = create_player("F", 'always fold', Chips(4))
+
+    #     table.add_player(E)
+    #     table.add_player(F)
+    #     table.add_player(A)
+    #     table.add_player(B)
+
+    #     A.hand = [Card("Q", "♦"), Card("A", "♠")]
+    #     B.hand = [Card("T", "♠"), Card("K", "♠")]
+    #     E.hand = [Card("4", "♥"), Card("6", "♣")]
+    #     F.hand = [Card("7", "♣"), Card("3", "♣")]
+
+    #     test_cards = [Card("K", "♠"), Card("T", "♣"), Card("Q", "♦"), Card("5", "♥"), Card("2", "♥")]
+
+    #     expected_sum = sum([player.chips.amount for player in table.players])
+
+    #     result = start_round(table=table, test_cards = test_cards)
+    #     print(expected_sum)
+    #     print(sum([player.chips.amount for player in result.players]))
+    #     self.assertEqual(sum([player.chips.amount for player in result.players]), expected_sum)
+
+    # def test_F_is_not_allowed_to_fold_and_loses(self):
+    #     table = Table()
+    #     table.blind_size = 20
+    #     C = create_player("C", 'conservative', Chips(590))
+    #     F = create_player("F", 'always fold', Chips(10))    
+ 
+    #     table.add_player(C)
+    #     table.add_player(F) 
+
+    #     C.hand = [Card("A", "♥"), Card("A", "♣")]
+    #     F.hand = [Card("4", "♠"), Card("T", "♠")] 
+
+    #     test_cards = [Card("A", "♥"), Card("A", "♦"), Card("8", "♠"), Card("5", "♠"), Card("J", "♠")]
+
+    #     expected_sum = sum([player.chips.amount for player in table.players])
+
+    #     result = start_round(table=table, test_cards = test_cards)
+    #     print(expected_sum)
+    #     print(sum([player.chips.amount for player in result.players]))
+    #     self.assertEqual(sum([player.chips.amount for player in result.players]), expected_sum)
 
     # def test_sum_error(self):
     #     table = Table()

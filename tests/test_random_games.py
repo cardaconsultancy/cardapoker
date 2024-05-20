@@ -1,3 +1,4 @@
+import datetime
 import unittest
 from poker_game.play_game import play_game
 from poker_game.utils.players import Player, ActualPlayerTemplate, create_player
@@ -6,14 +7,23 @@ from poker_game.utils.objects_on_table import Deck, Chips, Card
 from poker_game.utils.game import TexasHoldemGame
 from poker_game.utils.logging_config import setup_logging
 import logging
+from collections import Counter
 
 setup_logging()
 logger = logging.getLogger('poker_game')
 
 class TestTexasHoldemGame(unittest.TestCase):
     def test_play_round(self):
+        # test how long this test takes
+        start = datetime.datetime.now()
         winnerlist = []
         for game in range(1, 100):
+            # get the game number
+            logger.info(f"Game NR {game}")
+
+            #check if a game is looping forever
+            date = datetime.datetime.now()
+
             table = Table()
             A = create_player("A", 'raises with aces reduces with 12345', Chips(100))
             B = create_player("B", 'conservative', Chips(100))
@@ -34,7 +44,9 @@ class TestTexasHoldemGame(unittest.TestCase):
             winner, rounds = play_game(table=table)
             winnerlist.append(winner)
             logger.info(f"Winner of game {game} is {winner} after {rounds} rounds!")
-        winnerlist.values_count()
+        logger.info(f"Winnerlist: {Counter(winnerlist)}")
+        end = datetime.datetime.now()
+        logger.info(f"Time taken: {end-start}")
         # self.assertEqual(sum([player.chips.amount for player in result_table.players]), expected_sum)
 
 
