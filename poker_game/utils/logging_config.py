@@ -16,6 +16,9 @@ def setup_logging():
     # Console handler
     c_handler = logging.StreamHandler()
     c_handler.setLevel(logging.CRITICAL)
+    
+    # Uncomment the following line to enable console logging
+    # c_handler.setLevel(logging.DEBUG)
     c_format = logging.Formatter('%(name)s - %(message)s')
     c_handler.setFormatter(c_format)
     logger.addHandler(c_handler)

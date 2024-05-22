@@ -103,7 +103,7 @@ def start_round(table, test_cards=None, seed=None):
         # If not completed, the table is cleaned up
 
         if not betting_round_completed(table):
-            print('!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!')
+            logger.debug(f"!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!")
             clean_up(table)
             return table
         logger.debug(f"Total is {sum(player.total_in_pots_this_game for player in table.players)}.")
@@ -133,7 +133,7 @@ def start_round(table, test_cards=None, seed=None):
     if not all_but_one_folded_or_all_in:
         logger.debug(f"Players can bet on the turn.")
         if not betting_round_completed(table):
-            print('!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!')
+            logger.debug(f"!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!")
             clean_up(table)
             return table
         logger.debug(f"Total is {sum(player.total_in_pots_this_game for player in table.players)}.")
@@ -161,7 +161,7 @@ def start_round(table, test_cards=None, seed=None):
     if not all_but_one_folded_or_all_in:
         logger.debug(f"Players can bet on the river, final bet!")
         if not betting_round_completed(table):
-            print('!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!')
+            logger.debug(f"!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!")
             clean_up(table)
             return table
         logger.debug(f"Total is {sum(player.total_in_pots_this_game for player in table.players)}.")

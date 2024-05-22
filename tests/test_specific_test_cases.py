@@ -13,33 +13,86 @@ logger = logging.getLogger('poker_game')
 # this is a test where the person after the BB folds, making last raiser disappear
 class TestTexasHoldemGame(unittest.TestCase):
 
-    def test_last_player_has_no_call_because_they_called_before(self):
+    def test_SB_missed_betting_opportunity(self):
         table = Table()
-        table.blind_size = 4
-        B = create_player("B", "conservative", Chips(5))
-        C = create_player("C", "conservative", Chips(259))
-        D = create_player("D", "careful calculator", Chips(187))
-        E = create_player("E", "aggressive", Chips(52))
-        F = create_player("F", "always fold", Chips(97))
-        
-        table.add_player(F)
-        table.add_player(B)
+        table.blind_size = 2
+        A = create_player("A", "raises with aces reduces with 12345", Chips(512))
+        C = create_player("C", "conservative", Chips(6))
+        E = create_player("E", "aggressive", Chips(12))
+        F = create_player("F", "always fold", Chips(70))
+
         table.add_player(C)
-        table.add_player(D)
         table.add_player(E)
-        
-        B.hand = [Card("T", "♠"), Card("5", "♥")]
-        C.hand = [Card("T", "♥"), Card("4", "♥")]
-        D.hand = [Card("4", "♠"), Card("A", "♦")]
-        E.hand = [Card("3", "♣"), Card("5", "♣")]
-        F.hand = [Card("J", "♠"), Card("7", "♣")]
-        test_cards = [Card("3", "♠"), Card("7", "♠"), Card("6", "♦"), Card("Q", "♠"), Card("5", "♠")]
+        table.add_player(F)
+        table.add_player(A)
+
+        A.hand = [Card("5", "♦"), Card("6", "♠")]
+        C.hand = [Card("5", "♣"), Card("6", "♥")]
+        E.hand = [Card("K", "♣"), Card("9", "♦")]
+        F.hand = [Card("3", "♣"), Card("A", "♦")]
+
+        test_cards = [Card("2", "♣"), Card("3", "♥"), Card("K", "♥"), Card("2", "♠"), Card("J", "♠")]
         expected_sum = sum([player.chips.amount for player in table.players])
 
         result = start_round(table=table, test_cards = test_cards)
         print(expected_sum)
         print(sum([player.chips.amount for player in result.players]))
         self.assertEqual(sum([player.chips.amount for player in result.players]), expected_sum)
+
+    # def test_max_arg_is_empty_seq(self):
+    #     table = Table()
+    #     table.blind_size = 8
+        
+    #     B = create_player("B", "conservative", Chips(411))
+    #     C = create_player("C", "conservative", Chips(6))
+    #     D = create_player("D", "careful calculator", Chips(171))
+    #     F = create_player("F", "always fold", Chips(12))
+
+    #     table.add_player(C)
+    #     table.add_player(D)
+    #     table.add_player(F)
+    #     table.add_player(B)
+
+    #     B.hand = [Card("J", "♠"), Card("7", "♠")]
+    #     C.hand = [Card("A", "♠"), Card("9", "♣")]
+    #     D.hand = [Card("J", "♥"), Card("8", "♣")]
+    #     F.hand = [Card("Q", "♣"), Card("3", "♣")]
+
+    #     test_cards = [Card("2", "♣"), Card("3", "♥"), Card("K", "♥"), Card("2", "♠"), Card("J", "♠")]
+    #     expected_sum = sum([player.chips.amount for player in table.players])
+
+    #     result = start_round(table=table, test_cards = test_cards)
+    #     print(expected_sum)
+    #     print(sum([player.chips.amount for player in result.players]))
+    #     self.assertEqual(sum([player.chips.amount for player in result.players]), expected_sum)
+
+    # def test_last_player_has_no_call_because_they_called_before(self):
+    #     table = Table()
+    #     table.blind_size = 4
+    #     B = create_player("B", "conservative", Chips(5))
+    #     C = create_player("C", "conservative", Chips(259))
+    #     D = create_player("D", "careful calculator", Chips(187))
+    #     E = create_player("E", "aggressive", Chips(52))
+    #     F = create_player("F", "always fold", Chips(97))
+        
+    #     table.add_player(F)
+    #     table.add_player(B)
+    #     table.add_player(C)
+    #     table.add_player(D)
+    #     table.add_player(E)
+        
+    #     B.hand = [Card("T", "♠"), Card("5", "♥")]
+    #     C.hand = [Card("T", "♥"), Card("4", "♥")]
+    #     D.hand = [Card("4", "♠"), Card("A", "♦")]
+    #     E.hand = [Card("3", "♣"), Card("5", "♣")]
+    #     F.hand = [Card("J", "♠"), Card("7", "♣")]
+    #     test_cards = [Card("3", "♠"), Card("7", "♠"), Card("6", "♦"), Card("Q", "♠"), Card("5", "♠")]
+    #     expected_sum = sum([player.chips.amount for player in table.players])
+
+    #     result = start_round(table=table, test_cards = test_cards)
+    #     print(expected_sum)
+    #     print(sum([player.chips.amount for player in result.players]))
+    #     self.assertEqual(sum([player.chips.amount for player in result.players]), expected_sum)
 
 
 

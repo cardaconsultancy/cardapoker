@@ -33,7 +33,7 @@ def get_next_player(starting_players, active_players, current_player):
         next_index = (current_index + 1 + i) % total_players
         next_player = starting_players[next_index]
         if next_player in active_players:
-            logger.debug(f"Next player: {next_player.name}")
+            logger.debug(f"-- Next player: {next_player.name}")
             return next_player
 
 

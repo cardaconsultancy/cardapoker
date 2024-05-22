@@ -129,6 +129,7 @@ def check_for_side_pots(table):
 
         # for every player that has not folded already:
         for player in not_folded_or_out[:]:
+            lowest_bet = min([player.total_bet_betting_round for player in not_folded_or_out])
             logger.debug(f"check player:{player.name}")
             logger.debug(f"nr of players in not_folded_or_out: {len(not_folded_or_out)}")
             logger.debug(f"{player.name} has {player.total_bet_betting_round} left to devide over the pot(s)")
@@ -173,6 +174,8 @@ def check_for_side_pots(table):
         
         # check_for_side_pots = True
         logger.debug(f"A sidepot was created")
+    
+    logger.debug(f"End of check for side pots, the amounts in the pots are: {[pot.amount for pot in table.pots]}")
 
 
 def fill_current_pot(lowest_player, table):

@@ -97,6 +97,12 @@ def betting_round_completed(table, preflop_round = False):
         bet_sizes = [player.total_bet_betting_round for player in table.players_game]
         max_bet = max(bet_sizes)
         
+        # if the BB player cannot afford the BB, the max_bet is the BB
+        logger.debug(f"the max bet is {max_bet}")
+        if max_bet < table.blind_size*2:
+            logger.debug(f"the max bet is lower than the BB, so we set it to the BB of {table.blind_size*2}")
+            max_bet = table.blind_size*2
+        
         # check if all in or folded
         if not player.all_in or player.folded:
             # add the 'first' rule to account for the time when a person has a big blind and is the last raiser.
@@ -259,14 +265,14 @@ def betting_round_completed(table, preflop_round = False):
             else:
                 logger.debug(f"Because {player.name} (1) is the Big Blind, but (2) the {last_raiser.name}'s {max_bet} chips is less than or equal to {player.name}'s {player.total_bet_betting_round} and/or (3) there are other lower bets, continue as normal")
                 # The player who has the small blind makes the first bet in poker, which is why we can get the next one directly
-                logger.debug(f"-- The player was {player.name}")
+                logger.debug(f"The player was {player.name}")
                 player = get_next_player(starting_players=table.starting_players, active_players=table.players_game, current_player=player)
 
                 if player is None:
                     player = last_raiser
         else:
             # The player who has the small blind makes the first bet in poker, which is why we can get the next one directly
-            logger.debug(f"-- The player was {player.name}")
+            logger.debug(f"The player was {player.name}")
             player = get_next_player(starting_players=table.starting_players, active_players=table.players_game, current_player=player)
 
             if player is None:

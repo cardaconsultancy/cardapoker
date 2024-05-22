@@ -8,29 +8,31 @@ from poker_game.utils.game import TexasHoldemGame
 from poker_game.utils.logging_config import setup_logging
 import logging
 from collections import Counter
+import random
 
 setup_logging()
 logger = logging.getLogger('poker_game')
 
 class TestTexasHoldemGame(unittest.TestCase):
-    def test_play_round(self):
+    def test_random_players_random_games(self):
         # test how long this test takes
         start = datetime.datetime.now()
         winnerlist = []
-        for game in range(1, 10000):
+        role_list = ['raises with aces reduces with 12345', 'conservative', 'careful calculator', 'aggressive', 'always fold', 'super aggressive']
+        for game in range(1, 10000): 
             # get the game number
             logger.info(f"Game NR {game}")
 
             #check if a game is looping forever
             date = datetime.datetime.now()
-
+            
             table = Table()
-            A = create_player("A", 'raises with aces reduces with 12345', Chips(100))
-            B = create_player("B", 'conservative', Chips(100))
-            C = create_player("C", 'conservative', Chips(100))
-            D = create_player("D", 'careful calculator', Chips(100))
-            E = create_player("E", 'aggressive', Chips(100))
-            F = create_player("F", 'always fold', Chips(100))
+            A = create_player("A", role_list[random.randint(0,5)], Chips(100))
+            B = create_player("B", role_list[random.randint(0,5)], Chips(100))
+            C = create_player("C", role_list[random.randint(0,5)], Chips(100))
+            D = create_player("D", role_list[random.randint(0,5)], Chips(100))
+            E = create_player("E", role_list[random.randint(0,5)], Chips(100))
+            F = create_player("F", role_list[random.randint(0,5)], Chips(100))
             
             table.add_player(A)
             table.add_player(B)
