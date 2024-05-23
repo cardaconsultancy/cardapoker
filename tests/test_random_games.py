@@ -25,12 +25,12 @@ class TestTexasHoldemGame(unittest.TestCase):
             date = datetime.datetime.now()
 
             table = Table()
-            A = create_player("A", 'raises with aces reduces with 12345', Chips(100))
+            A = create_player("A", 'raises_with_aces_reduces_with_12345', Chips(100))
             B = create_player("B", 'conservative', Chips(100))
             C = create_player("C", 'conservative', Chips(100))
-            D = create_player("D", 'careful calculator', Chips(100))
+            D = create_player("D", 'careful_calculator', Chips(100))
             E = create_player("E", 'aggressive', Chips(100))
-            F = create_player("F", 'always fold', Chips(100))
+            F = create_player("F", 'always_fold', Chips(100))
             
             table.add_player(A)
             table.add_player(B)

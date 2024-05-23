@@ -163,7 +163,7 @@ def careful_calculator_decorator(player_class):
 def create_player(name, style):
     if style == 'aggressive':
         DecoratedPlayer = aggressive_player_decorator(ActualPlayerTemplate)
-    elif style == 'super aggressive':
+    elif style == 'super_aggressive':
         DecoratedPlayer = conservative_player_decorator(ActualPlayerTemplate)
     elif style == 'conservative':
         DecoratedPlayer = conservative_player_decorator(ActualPlayerTemplate)
@@ -200,15 +200,15 @@ class ActualPlayerTemplate(Player):
 def create_player(name, style, chips=Chips(100)):
     if style == 'aggressive':
         DecoratedPlayer = aggressive_player_decorator(ActualPlayerTemplate)
-    elif style == 'super aggressive':
+    elif style == 'super_aggressive':
         DecoratedPlayer = super_aggressive_player_decorator(ActualPlayerTemplate)
     elif style == 'conservative':
         DecoratedPlayer = conservative_player_decorator(ActualPlayerTemplate)
-    elif style == 'careful calculator':
+    elif style == 'careful_calculator':
         DecoratedPlayer = careful_calculator_decorator(ActualPlayerTemplate)
-    elif style == 'always fold':
+    elif style == 'always_fold':
         DecoratedPlayer = always_fold_player_decorator(ActualPlayerTemplate)
-    elif style == 'raises with aces reduces with 12345':
+    elif style == 'raises_with_aces_reduces_with_12345':
         DecoratedPlayer = raises_with_aces_reduces_with_12345_decorator(ActualPlayerTemplate)
     else:
         DecoratedPlayer = ActualPlayerTemplate  # No decoration 

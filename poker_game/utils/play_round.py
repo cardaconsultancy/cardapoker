@@ -40,14 +40,14 @@ def start_round(table, test_cards=None, seed=None):
         # for the ease of debugging
         strategy_mapping = {
             'AggressivePlayer': 'aggressive',
-            'SuperAggressivePlayer': 'super aggressive',
+            'SuperAggressivePlayer': 'super_aggressive',
             'ConservativePlayer': 'conservative',
-            'AlwaysFoldPlayer': 'always fold',
-            'Raises_with_aces_reduces_with_12345Player': 'raises with aces reduces with 12345',
-            'careful_calculator_Player': 'careful calculator',
+            'AlwaysFoldPlayer': 'always_fold',
+            'Raises_with_aces_reduces_with_12345Player': 'raises_with_aces_reduces_with_12345',
+            'careful_calculator_Player': 'careful_calculator',
             'ActualPlayerTemplate': 'default'
         }
-        'create logger info in the form of A = create_player("A", "raises with aces reduces with 12345", Chips(15))'
+        'create logger info in the form of A = create_player("A", "raises_with_aces_reduces_with_12345", Chips(15))'
         logger.info(f'{player.name} = create_player("{player.name}", "{strategy_mapping[player.__class__.__name__]}", Chips({player.chips.amount}))')
 
         # in case of a test with predefined cards, we don't want to give

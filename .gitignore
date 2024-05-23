@@ -2,3 +2,4 @@ gitignore_archive/
 gitig/
 openai_client/
 test_openai.py
+poker_game.log

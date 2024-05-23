@@ -13,25 +13,35 @@ logger = logging.getLogger('poker_game')
 # this is a test where the person after the BB folds, making last raiser disappear
 class TestTexasHoldemGame(unittest.TestCase):
 
-    def test_SB_missed_betting_opportunity(self):
+# always_fold_B = create_player("always_fold_B", "always_fold", Chips(592))
+# always_fold_E = create_player("always_fold_E", "always_fold", Chips(7))
+# aggressive_F = create_player("aggressive_F", "aggressive", Chips(1))
+# always_fold_B.hand = [Card("4", "♠"), Card("4", "♣")]
+# always_fold_E.hand = [Card("2", "♣"), Card("K", "♠")]
+# aggressive_F.hand = [Card("A", "♦"), Card("9", "♦")]
+# SB-always_fold_B-8
+# BB-always_fold_E-7
+# aggressive_F-1-AI
+# always_fold_B-F
+# [Card("A", "♥"), Card("6", "♦"), Card("8", "♠"), Card("2", "♦"), Card("6", "♠")]
+# always_fold_E-wins-12
+# aggressive_F-wins-3
+    def test_pot_does_not_add_up(self):
         table = Table()
-        table.blind_size = 2
-        A = create_player("A", "raises with aces reduces with 12345", Chips(512))
-        C = create_player("C", "conservative", Chips(6))
-        E = create_player("E", "aggressive", Chips(12))
-        F = create_player("F", "always fold", Chips(70))
+        table.blind_size = 8
+        always_fold_B = create_player("always_fold_B", "always_fold", Chips(592))
+        always_fold_E = create_player("always_fold_E", "always_fold", Chips(7))
+        aggressive_F = create_player("aggressive_F", "aggressive", Chips(1))
 
-        table.add_player(C)
-        table.add_player(E)
-        table.add_player(F)
-        table.add_player(A)
+        table.add_player(aggressive_F)
+        table.add_player(always_fold_B)
+        table.add_player(always_fold_E)
 
-        A.hand = [Card("5", "♦"), Card("6", "♠")]
-        C.hand = [Card("5", "♣"), Card("6", "♥")]
-        E.hand = [Card("K", "♣"), Card("9", "♦")]
-        F.hand = [Card("3", "♣"), Card("A", "♦")]
+        always_fold_B.hand = [Card("4", "♠"), Card("4", "♣")]
+        always_fold_E.hand = [Card("2", "♣"), Card("K", "♠")]
+        aggressive_F.hand = [Card("A", "♦"), Card("9", "♦")]
 
-        test_cards = [Card("2", "♣"), Card("3", "♥"), Card("K", "♥"), Card("2", "♠"), Card("J", "♠")]
+        test_cards = [Card("A", "♥"), Card("6", "♦"), Card("8", "♠"), Card("2", "♦"), Card("6", "♠")]
         expected_sum = sum([player.chips.amount for player in table.players])
 
         result = start_round(table=table, test_cards = test_cards)
@@ -39,14 +49,40 @@ class TestTexasHoldemGame(unittest.TestCase):
         print(sum([player.chips.amount for player in result.players]))
         self.assertEqual(sum([player.chips.amount for player in result.players]), expected_sum)
 
+    # def test_SB_missed_betting_opportunity(self):
+    #     table = Table()
+    #     table.blind_size = 2
+    #     A = create_player("A", "raises_with_aces_reduces_with_12345", Chips(512))
+    #     C = create_player("C", "conservative", Chips(6))
+    #     E = create_player("E", "aggressive", Chips(12))
+    #     F = create_player("F", "always_fold", Chips(70))
+
+    #     table.add_player(C)
+    #     table.add_player(E)
+    #     table.add_player(F)
+    #     table.add_player(A)
+
+    #     A.hand = [Card("5", "♦"), Card("6", "♠")]
+    #     C.hand = [Card("5", "♣"), Card("6", "♥")]
+    #     E.hand = [Card("K", "♣"), Card("9", "♦")]
+    #     F.hand = [Card("3", "♣"), Card("A", "♦")]
+
+    #     test_cards = [Card("2", "♣"), Card("3", "♥"), Card("K", "♥"), Card("2", "♠"), Card("J", "♠")]
+    #     expected_sum = sum([player.chips.amount for player in table.players])
+
+    #     result = start_round(table=table, test_cards = test_cards)
+    #     print(expected_sum)
+    #     print(sum([player.chips.amount for player in result.players]))
+    #     self.assertEqual(sum([player.chips.amount for player in result.players]), expected_sum)
+
     # def test_max_arg_is_empty_seq(self):
     #     table = Table()
     #     table.blind_size = 8
         
     #     B = create_player("B", "conservative", Chips(411))
     #     C = create_player("C", "conservative", Chips(6))
-    #     D = create_player("D", "careful calculator", Chips(171))
-    #     F = create_player("F", "always fold", Chips(12))
+    #     D = create_player("D", "careful_calculator", Chips(171))
+    #     F = create_player("F", "always_fold", Chips(12))
 
     #     table.add_player(C)
     #     table.add_player(D)
@@ -71,9 +107,9 @@ class TestTexasHoldemGame(unittest.TestCase):
     #     table.blind_size = 4
     #     B = create_player("B", "conservative", Chips(5))
     #     C = create_player("C", "conservative", Chips(259))
-    #     D = create_player("D", "careful calculator", Chips(187))
+    #     D = create_player("D", "careful_calculator", Chips(187))
     #     E = create_player("E", "aggressive", Chips(52))
-    #     F = create_player("F", "always fold", Chips(97))
+    #     F = create_player("F", "always_fold", Chips(97))
         
     #     table.add_player(F)
     #     table.add_player(B)
@@ -99,9 +135,9 @@ class TestTexasHoldemGame(unittest.TestCase):
     # def test_not_adding_to_600_due_to_pot_removal(self):
     #     table = Table()
     #     table.blind_size = 4
-    #     D = create_player("D", "careful calculator", Chips(522))
+    #     D = create_player("D", "careful_calculator", Chips(522))
     #     E = create_player("E", "aggressive", Chips(77))
-    #     F = create_player("F", "always fold", Chips(1))
+    #     F = create_player("F", "always_fold", Chips(1))
 
     #     table.add_player(E)
     #     table.add_player(F)
@@ -121,10 +157,10 @@ class TestTexasHoldemGame(unittest.TestCase):
     # def test_F_is_not_allowed_to_fold_and_loses(self):
     #     table = Table()
     #     table.blind_size = 20
-    #     A = create_player("A", 'raises with aces reduces with 12345', Chips(15))
+    #     A = create_player("A", 'raises_with_aces_reduces_with_12345', Chips(15))
     #     B = create_player("B", 'conservative', Chips(182))
     #     E = create_player("E", 'aggressive', Chips(399))
-    #     F = create_player("F", 'always fold', Chips(4))
+    #     F = create_player("F", 'always_fold', Chips(4))
 
     #     table.add_player(E)
     #     table.add_player(F)
@@ -149,7 +185,7 @@ class TestTexasHoldemGame(unittest.TestCase):
     #     table = Table()
     #     table.blind_size = 20
     #     C = create_player("C", 'conservative', Chips(590))
-    #     F = create_player("F", 'always fold', Chips(10))    
+    #     F = create_player("F", 'always_fold', Chips(10))    
  
     #     table.add_player(C)
     #     table.add_player(F) 
@@ -169,8 +205,8 @@ class TestTexasHoldemGame(unittest.TestCase):
     # def test_sum_error(self):
     #     table = Table()
     #     table.blind_size = 4
-    #     D = create_player("D", 'careful calculator', Chips(592))
-    #     F = create_player("F", 'always fold', Chips(8))    
+    #     D = create_player("D", 'careful_calculator', Chips(592))
+    #     F = create_player("F", 'always_fold', Chips(8))    
  
     #     table.add_player(F)
     #     table.add_player(D) 
@@ -190,8 +226,8 @@ class TestTexasHoldemGame(unittest.TestCase):
     # def test_fold_after_BB(self):
     #     table = Table()
 
-    #     player1 = create_player("F", 'always fold', Chips(97))
-    #     player2 = create_player("D", 'careful calculator', Chips(199))
+    #     player1 = create_player("F", 'always_fold', Chips(97))
+    #     player2 = create_player("D", 'careful_calculator', Chips(199))
     #     player3 = create_player("B", 'conservative', Chips(304))
         
     #     table.add_player(player1)
@@ -214,12 +250,12 @@ class TestTexasHoldemGame(unittest.TestCase):
     # def test_pot_management(self):
     #     table = Table()
 
-    #     player1 = create_player("A", 'raises with aces reduces with 12345', Chips(50))
+    #     player1 = create_player("A", 'raises_with_aces_reduces_with_12345', Chips(50))
     #     player2 = create_player("B", 'conservative', Chips(50))
     #     player3 = create_player("C", 'conservative', Chips(50))
-    #     player4 = create_player("D", 'careful calculator', Chips(260))
+    #     player4 = create_player("D", 'careful_calculator', Chips(260))
     #     player5 = create_player("E", 'aggressive', Chips(90))
-    #     player6 = create_player("F", 'always fold', Chips(100))
+    #     player6 = create_player("F", 'always_fold', Chips(100))
         
     #     table.add_player(player2)
     #     table.add_player(player3)
@@ -249,7 +285,7 @@ class TestTexasHoldemGame(unittest.TestCase):
 
     #     B = create_player("B", 'conservative', Chips(168))
     #     E = create_player("E", 'aggressive', Chips(422))
-    #     F = create_player("F", 'always fold', Chips(10))
+    #     F = create_player("F", 'always_fold', Chips(10))
         
     #     table.add_player(B)
     #     table.add_player(E)
