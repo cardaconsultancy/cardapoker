@@ -21,9 +21,6 @@ class TestTexasHoldemGame(unittest.TestCase):
             # get the game number
             logger.info(f"Game NR {game}")
 
-            #check if a game is looping forever
-            date = datetime.datetime.now()
-
             table = Table()
             A = create_player("A", 'raises_with_aces_reduces_with_12345', Chips(100))
             B = create_player("B", 'conservative', Chips(100))
@@ -47,7 +44,7 @@ class TestTexasHoldemGame(unittest.TestCase):
         logger.info(f"Winnerlist: {Counter(winnerlist)}")
         end = datetime.datetime.now()
         logger.info(f"Time taken: {end-start}")
-        # self.assertEqual(sum([player.chips.amount for player in result_table.players]), expected_sum)
+        self.assertEqual(sum([player.chips.amount for player in result_table.players]), expected_sum)
 
 
 if __name__ == '__main__': 

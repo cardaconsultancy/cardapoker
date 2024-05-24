@@ -14,9 +14,9 @@ logger = logging.getLogger('poker_game')
 @timeout(5)  # Set timeout to 5 seconds
 def start_round(table, test_cards=None, seed=None):
 
-    # log new game
-    logger.info(f"--- New Game ---")
-    logger.debug(2^10)
+    # log new Round
+    logger.info(f"--- New Round ---")
+    logger.info(f'table = Table()')
     # reset the deck
     deck = Deck(seed=seed)
 
@@ -28,6 +28,9 @@ def start_round(table, test_cards=None, seed=None):
 
     # copy the player list to easily keep track of players
     table.players_game = table.players
+
+    # log the blind size
+    logger.info(f'table.blind_size = {table.blind_size}')
 
     # Deal the first private card to each player
     # (Chosen to stay the closest to the real game, by not dealing two at once)
@@ -45,9 +48,10 @@ def start_round(table, test_cards=None, seed=None):
             'AlwaysFoldPlayer': 'always_fold',
             'Raises_with_aces_reduces_with_12345Player': 'raises_with_aces_reduces_with_12345',
             'careful_calculator_Player': 'careful_calculator',
-            'ActualPlayerTemplate': 'default'
+            'ActualPlayerTemplate': 'default',
+            'CompletelyRandomPlayer': 'completely_random'
         }
-        'create logger info in the form of A = create_player("A", "raises_with_aces_reduces_with_12345", Chips(15))'
+        # create logger info in the form of A = create_player("A", "raises_with_aces_reduces_with_12345", Chips(15))
         logger.info(f'{player.name} = create_player("{player.name}", "{strategy_mapping[player.__class__.__name__]}", Chips({player.chips.amount}))')
 
         # in case of a test with predefined cards, we don't want to give
@@ -119,12 +123,12 @@ def start_round(table, test_cards=None, seed=None):
     if test_cards is None:
         table.community_cards.append(deck.deal())
     else:
-        print('TEST')
+        logger.debug(f'TEST')
         table.community_cards.append(test_cards[3])
     
     # log turn
     # logger.info(f'{table.community_cards[3].rank}{table.community_cards[3].suit}')
-    logger.info(f' Card("{table.community_cards[3].rank}", "{table.community_cards[3].suit}"),')
+    logger.info(f'[Card("{table.community_cards[0].rank}", "{table.community_cards[0].suit}"), Card("{table.community_cards[1].rank}", "{table.community_cards[1].suit}"), Card("{table.community_cards[2].rank}", "{table.community_cards[2].suit}"), Card("{table.community_cards[3].rank}", "{table.community_cards[3].suit}"),')
     logger.debug(f"On the table comes {table.community_cards[3].rank} of {table.community_cards[3].suit}.") 
 
     # Betting Round 3, the turn
@@ -149,12 +153,12 @@ def start_round(table, test_cards=None, seed=None):
     if test_cards is None:
         table.community_cards.append(deck.deal())
     else:
-        print('TEST')
+        logger.debug(f'TEST')
         table.community_cards.append(test_cards[4])
 
     # log river
     # logger.info(f'{table.community_cards[4].rank}{table.community_cards[4].suit}')
-    logger.info(f' Card("{table.community_cards[4].rank}", "{table.community_cards[4].suit}")]')
+    logger.info(f'test_cards = [Card("{table.community_cards[0].rank}", "{table.community_cards[0].suit}"), Card("{table.community_cards[1].rank}", "{table.community_cards[1].suit}"), Card("{table.community_cards[2].rank}", "{table.community_cards[2].suit}"), Card("{table.community_cards[3].rank}", "{table.community_cards[3].suit}"), Card("{table.community_cards[4].rank}", "{table.community_cards[4].suit}")]')
     logger.debug(f"On the table comes {table.community_cards[4].rank} of {table.community_cards[4].suit}.") 
 
     # Betting Round 4, the river

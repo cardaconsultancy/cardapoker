@@ -1,3 +1,4 @@
+import random
 from poker_game.utils.evaluate_hand import evaluate_hand, get_hand_rank
 from .objects_on_table import Chips
 import logging
@@ -103,7 +104,7 @@ def raises_with_aces_reduces_with_12345_decorator(player_class):
 def careful_calculator_decorator(player_class):
     class careful_calculator_Player(player_class):
         def bet(self, betsize, hand, table):
-            #self.logger.debug(f"I am an Ace Raiser!")
+            #self.logger.debug(f"I am a calculator!")
             # if flop:
             if len(table.community_cards) >= 3:
                 rank = get_hand_rank(self, table)
@@ -129,6 +130,24 @@ def careful_calculator_decorator(player_class):
         # Additional methods or overrides can go here
     return careful_calculator_Player
 
+def completely_random_decorator(player_class):
+    class CompletelyRandomPlayer(player_class):
+        def bet(self, betsize, hand, table):
+            actions = ['fold', 'call', 'raise']
+            action = random.choice(actions)
+            self.logger.info(f"{self.name} randomly chooses to {action}")
+            if action == 'fold':
+                return 0
+            elif action == 'call':
+                return betsize
+            elif action == 'raise':
+                raise_amount = random.randint(10, 100)  # Adjust range as necessary
+                total_bet = betsize + raise_amount
+                self.logger.info(f"{self.name} raises an additional {raise_amount}, total bet: {total_bet}")
+                return total_bet
+
+            return betsize
+    return CompletelyRandomPlayer
 
 # def chatgpt35_decorator(player_class):
 #     class chatgpt35(player_class):
@@ -160,19 +179,19 @@ def careful_calculator_decorator(player_class):
 
 
 # Instantiate a player with a specific playing style
-def create_player(name, style):
-    if style == 'aggressive':
-        DecoratedPlayer = aggressive_player_decorator(ActualPlayerTemplate)
-    elif style == 'super_aggressive':
-        DecoratedPlayer = conservative_player_decorator(ActualPlayerTemplate)
-    elif style == 'conservative':
-        DecoratedPlayer = conservative_player_decorator(ActualPlayerTemplate)
-    elif style == 'raises_with_aces_reduces_with_12345':
-        DecoratedPlayer = raises_with_aces_reduces_with_12345_decorator(ActualPlayerTemplate)
-    else:
-        DecoratedPlayer = ActualPlayerTemplate  # No decoration
+# def create_player(name, style):
+#     if style == 'aggressive':
+#         DecoratedPlayer = aggressive_player_decorator(ActualPlayerTemplate)
+#     elif style == 'super_aggressive':
+#         DecoratedPlayer = conservative_player_decorator(ActualPlayerTemplate)
+#     elif style == 'conservative':
+#         DecoratedPlayer = conservative_player_decorator(ActualPlayerTemplate)
+#     elif style == 'raises_with_aces_reduces_with_12345':
+#         DecoratedPlayer = raises_with_aces_reduces_with_12345_decorator(ActualPlayerTemplate)
+#     else:
+#         DecoratedPlayer = ActualPlayerTemplate  # No decoration
 
-    return DecoratedPlayer(name)
+    # return DecoratedPlayer(name)
 
 # The child class, which will function as a template.
 class ActualPlayerTemplate(Player):
@@ -197,20 +216,42 @@ class ActualPlayerTemplate(Player):
     #         #self.logger.debug(f"{self.name} says: let's make that pot 20!")
     #         self.bet((20-pot)/players) 
 
+# def create_player(name, style, chips=Chips(100)):
+#     if style == 'aggressive':
+#         DecoratedPlayer = aggressive_player_decorator(ActualPlayerTemplate)
+#     elif style == 'super_aggressive':
+#         DecoratedPlayer = super_aggressive_player_decorator(ActualPlayerTemplate)
+#     elif style == 'conservative':
+#         DecoratedPlayer = conservative_player_decorator(ActualPlayerTemplate)
+#     elif style == 'careful_calculator':
+#         DecoratedPlayer = careful_calculator_decorator(ActualPlayerTemplate)
+#     elif style == 'always_fold':
+#         DecoratedPlayer = always_fold_player_decorator(ActualPlayerTemplate)
+#     elif style == 'raises_with_aces_reduces_with_12345':
+#         DecoratedPlayer = raises_with_aces_reduces_with_12345_decorator(ActualPlayerTemplate)
+#     elif style == 'completely_random':
+#         DecoratedPlayer = completely_random_decorator(ActualPlayerTemplate)
+#     else:
+#         DecoratedPlayer = ActualPlayerTemplate  # No decoration 
+
+#     return DecoratedPlayer(name, chips)
+
+# Function to instantiate a player with a specific playing style
 def create_player(name, style, chips=Chips(100)):
-    if style == 'aggressive':
-        DecoratedPlayer = aggressive_player_decorator(ActualPlayerTemplate)
-    elif style == 'super_aggressive':
-        DecoratedPlayer = super_aggressive_player_decorator(ActualPlayerTemplate)
-    elif style == 'conservative':
-        DecoratedPlayer = conservative_player_decorator(ActualPlayerTemplate)
-    elif style == 'careful_calculator':
-        DecoratedPlayer = careful_calculator_decorator(ActualPlayerTemplate)
-    elif style == 'always_fold':
-        DecoratedPlayer = always_fold_player_decorator(ActualPlayerTemplate)
-    elif style == 'raises_with_aces_reduces_with_12345':
-        DecoratedPlayer = raises_with_aces_reduces_with_12345_decorator(ActualPlayerTemplate)
+    player_classes = {
+        'aggressive': aggressive_player_decorator,
+        'super_aggressive': super_aggressive_player_decorator,
+        'conservative': conservative_player_decorator,
+        'careful_calculator': careful_calculator_decorator,
+        'always_fold': always_fold_player_decorator,
+        'raises_with_aces_reduces_with_12345': raises_with_aces_reduces_with_12345_decorator,
+        'completely_random': completely_random_decorator
+    }
+
+    # Check if the style exists in the decorator mapping, otherwise use default template
+    if style in player_classes:
+        DecoratedPlayer = player_classes[style](ActualPlayerTemplate)
     else:
-        DecoratedPlayer = ActualPlayerTemplate  # No decoration 
+        DecoratedPlayer = ActualPlayerTemplate  # No decoration
 
     return DecoratedPlayer(name, chips)

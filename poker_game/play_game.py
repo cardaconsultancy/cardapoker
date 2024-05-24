@@ -11,7 +11,7 @@ def play_game(table, rounds_before_raise_blinds=20, seed=None):
     game_on = True
     number_of_rounds = 1
     blinds_raised = 0
-    logger.debug('game on')
+    logger.debug(f'game on')
     while game_on:
         for raising_time in range(0, rounds_before_raise_blinds):            
             number_of_rounds += 1

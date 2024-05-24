@@ -53,7 +53,7 @@ def check_if_rest_folded_and_pay(table):
 def check_if_only_one_player_left(table):
     if len([player for player in table.players_game if player.folded != True]) == 1:
         winner = table.players_game[0]
-        logger.info(f"Only 1 left: {winner.name}, so immediately do payout")
+        logger.debug(f"Only 1 left: {winner.name}, so immediately do payout")
         for pot in table.pots:
             logger.info(f"Empty pot {pot.players}")
             winner.chips.win(pot.amount)
