@@ -5,7 +5,9 @@ from poker_game.utils.objects_on_table import Deck, Chips, Pot, Card
 from poker_game.utils.game import TexasHoldemGame
 from poker_game.utils.logging_config import setup_logging
 from poker_game.utils.get_and_pay_winners import pay_winners
+
 setup_logging()
+
 
 class TestTexasHoldemGame(unittest.TestCase):
 
@@ -18,24 +20,36 @@ class TestTexasHoldemGame(unittest.TestCase):
         player2 = Player("Jan", Chips(0))
         player3 = Player("Piet", Chips(0))
 
-        test_bets = 'p1 p2 p3 all in'
+        test_bets = "p1 p2 p3 all in"
 
-        if test_bets == 'p1 p2 p3 all in':
+        if test_bets == "p1 p2 p3 all in":
             player1 = Player("Klaas", Chips(0))
             player2 = Player("Jan", Chips(0))
             player3 = Player("Piet", Chips(0))
 
-        test_hands = 'p1 and p2 winner, p3 loser'
+        test_hands = "p1 and p2 winner, p3 loser"
 
-        if test_hands == 'p1 winner, p2 second, p3 loser':
-            community_cards = [Card(rank='3', suit='♣'), Card(rank='2', suit='♠'), Card(rank='J', suit='♠'), Card(rank='8', suit='♣'), Card(rank='7', suit='♠')]
+        if test_hands == "p1 winner, p2 second, p3 loser":
+            community_cards = [
+                Card(rank="3", suit="♣"),
+                Card(rank="2", suit="♠"),
+                Card(rank="J", suit="♠"),
+                Card(rank="8", suit="♣"),
+                Card(rank="7", suit="♠"),
+            ]
             # player_1 should win, due to highest kicker
-            player1_hand = [Card(rank='A', suit='♥'), Card(rank='J', suit='♥')]
+            player1_hand = [Card(rank="A", suit="♥"), Card(rank="J", suit="♥")]
             player2_hand = [Card("A", "♥"), Card("K", "♦")]
             player3_hand = [Card("T", "♥"), Card("4", "♦")]
 
-        if test_hands == 'p1 and p2 winner, p3 loser':
-            community_cards = [Card(rank='3', suit='♣'), Card(rank='2', suit='♠'), Card(rank='J', suit='♠'), Card(rank='8', suit='♣'), Card(rank='7', suit='♠')]
+        if test_hands == "p1 and p2 winner, p3 loser":
+            community_cards = [
+                Card(rank="3", suit="♣"),
+                Card(rank="2", suit="♠"),
+                Card(rank="J", suit="♠"),
+                Card(rank="8", suit="♣"),
+                Card(rank="7", suit="♠"),
+            ]
             # player_1 should win, due to highest kicker
             player1_hand = [Card("A", "♥"), Card("J", "♥")]
             player2_hand = [Card("A", "♥"), Card("J", "♥")]
@@ -54,17 +68,16 @@ class TestTexasHoldemGame(unittest.TestCase):
         testpot.amount = 300
         testpot.players = [player1, player2, player3]
 
-
         table.pots = [testpot]
         pay_winners(table)
 
-        if test_hands == 'p1 and p2 winner, p3 loser':
+        if test_hands == "p1 and p2 winner, p3 loser":
             self.assertEqual(150, player1.chips.amount)
             self.assertEqual(150, player2.chips.amount)
             self.assertEqual(0, player3.chips.amount)
-        if test_hands == 'p1 winner, p2 second, p3 loser':
+        if test_hands == "p1 winner, p2 second, p3 loser":
             self.assertEqual(300, player1.chips.amount)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

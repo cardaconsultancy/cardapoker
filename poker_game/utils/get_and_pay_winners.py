@@ -2,7 +2,8 @@ from .evaluate_hand import get_hand_rank, card_rank_value
 import logging
 
 # Retrieve the already configured logger
-logger = logging.getLogger('poker_game')
+logger = logging.getLogger("poker_game")
+
 
 # Determine the winners of the round
 def determine_winners(pot_players, table):
@@ -15,7 +16,7 @@ def determine_winners(pot_players, table):
         # create a list of players
         winner_list.append(player)
 
-    for metric in range(0,5):
+    for metric in range(0, 5):
         logger.debug(f"1. Metric nr {metric}")
         # get the max metric in hand rank
         metric_list = []
@@ -45,8 +46,10 @@ def determine_winners(pot_players, table):
         if len(winner_list) == 1:
             logger.debug(f"The winner is {winner_list[0].name}")
             break
-    if len(winner_list) != 1: logger.debug(f"There is a tie between winners:")
+    if len(winner_list) != 1:
+        logger.debug(f"There is a tie between winners:")
     return winner_list
+
 
 def pay_winners(table):
     logger.debug(f"1. There are {len(table.pots)} pots left")
@@ -54,22 +57,24 @@ def pay_winners(table):
         logger.debug(f"2. There are {len(table.pots)} pots left")
 
         last_pot = table.pots.pop()  # Remove and get the last pot
-        logger.debug(f"There are {len(table.pots)} pots left after popping--------------------")
+        logger.debug(
+            f"There are {len(table.pots)} pots left after popping--------------------"
+        )
         logger.debug(f"The current pot has {last_pot.amount}")
         # for player in last_pot.players:
         #     print(player.name)
 
         winner_list = determine_winners(last_pot.players, table)
-        
+
         # Calculate the main bounty for each winner
         bounty = last_pot.amount // len(winner_list)
         remainder = last_pot.amount % len(winner_list)
-        
+
         for winner in winner_list:
             logger.debug(f"{winner.name} gets {bounty} chips")
             logger.info(f"{winner.name}-wins-{bounty}")
             winner.chips.win(bounty)
-        
+
         # Distribute remainder chips
         index = 0  # Start from the first winner
         while remainder > 0:
