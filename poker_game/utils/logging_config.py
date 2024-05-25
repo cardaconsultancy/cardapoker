@@ -1,7 +1,7 @@
 # logging_config.py
 import logging
 
-def setup_logging(debug_mode=False):
+def setup_logging(debug_mode='DEBUG'):
     """
     Two Logger Instances: This script creates two separate logger objects, logger_game and logger_info, each with their own file handlers pointing to different log files. The logger_game object is used for general debugging and logging, while logger_info is used for specific analytics logging. The logger_game object is set to log messages of level DEBUG and above, while logger_info is set to log messages of level INFO and above. The logger_game object also has a console handler that logs messages of level CRITICAL and above. The console handler is commented out by default, but can be enabled by uncommenting the line that sets its level to DEBUG. The logger_info object has a file handler that logs messages of level INFO and above. Both logger objects are set to not propagate their messages to the root logger.
     """
@@ -13,6 +13,7 @@ def setup_logging(debug_mode=False):
     # File handler
     f_handler = logging.FileHandler('logs/poker_game_info.log')
     f_handler.setLevel(logging.INFO)
+
     f_format = logging.Formatter('%(message)s')
     # f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     f_handler.setFormatter(f_format)
@@ -22,12 +23,19 @@ def setup_logging(debug_mode=False):
     c_handler = logging.StreamHandler()
     c_handler.setLevel(logging.CRITICAL)
     
-    ##########################################################
-    # Uncomment the following line to enable console logging #
-    ##########################################################
+    #########################################################
+    # set the level of logging in the tests for convenience #
+    #########################################################
 
-    if debug_mode:
+    if debug_mode == 'DEBUG':
         c_handler.setLevel(logging.DEBUG)
+        f_handler.setLevel(logging.INFO)
+    elif debug_mode == 'INFO':
+        c_handler.setLevel(logging.CRITICAL)
+        f_handler.setLevel(logging.INFO)
+    elif debug_mode == 'CRITICAL':
+        c_handler.setLevel(logging.CRITICAL)
+        f_handler.setLevel(logging.CRITICAL)
 
     c_format = logging.Formatter('%(name)s - %(message)s')
     c_handler.setFormatter(c_format)

@@ -2,6 +2,7 @@ import logging
 from collections import deque
 from .players import Player
 
+
 class Table:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
@@ -12,7 +13,7 @@ class Table:
         self.players_game = deque()
         # self.seats = {}
         self.blind_size = 1
-        self.dealer = None # Initially, there is no dealer
+        self.dealer = None  # Initially, there is no dealer
         self.small_blind_seat = 1
         self.big_blind_seat = 2
 
@@ -30,7 +31,7 @@ class Table:
         # If this is the first player added, set them as the dealer
         if len(self.players) == 1:
             self.set_dealer(0)
-    
+
     def set_dealer(self, index):
         if 0 <= index < len(self.players):
             self.dealer = self.players[index]
@@ -42,7 +43,7 @@ class Table:
         #         self.players.append(player)
         #         self.logger.info(f"{player} got added to table on seat {chair}")
         #         break
-    
+
     # def change_dealer_and_blinds(self):
     #     # this produces problems if someone leaves, the blind doesn't get transferred.
     #     self.logger.info(f"The current dealer was seating on seat {self.dealer_seat}")
@@ -65,4 +66,3 @@ class Table:
 
     def set_community_cards(self, community_cards_list):
         self.community_cards = community_cards_list
-

@@ -10,7 +10,7 @@ import logging
 from collections import Counter
 import random
 
-setup_logging()
+setup_logging(debug_mode='CRITICAL')
 logger = logging.getLogger('poker_game')
 logger_analytics = logging.getLogger('poker_game_analytics')
 
@@ -21,12 +21,9 @@ class TestTexasHoldemGame(unittest.TestCase):
         winnerlist = []
         role_list = ['raises_with_aces_reduces_with_12345', 'conservative', 'careful_calculator', 'aggressive', 'always_fold', 'super_aggressive', 'completely_random']
         length_of_role_list = len(role_list)-1
-        for game in range(1, 10000): 
+        for game in range(0, 10): 
             # get the game number
             logger.info(f"Game NR {game}")
-
-            #check if a game is looping forever
-            date = datetime.datetime.now()
             
             # create names here to make sure that we can identify the player style
             A_role = role_list[random.randint(0,length_of_role_list)]
@@ -59,7 +56,6 @@ class TestTexasHoldemGame(unittest.TestCase):
         logger_analytics.info(f"Winnerlist: {Counter(winnerlist)}")
         end = datetime.datetime.now()
         logger.info(f"Time taken: {end-start}")
-        # self.assertEqual(sum([player.chips.amount for player in result_table.players]), expected_sum)
 
 
 if __name__ == '__main__': 

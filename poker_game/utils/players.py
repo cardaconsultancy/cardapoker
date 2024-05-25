@@ -42,7 +42,7 @@ class Player:
         return(amount_to_bet)
     
     # standard bet is 10, override below
-    def bet(self, betsize):
+    def bet(self, betsize, hand, table):
         #self.logger.debug(f"The standard parent class is called, no modification has been done.")
         print("The standard parent class is called, no modification has been done")
         # do this in game so that errors in modification don't mess this up

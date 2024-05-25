@@ -4,6 +4,7 @@ from poker_game.utils.table import Table
 from poker_game.utils.objects_on_table import Deck, Chips, Pot, Card
 from poker_game.utils.game import TexasHoldemGame
 from poker_game.utils.logging_config import setup_logging
+from poker_game.utils.get_and_pay_winners import pay_winners
 setup_logging()
 
 class TestTexasHoldemGame(unittest.TestCase):
@@ -55,7 +56,7 @@ class TestTexasHoldemGame(unittest.TestCase):
 
 
         table.pots = [testpot]
-        game.pay_winners()
+        pay_winners(table)
 
         if test_hands == 'p1 and p2 winner, p3 loser':
             self.assertEqual(150, player1.chips.amount)

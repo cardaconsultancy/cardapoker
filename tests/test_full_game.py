@@ -33,9 +33,10 @@ class TestTexasHoldemGame(unittest.TestCase):
 
             result_table, rounds = play_game(seed=game_seed, table=table)
             nr_of_rounds += rounds
-            logger.info(f"Total  nr of rounds: {nr_of_rounds}")
+            logger.debug(f"Total  nr of rounds: {nr_of_rounds}")
+            print(type(result_table))
 
-            self.assertEqual(sum([player.chips.amount for player in result_table.players]), expected_sum)
+            self.assertEqual(sum([player.chips.amount for player in table.players]), expected_sum)
 
 
 if __name__ == '__main__': 

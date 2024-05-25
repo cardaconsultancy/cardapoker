@@ -19,6 +19,7 @@ def find_next_dealer(starting_players, active_players, current_dealer):
 
     return None  # In case no active players are found in starting players, though this should ideally never happen
 
+
 # Example usage:
 active_players = ["Alice", "jaja"]
 starting_players = ["Alice", "jaja", "Bob", "Dana", "Charlie", "Diana"]

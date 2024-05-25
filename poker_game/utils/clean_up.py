@@ -2,18 +2,21 @@ import logging
 from poker_game.utils.next_player import get_next_player
 
 # Retrieve the already configured logger
-logger = logging.getLogger('poker_game')
+logger = logging.getLogger("poker_game")
+
 
 def clean_up(table):
-    logger.debug(f'cleaning time for players {[player.name for player in table.players]}')
-    
+    logger.debug(
+        f"cleaning time for players {[player.name for player in table.players]}"
+    )
+
     # remove losers and pass on dealer button
     # get the dealer location, this has to happen here because:
     # dealer could be the one left
     # but also the next could
 
     # num_players = len(table.players)
-    
+
     # # get the index of the current dealer
     # current_index_dealer = next((i for i, player in enumerate(table.players) if player == table.dealer), None)
     # if current_index_dealer is None:
@@ -29,10 +32,15 @@ def clean_up(table):
     #         logger.debug(f"The next player is {table.players[next_index].name}.")
     #         table.dealer = table.players[next_index]
     #     next_index = (next_index + 1) % num_players
-    
+
     # Get the next dealer
-    table.dealer = get_next_player(starting_players=table.starting_players, active_players=table.players_game, current_player=table.dealer)
-    if table.dealer.folded: AssertionError()
+    table.dealer = get_next_player(
+        starting_players=table.starting_players,
+        active_players=table.players_game,
+        current_player=table.dealer,
+    )
+    if table.dealer.folded:
+        AssertionError()
 
     # loop over a copy of the list and remove all the people without money
     for player in table.players[:]:
@@ -49,7 +57,7 @@ def clean_up(table):
     table.players_game = table.players
     table.community_cards = []
     table.pots = []
-    
+
     # if there is only one player left, the game is over
     if len(table.players) == 1:
         logger.debug(f"Only {table.players[0].name} is left, the game is over.")

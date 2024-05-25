@@ -1,7 +1,7 @@
 from poker_game.play_game import play_game
 from poker_game.utils.players import Player
-from utils.table import Table
-from utils.objects_on_table import Chips, Deck
+from poker_game.utils.table import Table
+from poker_game.utils.objects_on_table import Chips, Deck
 
 if __name__ == "__main__":
     # Create a deck and a table
