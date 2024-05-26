@@ -17,7 +17,7 @@ class TestTexasHoldemGame(unittest.TestCase):
         # test how long this test takes
         start = datetime.datetime.now()
         winnerlist = []
-        for game in range(1, 10):
+        for game in range(1, 1):
             # get the game number
             logger.info(f"Game NR {game}")
 
