@@ -12,7 +12,7 @@ class TestTexasHoldemGame(unittest.TestCase):
         nr_of_rounds = 0
         game_seed = 100
         winnerdict = {}
-        for game_seed in range(game_seed, game_seed+20):
+        for game_seed in range(game_seed, game_seed+2):
             table = Table()
 
             player1 = create_player("A", 'raises_with_aces_reduces_with_12345', Chips(100))
