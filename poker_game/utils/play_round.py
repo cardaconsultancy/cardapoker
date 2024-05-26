@@ -83,9 +83,15 @@ def play_round(table, test_cards=None, seed=None):
 
         # I will separate logging and dashboarding in the future
         # logger.info(f'{player.name}-{player.hand[0].rank}{player.hand[0].suit}{player.hand[1].rank}{player.hand[1].suit}')
-        logger.info(
-            f'{player.name}.hand = [Card("{player.hand[0].rank}", "{player.hand[0].suit}"), Card("{player.hand[1].rank}", "{player.hand[1].suit}")]'
-        )
+        # logger.info(
+        #     '%s.hand = [Card("%s", "%s"), Card("%s", "%s")]' % (
+        #         player.name, 
+        #         player.hand[0].rank, player.hand[0].suit, 
+        #         player.hand[1].rank, player.hand[1].suit
+        #     )
+        # ) 
+
+
         logger.debug(f"Player {player.name} has {player.hand}")
 
     # Betting Round 1, note that preflop_round is set to True

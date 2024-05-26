@@ -17,12 +17,12 @@ def determine_winners(pot_players, table):
         winner_list.append(player)
 
     for metric in range(0, 5):
-        logger.debug(f"1. Metric nr {metric}")
+        logger.debug("1. Metric nr %s", metric)
         # get the max metric in hand rank
         metric_list = []
         for player in winner_list:
-            logger.debug(f"  2a. Player {player.name} with {player.best_hand}")
-            logger.debug(f"{player.name}-{player.best_hand}")
+            logger.debug("  2a. Player %s with %s", player.name, player.best_hand)
+            logger.debug("%s-%s", player.name, player.best_hand)
             if metric == 0:
                 metric_list.append(player.best_hand[metric])
             else:
@@ -30,7 +30,7 @@ def determine_winners(pot_players, table):
         max_metric = max(metric_list)
         mask = []
         for metric in metric_list:
-            # logger.debug(f"  2b. Metric score {metric}")
+            # logger.debug("  2b. Metric score %s", metric)
             if metric == max_metric:
                 mask.append(True)
             else:
@@ -38,13 +38,13 @@ def determine_winners(pot_players, table):
         # use the mask to select True candidates from winner_list
         relevant_winners = []
         for i in range(len(winner_list)):
-            # logger.debug(f"  2c. {i} of {len(winner_list)}")
+            # logger.debug("  2c. %s of %s", i, len(winner_list))
             if mask[i]:
                 relevant_winners.append(winner_list[i])
-                logger.debug(f"{winner_list[i].name} is in winner list")
+                logger.debug("%s is in winner list", winner_list[i].name)
         winner_list = relevant_winners
         if len(winner_list) == 1:
-            logger.debug(f"The winner is {winner_list[0].name}")
+            logger.debug("The winner is %s", winner_list[0].name)
             break
     if len(winner_list) != 1:
         logger.debug("There is a tie between winners:")
@@ -52,15 +52,15 @@ def determine_winners(pot_players, table):
 
 
 def pay_winners(table):
-    logger.debug(f"1. There are {len(table.pots)} pots left")
+    logger.debug("1. There are %s pots left", len(table.pots))
     while table.pots:
-        logger.debug(f"2. There are {len(table.pots)} pots left")
+        logger.debug("2. There are %s pots left", len(table.pots))
 
         last_pot = table.pots.pop()  # Remove and get the last pot
         logger.debug(
-            f"There are {len(table.pots)} pots left after popping--------------------"
+            "There are %s pots left after popping--------------------", len(table.pots)
         )
-        logger.debug(f"The current pot has {last_pot.amount}")
+        logger.debug("The current pot has %s", last_pot.amount)
         # for player in last_pot.players:
         #     print(player.name)
 
@@ -71,25 +71,25 @@ def pay_winners(table):
         remainder = last_pot.amount % len(winner_list)
 
         for winner in winner_list:
-            logger.debug(f"{winner.name} gets {bounty} chips")
-            logger.info(f"{winner.name}-wins-{bounty}")
+            logger.debug("%s gets %s chips", winner.name, bounty)
+            logger.info("%s-wins-%s", winner.name, bounty)
             winner.chips.win(bounty)
 
         # Distribute remainder chips
         index = 0  # Start from the first winner
         while remainder > 0:
-            logger.debug(f"There is a remainder of {remainder} chips")
+            logger.debug("There is a remainder of %s chips", remainder)
             # Prioritize last raiser if they are a winner
             recipient = winner_list[index % len(winner_list)]
             index += 1
-            logger.debug(f"{recipient.name} gets an extra chip")
-            logger.info(f"{recipient.name} gets and extra chip")
+            logger.debug("%s gets an extra chip", recipient.name)
+            logger.info("%s gets and extra chip", recipient.name)
             recipient.chips.win(1)
             remainder -= 1
 
-        logger.debug(f"Removing {last_pot}, so {len(table.pots)} pots left")
+        logger.debug("Removing %s, so %s pots left", last_pot, len(table.pots))
     # debugger to identify errors in long simulations
     # if sum(player.chips.amount for player in table.players) != 600:
-    #     logger.debug(f"ERROR, this {(sum(player.chips.amount for player in table.players))} should be equal to 600")
+    #     logger.debug("ERROR, this %s should be equal to 600", (sum(player.chips.amount for player in table.players)))
     #     AttributeError("The total amount of chips is not 600")
     #     1/0

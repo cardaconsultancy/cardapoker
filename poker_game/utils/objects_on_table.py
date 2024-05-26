@@ -60,21 +60,11 @@ class Deck:
 
         random.seed(seed)  # Set the random seed
         random.shuffle(self.cards)
-        # self.dealt_cards = collections.deque()
         logging.basicConfig(level=logging.DEBUG)
-        # self.logger.debug(f"A new deck with {len(self.cards)} cards.")
 
-    def deal(self, number_of_cards=1):
+    def deal(self):
         """Deal a card from the deck."""
-        # dealt_cards = []
-        # for card in range(number_of_cards):
-        #     dealt_card = self.cards.pop()
-        #     self.dealt_cards.append(dealt_card)
-        # dealt_cards = dealt_cards.append(dealt_card)
-        # return dealt_cards
         dealt_card = self.cards.pop()
-        # self.logger.info(f"A {dealt_card.rank} of {dealt_card.suit} was dealt.")
-        # self.dealt_cards.append(dealt_card)
         return dealt_card
 
     def get_number_of_cards(self):

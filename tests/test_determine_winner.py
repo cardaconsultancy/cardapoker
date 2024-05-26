@@ -4,6 +4,7 @@
 # TODO: AI commentator
 
 import unittest
+import logging
 from poker_game.utils.play_round import play_round
 from poker_game.utils.players import create_player
 from poker_game.utils.table import Table
@@ -12,9 +13,11 @@ from poker_game.utils.game import TexasHoldemGame
 from poker_game.utils.get_and_pay_winners import determine_winners
 from poker_game.utils.logging_config import setup_logging
 
-setup_logging(logging_mode="DEBUG")
 
-TEST_ONE = True
+setup_logging(logging_mode="DEBUG")
+logger = logging.getLogger("poker_game")
+
+TEST_ONE = False
 
 
 class TestDeck(unittest.TestCase):
@@ -58,7 +61,6 @@ class TestDeck(unittest.TestCase):
             gets_it_in_hands.hand = [Card("A", "♠"), Card("T", "♥")]
             does_not_get_it1.hand = [Card("A", "♣"), Card("K", "♠")]
             does_not_get_it2.hand = [Card("A", "♦"), Card("9", "♦")]
-
             test_cards = [
                 Card("A", "♥"),
                 Card("K", "♥"),

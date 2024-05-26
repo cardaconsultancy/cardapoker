@@ -18,29 +18,28 @@ def is_royal_or_straight_flush(sorted_hand):
         for hand in sorted_hand:
             if hand.suit == the_suit:
                 suited_list.append(hand)
-        #
         straight_suited_counter = 0
         if len(suited_list) != 0:
             if suited_list[0].rank == "A":
-                logger.debug("Found an ace in %s", suited_list)
-                # USE + instead of .append as this doesn't mutate the original list.
-                suited_list = suited_list + [Card(rank="1", suit=the_suit)]
-                logger.debug("New list: %s", suited_list)
-                logger.debug("Old list: %s", sorted_hand)
+                logger.debug('Found an ace')
+                ace_suit = sorted_hand[0].suit
+                logger.debug('old list:%s', sorted_hand)
+                sorted_hand.append(Card(rank="1", suit=ace_suit))
+                logger.debug('New list: %s', sorted_hand)
         # logger.debug(f'New list: {suited_list}')
         for i in range(len(suited_list) - 1):
             if (
-                card_rank_value(suited_list[i].rank)
-                == card_rank_value(suited_list[i + 1].rank) + 1
+                card_rank_value(sorted_hand[i].rank)
+                == card_rank_value(sorted_hand[i + 1].rank) + 1
             ):
                 straight_suited_counter += 1
                 if straight_suited_counter == 4:
                     logger.debug("Straight Flush was Found with suit %s!!", the_suit)
-                    handscore = [8, suited_list[i - 3].rank, None, None, None, None]
+                    handscore = [8, sorted_hand[i - 3].rank, None, None, None, None]
                     return handscore
             elif (
-                card_rank_value(suited_list[i].rank)
-                - card_rank_value(suited_list[i + 1].rank)
+                card_rank_value(sorted_hand[i].rank)
+                - card_rank_value(sorted_hand[i + 1].rank)
                 > 2
             ):
                 #
@@ -108,11 +107,11 @@ def is_straight(sorted_hand):
     # as there are nog 8 cards with the extra Ace possibility, needs different solving for straight flush
     straight_counter = 0
     if sorted_hand[0].rank == "A":
-        # logger.debug(f'Found an ace')
+        logger.debug('Found an ace')
         ace_suit = sorted_hand[0].suit
-        # logger.debug(f'old list: {sorted_hand}')
+        logger.debug('old list:%s', sorted_hand)
         sorted_hand.append(Card(rank="1", suit=ace_suit))
-        # logger.debug(f'New list: {sorted_hand}')
+        logger.debug('New list: %s', sorted_hand)
     for i in range(len(sorted_hand) - 1):
         # just an extra card for each ace
         # )
