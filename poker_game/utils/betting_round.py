@@ -52,23 +52,30 @@ def betting_round_completed(table, preflop_round=False) -> bool:
 
     # start the betting round
 
-    # this poses a problem when the last raiser has folded and is automatically the last raiser after the BB
+    # this poses a problem when the last raiser has folded and is automatically the last 
+    # raiser after the BB
     big_blind_player = None
 
     while player != last_raiser:
 
-        # if this is the first bet and we are not in the preflop round, the first raiser is the one that sets the limit
+        # if this is the first bet and we are not in the preflop round, the first raiser 
+        # is the one that sets the limit
         if first_bet and preflop_round is False:
             last_raiser = player
             logger.debug(
-                f"this is the first bet and so {last_raiser.name} automatically is last raiser"
+                "this is the first bet and so %s automatically is last raiser",
+                last_raiser.name
             )
             first_bet = False
         logger.debug(
-            f" the current last raiser is {last_raiser.name} with {last_raiser.total_bet_betting_round} chips"
+            "the current last raiser is %s with %s chips",
+            last_raiser.name,
+            last_raiser.total_bet_betting_round
         )
         logger.debug(
-            f"{player.name} is up and currently has {player.total_bet_betting_round} in the betting round pot"
+            "%s is up and currently has %s in the betting round pot",
+            player.name,
+            player.total_bet_betting_round
         )
 
         if preflop_round:
