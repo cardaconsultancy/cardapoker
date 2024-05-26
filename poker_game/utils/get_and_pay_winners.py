@@ -12,7 +12,7 @@ def determine_winners(pot_players, table):
     winner_list = []
     for player in pot_players:
         player.set_best_hand(get_hand_rank(player, table))
-        logger.debug(f"{player.name} highest hand is {player.best_hand}")
+        logger.debug("%s highest hand is %s", player.name, player.best_hand)
         # create a list of players
         winner_list.append(player)
 

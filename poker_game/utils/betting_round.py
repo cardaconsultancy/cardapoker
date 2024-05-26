@@ -52,13 +52,13 @@ def betting_round_completed(table, preflop_round=False) -> bool:
 
     # start the betting round
 
-    # this poses a problem when the last raiser has folded and is automatically the last 
+    # this poses a problem when the last raiser has folded and is automatically the last
     # raiser after the BB
     big_blind_player = None
 
     while player != last_raiser:
 
-        # if this is the first bet and we are not in the preflop round, the first raiser 
+        # if this is the first bet and we are not in the preflop round, the first raiser
         # is the one that sets the limit
         if first_bet and preflop_round is False:
             last_raiser = player
@@ -115,8 +115,8 @@ def betting_round_completed(table, preflop_round=False) -> bool:
                 player.total_bet_betting_round,
             )
 
-            # create a variable that keeps track of the big blind player. We do this so 
-            # that we can name the next player automatically the last raiser without 
+            # create a variable that keeps track of the big blind player. We do this so
+            # that we can name the next player automatically the last raiser without
             # worrying about creating an indefinite loop.
             big_blind_player = player
 
@@ -160,11 +160,11 @@ def betting_round_completed(table, preflop_round=False) -> bool:
         # UNLESS... the SB player has the highest bet because all the other players
         # cannot afford the SB... Ugh...
         # UNLESS... the round is not the preflop round
-        logger.debug(f"the max bet is {max_bet}")
+        logger.debug("the max bet is %s", max_bet)
         if (
             max_bet < table.blind_size * 2
             and player.total_bet_betting_round != max_bet
-            and preflop_round == True
+            and preflop_round is True
         ):
             logger.debug(
                 "the max bet is lower than the BB, so we set it to the BB of %s",
@@ -175,7 +175,7 @@ def betting_round_completed(table, preflop_round=False) -> bool:
         # check if all in or folded
         if not player.all_in and not player.folded:
 
-            # ugly but this prevents the users from making mistakes (or cheating) by 
+            # ugly but this prevents the users from making mistakes (or cheating) by
             # this functionality in their standard function.
 
             ################## user call #####################
@@ -214,14 +214,15 @@ def betting_round_completed(table, preflop_round=False) -> bool:
                 )
                 player.all_in = True
 
-                # check if the all in player is raising (seems better than to check for 
+                # check if the all in player is raising (seems better than to check for
                 # all options if player is all in)
                 if player.total_bet_betting_round > max_bet:
                     last_raiser = player
                     logger.debug("----%s is the last raiser", player.name)
 
             # Folding
-            # Note that this automatically prevents a player from folding when he/she can check, as it should
+            # Note that this automatically prevents a player from folding when he/she
+            # can check, as it should
 
             elif player.total_bet_betting_round + player_bet < max_bet:
 
@@ -391,7 +392,10 @@ def betting_round_completed(table, preflop_round=False) -> bool:
 
     # all players are either all in or folded or have called/checked/raised
     logger.debug(
-        f"Betting round over, because {player.name} is the last raiser {last_raiser.name} and all players have called/checked/raised or folded."
+        "Betting round over, because %s is the last raiser %s and all players have "
+        "called/checked/raised or folded.",
+        player.name,
+        last_raiser.name
     )
 
     # create pots
@@ -399,10 +403,11 @@ def betting_round_completed(table, preflop_round=False) -> bool:
 
     # remove all players that have folded
     table.players_game = [
-        player for player in table.players_game if player.folded == False
+        player for player in table.players_game if not player.folded
     ]
     logger.debug(
-        f"Players left in the game {[player.name for player in table.players_game]}"
+        "Players left in the game %s",
+        [player.name for player in table.players_game]
     )
 
     # completed betting round

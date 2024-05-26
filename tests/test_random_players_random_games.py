@@ -1,10 +1,9 @@
 import datetime
 import unittest
 from poker_game.play_game import play_game
-from poker_game.utils.players import Player, ActualPlayerTemplate, create_player
+from poker_game.utils.players import create_player
 from poker_game.utils.table import Table
-from poker_game.utils.objects_on_table import Deck, Chips, Card
-from poker_game.utils.game import TexasHoldemGame
+from poker_game.utils.objects_on_table import Chips, Card
 from poker_game.utils.logging_config import setup_logging
 import logging
 from collections import Counter

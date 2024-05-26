@@ -251,7 +251,7 @@ def evaluate_hand(sorted_hand):
 
 
 def get_hand_rank(player, table):
-    logger.debug(f"...Checking for different hand Ranks for {player.name }")
+    logger.debug("...Checking for different hand Ranks for %s", player.name)
     all_cards = player.hand + [Card(card[0], card[1]) for card in table.community_cards]
     hand_rank = evaluate_hand(all_cards)
     # logger.debug(f"The best hand is {hand_rank}")

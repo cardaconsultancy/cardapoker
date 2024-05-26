@@ -1,14 +1,14 @@
 import datetime
 import unittest
-from poker_game.play_game import play_game
-from poker_game.utils.players import Player, ActualPlayerTemplate, create_player
-from poker_game.utils.table import Table
-from poker_game.utils.objects_on_table import Deck, Chips, Card
-from poker_game.utils.game import TexasHoldemGame
-from poker_game.utils.logging_config import setup_logging
 import logging
-from collections import Counter
 import random
+from poker_game.play_game import play_game
+from poker_game.utils.players import create_player
+from poker_game.utils.table import Table
+from poker_game.utils.objects_on_table import Chips
+from poker_game.utils.logging_config import setup_logging
+from collections import Counter
+
 
 setup_logging(logging_mode='CRITICAL')
 logger = logging.getLogger('poker_game')
@@ -23,7 +23,7 @@ class TestTexasHoldemGame(unittest.TestCase):
         length_of_role_list = len(role_list)-1
         for game in range(0, 1000): 
             # get the game number
-            logger.info(f"Game NR {game}")
+            logger.info("Game NR %s", game)
             
             # create names here to make sure that we can identify the player style
             A_role = role_list[random.randint(0,length_of_role_list)]
