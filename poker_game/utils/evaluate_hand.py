@@ -1,5 +1,6 @@
-from .objects_on_table import Card
 import logging
+from .objects_on_table import Card
+
 
 logger = logging.getLogger(__name__)
 
