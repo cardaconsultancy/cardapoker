@@ -20,16 +20,26 @@ class TestTexasHoldemGame(unittest.TestCase):
         player2 = Player("Jan", Chips(0))
         player3 = Player("Piet", Chips(0))
 
-        test_bets = "p1 p2 p3 all in"
+        test_hands = "p1 p2 p3 all equal and all in"
 
-        if test_bets == "p1 p2 p3 all in":
+        if test_hands == "p1 p2 p3 all equal and all in":
             player1 = Player("Klaas", Chips(0))
             player2 = Player("Jan", Chips(0))
             player3 = Player("Piet", Chips(0))
+            
+            community_cards = [
+                Card(rank="3", suit="♣"),
+                Card(rank="2", suit="♠"),
+                Card(rank="T", suit="♠"),
+                Card(rank="8", suit="♣"),
+                Card(rank="7", suit="♠"),
+            ]
+            # all equal, all all in
+            player1_hand = [Card(rank="A", suit="♥"), Card(rank="J", suit="♥")]
+            player2_hand = [Card("A", "♥"), Card("J", "♦")]
+            player3_hand = [Card("A", "♥"), Card("J", "♦")]
 
-        test_hands = "p1 and p2 winner, p3 loser"
-
-        if test_hands == "p1 winner, p2 second, p3 loser":
+        elif test_hands == "p1 winner, p2 second, p3 loser":
             community_cards = [
                 Card(rank="3", suit="♣"),
                 Card(rank="2", suit="♠"),
@@ -42,7 +52,7 @@ class TestTexasHoldemGame(unittest.TestCase):
             player2_hand = [Card("A", "♥"), Card("K", "♦")]
             player3_hand = [Card("T", "♥"), Card("4", "♦")]
 
-        if test_hands == "p1 and p2 winner, p3 loser":
+        elif test_hands == "p1 and p2 winner, p3 loser":
             community_cards = [
                 Card(rank="3", suit="♣"),
                 Card(rank="2", suit="♠"),
@@ -75,8 +85,14 @@ class TestTexasHoldemGame(unittest.TestCase):
             self.assertEqual(150, player1.chips.amount)
             self.assertEqual(150, player2.chips.amount)
             self.assertEqual(0, player3.chips.amount)
-        if test_hands == "p1 winner, p2 second, p3 loser":
+        
+        elif test_hands == "p1 winner, p2 second, p3 loser":
             self.assertEqual(300, player1.chips.amount)
+        
+        elif test_hands == "p1 p2 p3 all in all equal":
+            self.assertEqual(100, player1.chips.amount)
+            self.assertEqual(100, player2.chips.amount)
+            self.assertEqual(100, player3.chips.amount)
 
 
 if __name__ == "__main__":
