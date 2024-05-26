@@ -24,7 +24,7 @@ class Chips:
             # self.logger.debug(f"{amount} chip(s) is/are lost")
             self.amount -= amount
         else:
-            # self.logger.debug(f"THIS PLAYER IS ALL INNNNNNNNNN!!!!!!!!!!!")
+            # self.logger.debug("THIS PLAYER IS ALL INNNNNNNNNN!!!!!!!!!!!")
             self.amount -= self.amount
             # self.logger.debug(f"{self.amount} chips left")
             return False

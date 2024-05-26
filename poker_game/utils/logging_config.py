@@ -2,7 +2,7 @@
 import logging
 
 
-def setup_logging(debug_mode="DEBUG"):
+def setup_logging(logging_mode="DEBUG"):
     """
     Two Logger Instances: This script creates two separate logger objects, logger_game and logger_info, each with their own file handlers pointing to different log files. The logger_game object is used for general debugging and logging, while logger_info is used for specific analytics logging. The logger_game object is set to log messages of level DEBUG and above, while logger_info is set to log messages of level INFO and above. The logger_game object also has a console handler that logs messages of level CRITICAL and above. The console handler is commented out by default, but can be enabled by uncommenting the line that sets its level to DEBUG. The logger_info object has a file handler that logs messages of level INFO and above. Both logger objects are set to not propagate their messages to the root logger.
     """
@@ -24,19 +24,19 @@ def setup_logging(debug_mode="DEBUG"):
 
     # Console handler
     c_handler = logging.StreamHandler()
-    c_handler.setLevel(logging.CRITICAL)
+    c_handler.setLevel(logging.DEBUG)
 
     #########################################################
     # set the level of logging in the tests for convenience #
     #########################################################
 
-    if debug_mode == "DEBUG":
+    if logging_mode == "DEBUG":
         c_handler.setLevel(logging.DEBUG)
         f_handler.setLevel(logging.INFO)
-    elif debug_mode == "INFO":
+    elif logging_mode == "INFO":
         c_handler.setLevel(logging.CRITICAL)
         f_handler.setLevel(logging.INFO)
-    elif debug_mode == "CRITICAL":
+    elif logging_mode == "CRITICAL":
         c_handler.setLevel(logging.CRITICAL)
         f_handler.setLevel(logging.CRITICAL)
 

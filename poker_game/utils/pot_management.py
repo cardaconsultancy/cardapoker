@@ -11,7 +11,7 @@ def create_pots(table):
     This function creates pots for the table. It is called at the end of each round.
     """
 
-    logger.debug(f"Start to create pot(s)")
+    logger.debug("Start to create pot(s)")
 
     # if there are no pots, create one.
     if len(table.pots) == 0:
@@ -74,7 +74,7 @@ def check_if_only_one_player_left(table):
 def check_for_side_pots(table):
     # use total betting round as an indicator to get out of the loop. Keep reducing it untill every player has 0.
 
-    logger.debug(f"checking for side pots")
+    logger.debug("checking for side pots")
 
     # check_for_side_pots = True
     sidepot_created = False
@@ -96,7 +96,7 @@ def check_for_side_pots(table):
             == 1
         ):
             logger.debug(
-                f"Only one player has money left, the only time in the game we give money back"
+                "Only one player has money left, the only time in the game we give money back"
             )
             # get the player that has money left and give it back
             player = next(
@@ -141,7 +141,7 @@ def check_for_side_pots(table):
 
         if len(not_folded_or_out) < 2:
             logger.debug(
-                f"there are multiple people all in, but not enough players to create a side pot"
+                "there are multiple people all in, but not enough players to create a side pot"
             )
             logger.debug(
                 len([player for player in not_folded_or_out if not player.all_in])
@@ -152,7 +152,7 @@ def check_for_side_pots(table):
         if lowest_bet == max(
             [player.total_bet_betting_round for player in not_folded_or_out]
         ):
-            logger.debug(f"99. Every player is in with the same amount")
+            logger.debug("99. Every player is in with the same amount")
 
             # get the first out of not_folded_or_out
             fill_current_pot(not_folded_or_out[0], table)
@@ -209,7 +209,7 @@ def check_for_side_pots(table):
             #     not_folded_or_out.remove(player)
             #     print(f'the rest of the list {not_folded_or_out}')
         if sidepot_created is False:
-            logger.debug(f"No (more) sidepots created")
+            logger.debug("No (more) sidepots created")
             # just get a person that did not fold, as there are no sidepots his/her bet will be the same as the others.
             fill_current_pot(not_folded_or_out[0], table)
             # for pot in table.pots:
@@ -219,7 +219,7 @@ def check_for_side_pots(table):
             return None
 
         # check_for_side_pots = True
-        logger.debug(f"A sidepot was created")
+        logger.debug("A sidepot was created")
 
     logger.debug(
         f"End of check for side pots, the amounts in the pots are: {[pot.amount for pot in table.pots]}"
@@ -227,7 +227,7 @@ def check_for_side_pots(table):
 
 
 def fill_current_pot(lowest_player, table):
-    logger.debug(f"-- Fill the current pot --")
+    logger.debug("-- Fill the current pot --")
     lowest_bet = lowest_player.total_bet_betting_round
     current_pot = table.pots[-1]
     # reset the participants

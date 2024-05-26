@@ -10,7 +10,7 @@ import logging
 from collections import Counter
 import random
 
-setup_logging(debug_mode='CRITICAL')
+setup_logging(logging_mode='CRITICAL')
 logger = logging.getLogger('poker_game')
 logger_analytics = logging.getLogger('poker_game_analytics')
 

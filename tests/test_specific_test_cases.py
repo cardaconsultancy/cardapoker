@@ -6,17 +6,21 @@ from poker_game.utils.table import Table
 from poker_game.utils.objects_on_table import Chips, Card
 from poker_game.utils.logging_config import setup_logging
 
-setup_logging(debug_mode=True)
+setup_logging(logging_mode="INFO")
 
 logger = logging.getLogger("poker_game")
 
 TEST_ONE = False
 
+
 class TestTexasHoldemGame(unittest.TestCase):
+    """Test one case"""
+
     if TEST_ONE:
 
         def test_template(self):
-            pass
+            """Template for testing"""
+            logger.debug("Testing one use case")
 
     # test all the other test cases
     else:

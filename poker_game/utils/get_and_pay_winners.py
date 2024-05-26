@@ -47,7 +47,7 @@ def determine_winners(pot_players, table):
             logger.debug(f"The winner is {winner_list[0].name}")
             break
     if len(winner_list) != 1:
-        logger.debug(f"There is a tie between winners:")
+        logger.debug("There is a tie between winners:")
     return winner_list
 
 

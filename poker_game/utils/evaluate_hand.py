@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def card_rank_value(rank):
+def card_rank_value(rank) -> int:
     if rank is None:
         return 0
     return "123456789TJQKA".index(rank) + 1
@@ -22,9 +22,11 @@ def is_royal_or_straight_flush(sorted_hand):
         straight_suited_counter = 0
         if len(suited_list) != 0:
             if suited_list[0].rank == "A":
-                # logger.debug(f'Found an ace')
+                logger.debug("Found an ace in %s", suited_list)
                 # USE + instead of .append as this doesn't mutate the original list.
-                suited_list + [Card(rank="1", suit=the_suit)]
+                suited_list = suited_list + [Card(rank="1", suit=the_suit)]
+                logger.debug("New list: %s", suited_list)
+                logger.debug("Old list: %s", sorted_hand)
         # logger.debug(f'New list: {suited_list}')
         for i in range(len(suited_list) - 1):
             if (
@@ -33,7 +35,7 @@ def is_royal_or_straight_flush(sorted_hand):
             ):
                 straight_suited_counter += 1
                 if straight_suited_counter == 4:
-                    logger.debug(f"Straight Flush was Found with suit {the_suit}!!")
+                    logger.debug("Straight Flush was Found with suit %s!!", the_suit)
                     handscore = [8, suited_list[i - 3].rank, None, None, None, None]
                     return handscore
             elif (
@@ -64,7 +66,7 @@ def is_four_of_a_kind(sorted_hand):
             sorted_hand.remove(sorted_hand[i])
             sorted_hand.remove(sorted_hand[i])
             sorted_hand.remove(sorted_hand[i])
-            logger.debug(f"rest is now {sorted_hand}")
+            logger.debug("rest is now %s", sorted_hand)
             return [7, quads_rank, sorted_hand[0].rank, None, None, None]
     logger.debug("No Four of a Kind.")
     return False
@@ -82,7 +84,7 @@ def is_full_house(sorted_hand):
             ):
                 logger.debug("Found a full house!")
                 return [6, first_handscore[1], sorted_hand[i].rank, None, None, None]
-    logger.debug(f"No Full House")
+    logger.debug("No Full House")
     return False
 
 
@@ -145,7 +147,7 @@ def is_three_of_a_kind(sorted_hand):
             sorted_hand.remove(sorted_hand[i])
             sorted_hand.remove(sorted_hand[i])
             sorted_hand.remove(sorted_hand[i])
-            logger.debug(f"rest is now {sorted_hand}")
+            logger.debug("rest is now %s", sorted_hand)
             return [3, trips_rank, sorted_hand[0].rank, sorted_hand[1].rank, None, None]
     logger.debug("No Three of a Kind.")
     return False
@@ -164,7 +166,7 @@ def is_two_pair(sorted_hand):
             first_pair_rank = sorted_hand[i].rank
             sorted_hand.remove(sorted_hand[i])
             sorted_hand.remove(sorted_hand[i])
-            logger.debug(f"rest is now {sorted_hand}")
+            logger.debug("rest is now %s", sorted_hand)
 
             pairs += 1
         if sorted_hand[i].rank == sorted_hand[i + 1].rank and pairs == 1:
@@ -183,7 +185,7 @@ def is_two_pair(sorted_hand):
             ]
             return handscore
         # fill the rest with first, second and third kicker
-    logger.debug(f"No two Pair!")
+    logger.debug("No two Pair!")
     return False
 
 
@@ -214,29 +216,28 @@ def is_one_pair(sorted_hand):
     return False
 
 
-def evaluate_hand(all_cards):
-    sorted_hand = sorted(
-        all_cards, key=lambda card: card_rank_value(card.rank), reverse=True
-    )
-    logger.debug(f"...Checking for different hand Ranks.. for {sorted_hand}")
+def evaluate_hand(sorted_hand):
+    """ Check the hand rank """
+
+    logger.debug("...Checking for different hand Ranks.. for %s", sorted_hand)
 
     sorted_hand = sorted_hand.copy()
     hand_rank = is_royal_or_straight_flush(sorted_hand)
-    if hand_rank == False:
+    if hand_rank is False:
         hand_rank = is_four_of_a_kind(sorted_hand)
-    if hand_rank == False:
+    if hand_rank is False:
         hand_rank = is_full_house(sorted_hand)
-    if hand_rank == False:
+    if hand_rank is False:
         hand_rank = is_flush(sorted_hand)
-    if hand_rank == False:
+    if hand_rank is False:
         hand_rank = is_straight(sorted_hand)
-    if hand_rank == False:
+    if hand_rank is False:
         hand_rank = is_three_of_a_kind(sorted_hand)
-    if hand_rank == False:
+    if hand_rank is False:
         hand_rank = is_two_pair(sorted_hand)
-    if hand_rank == False:
+    if hand_rank is False:
         hand_rank = is_one_pair(sorted_hand)
-    if hand_rank == False:
+    if hand_rank is False:
         logger.debug("Return high card...")
         hand_rank = [
             0,

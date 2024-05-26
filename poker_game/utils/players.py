@@ -1,8 +1,10 @@
 import random
-from poker_game.utils.evaluate_hand import evaluate_hand, get_hand_rank
+from poker_game.utils.evaluate_hand import get_hand_rank
 from .objects_on_table import Chips
 import logging
-# from openai_client.test_openai import client 
+
+# from openai_client.test_openai import client
+
 
 class Player:
     def __init__(self, name, chips):
@@ -20,11 +22,11 @@ class Player:
         self.all_in = False
 
     def receive_card(self, card):
-        #self.logger.debug(f"{self.name} gets a {card.rank} of {card.suit}.")
+        # self.logger.debug(f"{self.name} gets a {card.rank} of {card.suit}.")
         self.hand.append(card)
 
     def show_hand(self):
-        return ', '.join(map(str, self.hand))
+        return ", ".join(map(str, self.hand))
 
     def set_hand(self, hand_list):
         self.hand = hand_list
@@ -33,78 +35,95 @@ class Player:
         self.best_hand = hand_rank
 
     def response(self, max_total_bet_size, hand, table):
-        #self.logger.debug(f"{self.name} must do his/her thing: the bet is {max_total_bet_size} and he/she already has {self.total_bet_betting_round} in the pot and {self.chips.amount} left.")
+        # self.logger.debug(f"{self.name} must do his/her thing: the bet is {max_total_bet_size} and he/she already has {self.total_bet_betting_round} in the pot and {self.chips.amount} left.")
         # this is the function that should be shared
-        
+
         # simple call function
         amount_to_call = max_total_bet_size - self.total_bet_betting_round
         amount_to_bet = self.bet(amount_to_call, hand, table)
-        return(amount_to_bet)
-    
+        return amount_to_bet
+
     # standard bet is 10, override below
     def bet(self, betsize, hand, table):
-        #self.logger.debug(f"The standard parent class is called, no modification has been done.")
+        # self.logger.debug("The standard parent class is called, no modification has been done.")
         print("The standard parent class is called, no modification has been done")
         # do this in game so that errors in modification don't mess this up
         # self.chips.lose(10)
-        return betsize 
+        return betsize
+
 
 #########################################################################################
 
-## decorators which people can fill in <-- other option would be to directly change the child class.
+
+## decorators which people can "Aggressive players go big at first chance"y change the child class.
 def aggressive_player_decorator(player_class):
     class AggressivePlayer(player_class):
         def bet(self, betsize, hand, table):
-            #self.logger.debug(f"Aggressive players go big at first chance")
+            # self.logger.debug("Aggressive players go big at first chance")
             return 10
+
         # Additional methods or overrides can go here
+
     return AggressivePlayer
+
 
 def super_aggressive_player_decorator(player_class):
     class SuperAggressivePlayer(player_class):
         def bet(self, betsize, hand, table):
-            #self.logger.debug(f"Aggressive players go big at first chance")
+            # self.logger.debug("Aggressive players go big at first chance")
             return 100
+
         # Additional methods or overrides can go here
+
     return SuperAggressivePlayer
+
 
 def conservative_player_decorator(player_class):
     class ConservativePlayer(player_class):
         def bet(self, betsize, hand, table):
-            #self.logger.debug(f"Conservative players only call")
+            # self.logger.debug("Conservative players only call")
             return betsize
+
         # Additional methods or overrides can go here
+
     return ConservativePlayer
+
 
 def always_fold_player_decorator(player_class):
     class AlwaysFoldPlayer(player_class):
         def bet(self, betsize, hand, table):
-            #self.logger.debug(f"folding is all I do")
+            # self.logger.debug("folding is all I do")
             return 0
+
         # Additional methods or overrides can go here
+
     return AlwaysFoldPlayer
+
 
 def raises_with_aces_reduces_with_12345_decorator(player_class):
     class Raises_with_aces_reduces_with_12345Player(player_class):
         def bet(self, betsize, hand, table):
-            #self.logger.debug(f"I am an Ace Raiser!")
+            # self.logger.debug("I am an Ace Raiser!")
             for card in hand:
-                if card.suit == 'A':
-                    betsize = betsize * 2 
+                if card.suit == "A":
+                    betsize = betsize * 2
                     # print("Ace is raise!")
-                elif card.suit in '12345':
+                elif card.suit in "12345":
                     # print("that is a low card!")
                     betsize = betsize / 2
                 # else:
                 #     print('that is an average card!')
             return betsize
+
         # Additional methods or overrides can go here
+
     return Raises_with_aces_reduces_with_12345Player
+
 
 def careful_calculator_decorator(player_class):
     class careful_calculator_Player(player_class):
         def bet(self, betsize, hand, table):
-            #self.logger.debug(f"I am a calculator!")
+            # self.logger.debug("I am a calculator!")
             # if flop:
             if len(table.community_cards) >= 3:
                 rank = get_hand_rank(self, table)
@@ -114,46 +133,53 @@ def careful_calculator_decorator(player_class):
                 if 2 <= rank[0] <= 4:
                     # raise
                     betsize = betsize * 2 + 20
-            # if before flop: 
-            else:    
+            # if before flop:
+            else:
                 for card in hand:
-                    if card.suit == 'A':
-                        betsize = betsize * 2 
+                    if card.suit == "A":
+                        betsize = betsize * 2
                         # print("Ace is raise!")
-                    elif card.suit in '12345':
+                    elif card.suit in "12345":
                         # print("that is a low card!")
                         betsize = betsize / 2
                     # else:
                     #     print('that is an average card!')
                 return betsize
             return betsize
+
         # Additional methods or overrides can go here
+
     return careful_calculator_Player
+
 
 def completely_random_decorator(player_class):
     class CompletelyRandomPlayer(player_class):
         def bet(self, betsize, hand, table):
-            actions = ['fold', 'call', 'raise']
+            actions = ["fold", "call", "raise"]
             action = random.choice(actions)
             self.logger.info(f"{self.name} randomly chooses to {action}")
-            if action == 'fold':
+            if action == "fold":
                 return 0
-            elif action == 'call':
+            elif action == "call":
                 return betsize
-            elif action == 'raise':
+            elif action == "raise":
                 raise_amount = random.randint(10, 100)  # Adjust range as necessary
                 total_bet = betsize + raise_amount
-                self.logger.info(f"{self.name} raises an additional {raise_amount}, total bet: {total_bet}")
+                self.logger.info(
+                    f"{self.name} raises an additional {raise_amount}, total bet: {total_bet}"
+                )
                 return total_bet
 
             return betsize
+
     return CompletelyRandomPlayer
+
 
 # def chatgpt35_decorator(player_class):
 #     class chatgpt35(player_class):
 #         def bet(self, betsize, hand, table):
 
-#             table.players 
+#             table.players
 
 #             prompt = "6 players. Nr chips per person: 1000"\
 #             "You are the fouth player after the dealer."\
@@ -191,11 +217,12 @@ def completely_random_decorator(player_class):
 #     else:
 #         DecoratedPlayer = ActualPlayerTemplate  # No decoration
 
-    # return DecoratedPlayer(name)
+# return DecoratedPlayer(name)
+
 
 # The child class, which will function as a template.
 class ActualPlayerTemplate(Player):
-    def __init__(self, name, chips = None):
+    def __init__(self, name, chips=None):
         # Call the constructor of the base class (Player)
         super().__init__(name, chips)
         # Add or override attributes specific to the Player
@@ -208,13 +235,15 @@ class ActualPlayerTemplate(Player):
         return betsize
         # OR make it more complex:
         # bet_to_make_pot_20()
-    # A more complex function can be added: 
-    
+
+    # A more complex function can be added:
+
     # def bet_to_make_pot_20(self, previous_bet, pot, players):
     #     #self.logger.debug(f"{self.name} has to decide what to do.")
     #     if pot < 20 and self.hand != [Card('2', '♠'), Card('7', '♥')]:
     #         #self.logger.debug(f"{self.name} says: let's make that pot 20!")
-    #         self.bet((20-pot)/players) 
+    #         self.bet((20-pot)/players)
+
 
 # def create_player(name, style, chips=Chips(100)):
 #     if style == 'aggressive':
@@ -232,20 +261,21 @@ class ActualPlayerTemplate(Player):
 #     elif style == 'completely_random':
 #         DecoratedPlayer = completely_random_decorator(ActualPlayerTemplate)
 #     else:
-#         DecoratedPlayer = ActualPlayerTemplate  # No decoration 
+#         DecoratedPlayer = ActualPlayerTemplate  # No decoration
 
 #     return DecoratedPlayer(name, chips)
+
 
 # Function to instantiate a player with a specific playing style
 def create_player(name, style, chips=Chips(100)):
     player_classes = {
-        'aggressive': aggressive_player_decorator,
-        'super_aggressive': super_aggressive_player_decorator,
-        'conservative': conservative_player_decorator,
-        'careful_calculator': careful_calculator_decorator,
-        'always_fold': always_fold_player_decorator,
-        'raises_with_aces_reduces_with_12345': raises_with_aces_reduces_with_12345_decorator,
-        'completely_random': completely_random_decorator
+        "aggressive": aggressive_player_decorator,
+        "super_aggressive": super_aggressive_player_decorator,
+        "conservative": conservative_player_decorator,
+        "careful_calculator": careful_calculator_decorator,
+        "always_fold": always_fold_player_decorator,
+        "raises_with_aces_reduces_with_12345": raises_with_aces_reduces_with_12345_decorator,
+        "completely_random": completely_random_decorator,
     }
 
     # Check if the style exists in the decorator mapping, otherwise use default template

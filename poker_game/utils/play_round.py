@@ -89,16 +89,16 @@ def play_round(table, test_cards=None, seed=None):
         logger.debug(f"Player {player.name} has {player.hand}")
 
     # Betting Round 1, note that preflop_round is set to True
-    logger.debug(f"Players can make their first bet.")
+    logger.debug("Players can make their first bet.")
     if not betting_round_completed(table, preflop_round=True):
-        logger.debug(f"!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!")
+        logger.debug("!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!")
         clean_up(table)
         return table
     if check_if_rest_folded_and_pay(table):
         print("obsolete")
         return table
 
-    logger.debug(f"Bets are made")
+    logger.debug("Bets are made")
     logger.debug(
         f"Total betted {sum(player.total_in_pots_this_game for player in table.players)}."
     )
@@ -118,7 +118,7 @@ def play_round(table, test_cards=None, seed=None):
 
     # Betting Round 2: flop
     if not all_but_one_folded_or_all_in(table):
-        logger.debug(f"Players can bet on the flop.")
+        logger.debug("Players can bet on the flop.")
 
         # Start the betting round and check if the betting round is completed
         # If not completed, the table is cleaned up
@@ -141,7 +141,7 @@ def play_round(table, test_cards=None, seed=None):
     if test_cards is None:
         table.community_cards.append(deck.deal())
     else:
-        logger.debug(f"TEST")
+        logger.debug("TEST")
         table.community_cards.append(test_cards[3])
 
     # log turn
@@ -157,16 +157,16 @@ def play_round(table, test_cards=None, seed=None):
 
     # Check if all players are all-in or folded
     if not all_but_one_folded_or_all_in:
-        logger.debug(f"Players can bet on the turn.")
+        logger.debug("Players can bet on the turn.")
         if not betting_round_completed(table):
-            logger.debug(f"!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!")
+            logger.debug("!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!")
             clean_up(table)
             return table
         logger.debug(
-            f"Total is {sum(player.total_in_pots_this_game for player in table.players)}."
+            f"Total is %s{sum(player.total_in_pots_this_game for player in table.players)}."
         )
     else:
-        logger.debug(f"All but one are all in, so no more bets!")
+        logger.debug("All but one are all in, so no more bets!")
 
     # TODO delete this line if not needed
     if check_if_rest_folded_and_pay(table):
@@ -177,30 +177,36 @@ def play_round(table, test_cards=None, seed=None):
     if test_cards is None:
         table.community_cards.append(deck.deal())
     else:
-        logger.debug(f"TEST")
+        logger.debug("TEST")
         table.community_cards.append(test_cards[4])
 
     # log river
     # logger.info(f'{table.community_cards[4].rank}{table.community_cards[4].suit}')
-    logger.info(
-        f'test_cards = [Card("{table.community_cards[0].rank}", "{table.community_cards[0].suit}"), Card("{table.community_cards[1].rank}", "{table.community_cards[1].suit}"), Card("{table.community_cards[2].rank}", "{table.community_cards[2].suit}"), Card("{table.community_cards[3].rank}", "{table.community_cards[3].suit}"), Card("{table.community_cards[4].rank}", "{table.community_cards[4].suit}")]'
-    )
+
+    # for debugging purposes while running random simulations, this made life easier to copy paste
+    # logger.info(
+    #     f'test_cards = [Card("{table.community_cards[0].rank}", "{table.community_cards[0].suit}"), Card("{table.community_cards[1].rank}", "{table.community_cards[1].suit}"), Card("{table.community_cards[2].rank}", "{table.community_cards[2].suit}"), Card("{table.community_cards[3].rank}", "{table.community_cards[3].suit}"), Card("{table.community_cards[4].rank}", "{table.community_cards[4].suit}")]'
+    # )
+
     logger.debug(
-        f"On the table comes {table.community_cards[4].rank} of {table.community_cards[4].suit}."
+        "On the table comes %s of %s.",
+        table.community_cards[4].rank,
+        table.community_cards[4].suit,
     )
 
     # Betting Round 4, the river
     if not all_but_one_folded_or_all_in:
-        logger.debug(f"Players can bet on the river, final bet!")
+        logger.debug("Players can bet on the river, final bet!")
         if not betting_round_completed(table):
-            logger.debug(f"!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!")
+            logger.debug("!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!")
             clean_up(table)
             return table
         logger.debug(
-            f"Total is {sum(player.total_in_pots_this_game for player in table.players)}."
+            "Total is %s",
+            sum(player.total_in_pots_this_game for player in table.players),
         )
     else:
-        logger.debug(f"All but one are all in, so no more bets!")
+        logger.debug("All but one are all in, so no more bets!")
 
     # TODO delete this line if not needed
     if check_if_rest_folded_and_pay(table):
@@ -208,13 +214,13 @@ def play_round(table, test_cards=None, seed=None):
         return True
 
     # Determine the winner(s)
-    logger.debug(f"Pay_the_winner(s)")
+    logger.debug("Pay_the_winner(s)")
     pay_winners(table)
 
     # debugger to identify errors in long simulations
-    if sum(player.chips.amount for player in table.players) != 600:
-        AttributeError("The total amount of chips is not 600")
-        print(sum(player.chips.amount for player in table.players))
+    # if sum(player.chips.amount for player in table.players) != 600:
+    #     AttributeError("The total amount of chips is not 600")
+    #     logger.debug(sum(player.chips.amount for player in table.players))
 
     # Clean up
     clean_up(table)

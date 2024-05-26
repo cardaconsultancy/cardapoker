@@ -11,7 +11,7 @@ from poker_game.utils.game import TexasHoldemGame
 from poker_game.utils.logging_config import setup_logging
 import logging
 
-setup_logging(debug_mode=True)
+setup_logging(logging_mode=True)
 
 logger = logging.getLogger("poker_game")
 
