@@ -1,13 +1,18 @@
+""" 
+This files tests the game with random players and random games a lot of times, 
+but pragmatically prevents me from running it with all the test because it takes too long.
+"""
+
 import datetime
 import unittest
 import logging
 import random
+from collections import Counter
 from poker_game.play_game import play_game
 from poker_game.utils.players import create_player
 from poker_game.utils.table import Table
 from poker_game.utils.objects_on_table import Chips
 from poker_game.utils.logging_config import setup_logging
-from collections import Counter
 
 
 setup_logging(logging_mode='CRITICAL')
@@ -21,7 +26,7 @@ class TestTexasHoldemGame(unittest.TestCase):
         winnerlist = []
         role_list = ['raises_with_aces_reduces_with_12345', 'conservative', 'careful_calculator', 'aggressive', 'always_fold', 'super_aggressive', 'completely_random']
         length_of_role_list = len(role_list)-1
-        for game in range(0, 1000): 
+        for game in range(0, 10): 
             # get the game number
             logger.info("Game NR %s", game)
             

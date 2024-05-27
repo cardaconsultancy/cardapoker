@@ -13,41 +13,50 @@ def card_rank_value(rank) -> int:
 
 def is_royal_or_straight_flush(sorted_hand):
     logger.debug("Checking for Royal and/or Straight Flush...")
+
+    # create a copy of the hand to be able to add an Ace if needed
+    sorted_hand_copy = sorted_hand.copy()
     for the_suit in ["♠", "♥", "♦", "♣"]:
+        logger.debug('Checking for %s', the_suit)
         # omdat als ie nou een niet suited eentje naar beneden gaat? Dat sluit nu nog niks uit...
         suited_list = []
-        for hand in sorted_hand:
-            if hand.suit == the_suit:
-                suited_list.append(hand)
+        for card in sorted_hand_copy:
+            if card.suit == the_suit:
+                suited_list.append(card)
+        logger.debug('Suited list: %s', suited_list)
         straight_suited_counter = 0
         if len(suited_list) != 0:
             if suited_list[0].rank == "A":
                 logger.debug('Found an ace')
-                ace_suit = sorted_hand[0].suit
-                logger.debug('old list:%s', sorted_hand)
-                sorted_hand.append(Card(rank="1", suit=ace_suit))
-                logger.debug('New list: %s', sorted_hand)
+                ace_suit = suited_list[0].suit
+                logger.debug('old list:%s', suited_list)
+                suited_list.append(Card(rank="1", suit=ace_suit))
+                logger.debug('New list: %s', suited_list)
         # logger.debug(f'New list: {suited_list}')
         for i in range(len(suited_list) - 1):
             if (
-                card_rank_value(sorted_hand[i].rank)
-                == card_rank_value(sorted_hand[i + 1].rank) + 1
+                card_rank_value(suited_list[i].rank)
+                == card_rank_value(suited_list[i + 1].rank) + 1
             ):
+                logger.debug(
+                    "Found a straight suited %s %s",
+                    suited_list[i].rank,
+                    suited_list[i + 1].rank,
+                )
                 straight_suited_counter += 1
                 if straight_suited_counter == 4:
                     logger.debug("Straight Flush was Found with suit %s!!", the_suit)
-                    handscore = [8, sorted_hand[i - 3].rank, None, None, None, None]
+                    handscore = [8, suited_list[i - 3].rank, None, None, None, None]
+                    if handscore[1] == "A":
+                        logger.debug("Royal Flush was Found!")
+                        handscore = [9, None, None, None, None, None]
                     return handscore
-            elif (
-                card_rank_value(sorted_hand[i].rank)
-                - card_rank_value(sorted_hand[i + 1].rank)
-                > 2
-            ):
-                #
+            else:
+                logger.debug('No straight suited %s %s', suited_list[i].rank, suited_list[i+1].rank)
                 straight_suited_counter = 0
-
         logger.debug("No straight flush was Found.")
-        return False
+    logger.debug("No straight flush was Found.")
+    return False
 
 
 def is_four_of_a_kind(sorted_hand):
@@ -103,6 +112,7 @@ def is_flush(sorted_hand):
 
 
 def is_straight(sorted_hand):
+    print('!!!!!!!!!!!', sorted_hand)
     logger.debug("Checking for Straight...")
 
     # as there are nog 8 cards with the extra Ace possibility, needs different solving for straight flush
@@ -208,7 +218,6 @@ def is_one_pair(sorted_hand):
                 sorted_hand[0].rank,
                 sorted_hand[1].rank,
                 sorted_hand[2].rank,
-                None,
             ]
             # logger.debug(f"Handscore = {handscore}")
             return handscore
@@ -253,6 +262,9 @@ def evaluate_hand(sorted_hand):
 def get_hand_rank(player, table):
     logger.debug("...Checking for different hand Ranks for %s", player.name)
     all_cards = player.hand + [Card(card[0], card[1]) for card in table.community_cards]
-    hand_rank = evaluate_hand(all_cards)
-    # logger.debug(f"The best hand is {hand_rank}")
+    logger.debug("all cards %s", all_cards)
+    sorted_hand = sorted(all_cards, key=lambda card: card_rank_value(card.rank), reverse=True)
+    logger.debug("Sorted cards %s", sorted_hand)
+    hand_rank = evaluate_hand(sorted_hand)
+    logger.debug("The best hand is %s", sorted_hand)
     return hand_rank
