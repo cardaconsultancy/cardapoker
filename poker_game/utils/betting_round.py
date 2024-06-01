@@ -4,6 +4,7 @@ import logging
 from poker_game.utils.next_player import get_next_player
 from poker_game.utils.pot_management import check_if_only_one_player_left, create_pots
 from poker_game.Timer import timeout
+from poker_game.utils.set_up_database import log_betting_activity
 
 # Retrieve the already configured logger
 logger = logging.getLogger("poker_game")
@@ -11,7 +12,7 @@ logger = logging.getLogger("poker_game")
 
 # A full round of Texas Holdem
 @timeout(5)  # Set timeout to 5 seconds
-def betting_round_completed(table, preflop_round=False) -> bool:
+def betting_round_completed(table, round_id, preflop_round=False) -> bool:
     """This code starts the betting round until we reach the last raiser"""
 
     logger.debug(" ------------- Start betting round ------------- ")
@@ -102,6 +103,7 @@ def betting_round_completed(table, preflop_round=False) -> bool:
 
             # log SB if all in or not
             logger.info("SB-%s-%s", player.name, player.total_bet_betting_round)
+            # log_betting_activity(round_id = round_id, player_name=player.name, amount=player.total_bet_betting_round)
 
             player = get_next_player(
                 starting_players=table.starting_players,
@@ -133,6 +135,8 @@ def betting_round_completed(table, preflop_round=False) -> bool:
 
             # log BB if all in or not
             logger.info("BB-%s-%s", player.name, player.total_bet_betting_round)
+            # log_betting_activity(round_id = round_id, player_name=player.name, amount=player.total_bet_betting_round)
+
 
             preflop_round = False
 
@@ -205,6 +209,8 @@ def betting_round_completed(table, preflop_round=False) -> bool:
 
                 player.total_bet_betting_round += player_bet
                 logger.info("%s-%s-AI", player.name, player_bet)
+                # log_betting_activity(round_id = round_id, player_name=player.name, amount=player_bet)
+
 
                 player.total_in_pots_this_game += player_bet
                 logger.debug(
@@ -235,6 +241,7 @@ def betting_round_completed(table, preflop_round=False) -> bool:
                     max_bet,
                 )
                 logger.info("%s-F", player.name)
+                # log_betting_activity(round_id = round_id, player_name=player.name, amount=None)
 
                 player.folded = True
 
@@ -268,6 +275,8 @@ def betting_round_completed(table, preflop_round=False) -> bool:
                     player.chips.amount,
                 )
                 logger.info("%s-%s-Check", player.name, player_bet)
+                # log_betting_activity(round_id = round_id, player_name=player.name, amount=player_bet)
+
 
             # Calling
             elif player.total_bet_betting_round + player_bet == max_bet:
@@ -286,6 +295,7 @@ def betting_round_completed(table, preflop_round=False) -> bool:
                     player.chips.amount,
                 )
                 logger.info("%s-%s-Call", player.name, player_bet)
+                # log_betting_activity(round_id = round_id, player_name=player.name, amount=player_bet)
 
             # Raising
             elif player.total_bet_betting_round + player_bet > max_bet:
@@ -303,6 +313,7 @@ def betting_round_completed(table, preflop_round=False) -> bool:
                 last_raiser = player
                 logger.debug("----%s is the last raiser", player.name)
                 logger.info("%s-%s-Raise", player.name, player_bet)
+                # log_betting_activity(round_id = round_id, player_name=player.name, amount=player_bet)
 
             else:
                 logger.debug(

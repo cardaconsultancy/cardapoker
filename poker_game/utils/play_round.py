@@ -1,6 +1,7 @@
 """The logic of the poker round is here."""
 
 import logging
+import datetime
 from poker_game.Timer import timeout
 from poker_game.utils.at_most_one_not_all_in_or_folded import (
     all_but_one_folded_or_all_in,
@@ -10,6 +11,10 @@ from poker_game.utils.clean_up import clean_up
 from poker_game.utils.get_and_pay_winners import pay_winners
 from poker_game.utils.objects_on_table import Deck
 from poker_game.utils.pot_management import check_if_rest_folded_and_pay
+from poker_game.utils.set_up_database import log_round_and_communal_cards
+from poker_game.utils.set_up_database import log_betting_activity
+from poker_game.utils.set_up_database import log_cards_player
+
 
 # Retrieve the already configured logger
 logger = logging.getLogger("poker_game")
@@ -22,6 +27,9 @@ def play_round(table, test_cards=None, seed=None):
     # log new Round
     logger.info("--- New Round ---")
     logger.info("table = Table()")
+    round_id = str(datetime.datetime.now())
+    # round_id = log_new_round(timing)  # Log the new round and get its ID
+
     # reset the deck
     deck = Deck(seed=seed)
 
@@ -79,7 +87,8 @@ def play_round(table, test_cards=None, seed=None):
             player.receive_card(deck.deal())
 
     # Log each player's hand
-    for player in table.players_game:
+    for gambler in table.starting_players:
+        pass
 
         # I will separate logging and dashboarding in the future
         # logger.info(f'{player.name}-{player.hand[0].rank}{player.hand[0].suit}{player.hand[1].rank}{player.hand[1].suit}')
@@ -91,12 +100,12 @@ def play_round(table, test_cards=None, seed=None):
         #     )
         # ) 
 
-
-        logger.debug(f"Player {player.name} has {player.hand}")
+        # log_cards_player(round_id=round_id, card_1_rank=gambler.hand[0].rank, card_1_suit=gambler.hand[0].suit, card_2_rank=gambler.hand[1].rank, card_2_suit=gambler.hand[1].suit)
+        # logger.debug(f"Player {gambler.name} has {gambler.hand}")
 
     # Betting Round 1, note that preflop_round is set to True
     logger.debug("Players can make their first bet.")
-    if not betting_round_completed(table, preflop_round=True):
+    if not betting_round_completed(table, preflop_round=True, round_id=round_id):
         logger.debug("!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!")
         clean_up(table)
         return table
@@ -129,7 +138,7 @@ def play_round(table, test_cards=None, seed=None):
         # Start the betting round and check if the betting round is completed
         # If not completed, the table is cleaned up
 
-        if not betting_round_completed(table):
+        if not betting_round_completed(table, round_id=round_id):
             logger.debug("!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!")
             clean_up(table)
             return table
@@ -164,7 +173,7 @@ def play_round(table, test_cards=None, seed=None):
     # Check if all players are all-in or folded
     if not all_but_one_folded_or_all_in:
         logger.debug("Players can bet on the turn.")
-        if not betting_round_completed(table):
+        if not betting_round_completed(table, round_id=round_id):
             logger.debug("!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!")
             clean_up(table)
             return table
@@ -186,7 +195,13 @@ def play_round(table, test_cards=None, seed=None):
         logger.debug("TEST")
         table.community_cards.append(test_cards[4])
 
-    # log river
+    # log the cards...
+    # but what happens if everybody folds? Did that never happen... do we still show cards?
+    # TODO easiest is to add Nans.
+
+    log_round_and_communal_cards(round_id, table.community_cards[0].rank, table.community_cards[0].suit, table.community_cards[1].rank, table.community_cards[1].suit, table.community_cards[2].rank, table.community_cards[2].suit, table.community_cards[3].rank, table.community_cards[3].suit, table.community_cards[4].rank, table.community_cards[4].suit)
+
+
     # logger.info(f'{table.community_cards[4].rank}{table.community_cards[4].suit}')
 
     # for debugging purposes while running random simulations, this made life easier to copy paste
@@ -203,7 +218,7 @@ def play_round(table, test_cards=None, seed=None):
     # Betting Round 4, the river
     if not all_but_one_folded_or_all_in:
         logger.debug("Players can bet on the river, final bet!")
-        if not betting_round_completed(table):
+        if not betting_round_completed(table, round_id=round_id):
             logger.debug("!!!!!!!!!!!!!!everybody folded!!!!!!!!!!!!!!!")
             clean_up(table)
             return table

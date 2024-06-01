@@ -112,7 +112,6 @@ def is_flush(sorted_hand):
 
 
 def is_straight(sorted_hand):
-    print('!!!!!!!!!!!', sorted_hand)
     logger.debug("Checking for Straight...")
 
     # as there are nog 8 cards with the extra Ace possibility, needs different solving for straight flush

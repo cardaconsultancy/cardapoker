@@ -6,7 +6,7 @@ from poker_game.utils.objects_on_table import Deck, Chips, Card, Pot
 from poker_game.utils.game import TexasHoldemGame
 from poker_game.utils.logging_config import setup_logging
 
-setup_logging()
+setup_logging(logging_mode="INFO")
 
 
 class TestTexasHoldemGame(unittest.TestCase):

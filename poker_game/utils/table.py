@@ -25,7 +25,7 @@ class Table:
     def add_player(self, player):
 
         self.starting_players.append(player)
-        # I am not sure if we still need this one, but added starting players because we remove players and I need the reference
+        # I am not sure if we still need this 'players' one, but added starting players because we remove players and I need the reference
         self.players.append(player)
         self.players_game.append(player)
         # If this is the first player added, set them as the dealer
