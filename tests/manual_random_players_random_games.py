@@ -26,7 +26,7 @@ class TestTexasHoldemGame(unittest.TestCase):
         winnerlist = []
         role_list = ['raises_with_aces_reduces_with_12345', 'conservative', 'careful_calculator', 'aggressive', 'always_fold', 'super_aggressive', 'completely_random']
         length_of_role_list = len(role_list)-1
-        for game in range(0, 100000): 
+        for game in range(0, 100): 
             # get the game number
             logger.info("Game NR %s", game)
             

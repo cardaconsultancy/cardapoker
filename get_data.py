@@ -46,15 +46,25 @@ DESC
 """
 
 PLAYER_DISTRIBUTION = """
-SELECT seat_winner,
-count(*) as nr_of_games
-FROM games
-group by seat_winner
-order by nr_of_games
-DESC
+SELECT player_type, COUNT(*) as count
+FROM (
+    SELECT player_1 as player_type FROM games
+    UNION ALL
+    SELECT player_2 FROM games
+    UNION ALL
+    SELECT player_3 FROM games
+    UNION ALL
+    SELECT player_4 FROM games
+    UNION ALL
+    SELECT player_5 FROM games
+    UNION ALL
+    SELECT player_6 FROM games
+) AS player_types
+GROUP BY player_type
+ORDER BY count DESC
 """
 
 
-cursor.execute(WINNING_STRATEGY_QUERY)
-WINNING_STRATEGY_QUERY = cursor.fetchall()
-print('Query result', WINNING_STRATEGY_QUERY)
+cursor.execute(PLAYER_DISTRIBUTION)
+QUERY = cursor.fetchall()
+print('Query result', QUERY)

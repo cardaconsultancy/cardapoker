@@ -175,30 +175,30 @@ def completely_random_decorator(player_class):
     return CompletelyRandomPlayer
 
 
-# def chatgpt35_decorator(player_class):
-#     class chatgpt35(player_class):
-#         def bet(self, betsize, hand, table):
+def chatgpt35_decorator(player_class):
+    class chatgpt35(player_class):
+        def bet(self, betsize, hand, table):
 
-#             table.players
+            table.players
 
-#             prompt = "6 players. Nr chips per person: 1000"\
-#             "You are the fouth player after the dealer."\
-#             "First round. You get a jack of hearts and a queen of hearts."\
-#             "Player 2 small blind: 1 chip. Player 3 big blind: 2 chips."\
-#             "Your turn. What do you do? Pick one option."
+            prompt = "6 players. Nr chips per person: 1000"\
+            "You are the fouth player after the dealer."\
+            "First round. You get a jack of hearts and a queen of hearts."\
+            "Player 2 small blind: 1 chip. Player 3 big blind: 2 chips."\
+            "Your turn. What do you do? Pick one option."
 
-#             chat_completion = client.chat.completions.create(
-#                 messages = [
-#                     {
-#                         "role":"user",
-#                         "content": prompt
-#                     }
-#                 ],
-#                 model="gpt-3.5-turbo"
-#             )
-#             print(chat_completion)
-#         # Additional methods or overrides can go here
-#     return chatgpt35
+            chat_completion = client.chat.completions.create(
+                messages = [
+                    {
+                        "role":"user",
+                        "content": prompt
+                    }
+                ],
+                model="gpt-3.5-turbo"
+            )
+            print(chat_completion)
+        # Additional methods or overrides can go here
+    return chatgpt35
 
 
 #########################################################################################
@@ -243,27 +243,6 @@ class ActualPlayerTemplate(Player):
     #     if pot < 20 and self.hand != [Card('2', '♠'), Card('7', '♥')]:
     #         #self.logger.debug(f"{self.name} says: let's make that pot 20!")
     #         self.bet((20-pot)/players)
-
-
-# def create_player(name, style, chips=Chips(100)):
-#     if style == 'aggressive':
-#         DecoratedPlayer = aggressive_player_decorator(ActualPlayerTemplate)
-#     elif style == 'super_aggressive':
-#         DecoratedPlayer = super_aggressive_player_decorator(ActualPlayerTemplate)
-#     elif style == 'conservative':
-#         DecoratedPlayer = conservative_player_decorator(ActualPlayerTemplate)
-#     elif style == 'careful_calculator':
-#         DecoratedPlayer = careful_calculator_decorator(ActualPlayerTemplate)
-#     elif style == 'always_fold':
-#         DecoratedPlayer = always_fold_player_decorator(ActualPlayerTemplate)
-#     elif style == 'raises_with_aces_reduces_with_12345':
-#         DecoratedPlayer = raises_with_aces_reduces_with_12345_decorator(ActualPlayerTemplate)
-#     elif style == 'completely_random':
-#         DecoratedPlayer = completely_random_decorator(ActualPlayerTemplate)
-#     else:
-#         DecoratedPlayer = ActualPlayerTemplate  # No decoration
-
-#     return DecoratedPlayer(name, chips)
 
 
 # Function to instantiate a player with a specific playing style
