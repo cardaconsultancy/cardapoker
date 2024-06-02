@@ -8,7 +8,6 @@ from poker_game.utils.logging_config import setup_logging
 
 setup_logging(logging_mode="INFO")
 
-
 class TestTexasHoldemGame(unittest.TestCase):
     def test_play_round(self):
         table = Table()

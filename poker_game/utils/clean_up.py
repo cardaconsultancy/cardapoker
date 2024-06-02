@@ -6,6 +6,7 @@ from poker_game.utils.next_player import get_next_player
 # Retrieve the already configured logger
 logger = logging.getLogger("poker_game")
 
+
 def clean_up(table) -> None:
     """Get the next dealer, remove the players without money and determine if the game is ended"""
 
@@ -15,7 +16,7 @@ def clean_up(table) -> None:
 
     # Get the next dealer
     table.dealer = get_next_player(
-        starting_players=table.starting_players,
+        starting_players_and_seats=table.starting_players_and_seats,
         active_players=table.players_game,
         current_player=table.dealer,
     )
@@ -30,7 +31,9 @@ def clean_up(table) -> None:
         player.all_in = False
         if player.chips.amount == 0:
             table.players.remove(player)
-            logger.debug("%s has no chips left and leaves the table crying", player.name)
+            logger.debug(
+                "%s has no chips left and leaves the table crying", player.name
+            )
     # Create a new list that only includes the players you want to keep
     table.players_game = table.players
     table.community_cards = []

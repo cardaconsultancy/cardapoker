@@ -79,7 +79,7 @@ class TestTexasHoldemGame(unittest.TestCase):
         testpot.players = [player1, player2, player3]
 
         table.pots = [testpot]
-        pay_winners(table)
+        pay_winners(table, 'round_ID')
 
         if test_hands == "p1 and p2 winner, p3 loser":
             self.assertEqual(150, player1.chips.amount)

@@ -42,12 +42,12 @@ class TestTexasHoldemGame(unittest.TestCase):
             F_role = role_list[random.randint(0, length_of_role_list)]
 
             table = Table()
-            A = create_player(A_role + "_A", A_role, Chips(100))
-            B = create_player(B_role + "_B", B_role, Chips(100))
-            C = create_player(C_role + "_C", C_role, Chips(100))
-            D = create_player(D_role + "_D", D_role, Chips(100))
-            E = create_player(E_role + "_E", E_role, Chips(100))
-            F = create_player(F_role + "_F", F_role, Chips(100))
+            A = create_player(A_role + "_seat_1", A_role, Chips(100))
+            B = create_player(B_role + "_seat_2", B_role, Chips(100))
+            C = create_player(C_role + "_seat_3", C_role, Chips(100))
+            D = create_player(D_role + "_seat_4", D_role, Chips(100))
+            E = create_player(E_role + "_seat_5", E_role, Chips(100))
+            F = create_player(F_role + "_seat_6", F_role, Chips(100))
 
             table.add_player(A)
             table.add_player(B)

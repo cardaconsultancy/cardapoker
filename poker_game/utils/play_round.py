@@ -9,9 +9,13 @@ from poker_game.utils.at_most_one_not_all_in_or_folded import (
 from poker_game.utils.betting_round import betting_round_completed
 from poker_game.utils.clean_up import clean_up
 from poker_game.utils.get_and_pay_winners import pay_winners
-from poker_game.utils.objects_on_table import Deck
+from poker_game.utils.objects_on_table import Card, Chips, Deck
+from poker_game.utils.players import create_player
 from poker_game.utils.pot_management import check_if_rest_folded_and_pay
-from poker_game.utils.set_up_database import log_round_and_communal_cards
+from poker_game.utils.set_up_database import (
+    log_active_players,
+    log_round_players_chips_cards,
+)
 from poker_game.utils.set_up_database import log_betting_activity
 from poker_game.utils.set_up_database import log_cards_player
 
@@ -52,25 +56,25 @@ def play_round(table, test_cards=None, seed=None):
         # log the amount of chips each player has
         # logger.info(f"{player.name}-chips-{player.chips.amount}")
 
-        # TODO: remove this lines when the game is stable
-        # for the ease of debugging
-        strategy_mapping = {
-            "AggressivePlayer": "aggressive",
-            "SuperAggressivePlayer": "super_aggressive",
-            "ConservativePlayer": "conservative",
-            "AlwaysFoldPlayer": "always_fold",
-            "Raises_with_aces_reduces_with_12345Player": "raises_with_aces_reduces_with_12345",
-            "careful_calculator_Player": "careful_calculator",
-            "ActualPlayerTemplate": "default",
-            "CompletelyRandomPlayer": "completely_random",
-        }
-        # create logger info in the form of A = create_player("A", "raises_with_aces_reduces_with_12345", Chips(15))
-        logger.info(
-            '{player.name} = create_player("%s", "%s", Chips(%s))',
-            player.name,
-            strategy_mapping[player.__class__.__name__],
-            player.chips.amount,
-        )
+        # # TODO: remove this lines when the game is stable
+        # # for the ease of debugging
+        # strategy_mapping = {
+        #     "AggressivePlayer": "aggressive",
+        #     "SuperAggressivePlayer": "super_aggressive",
+        #     "ConservativePlayer": "conservative",
+        #     "AlwaysFoldPlayer": "always_fold",
+        #     "Raises_with_aces_reduces_with_12345Player": "raises_with_aces_reduces_with_12345",
+        #     "careful_calculator_Player": "careful_calculator",
+        #     "ActualPlayerTemplate": "default",
+        #     "CompletelyRandomPlayer": "completely_random",
+        # }
+        # # create logger info in the form of A = create_player("A", "raises_with_aces_reduces_with_12345", Chips(15))
+        # logger.info(
+        #     '{player.name} = create_player("%s", "%s", Chips(%s))',
+        #     player.name,
+        #     strategy_mapping[player.__class__.__name__],
+        #     player.chips.amount,
+        # )
 
         # in case of a test with predefined cards, we don't want to give
         # the player any cards
@@ -87,18 +91,26 @@ def play_round(table, test_cards=None, seed=None):
             player.receive_card(deck.deal())
 
     # Log each player's hand
-    for gambler in table.starting_players:
-        pass
+    for gambler in table.players_game:
+        log_active_players(
+            round_id=round_id,
+            player_name=gambler.name,
+            player_strategy=player.__class__.__name__,
+            player_card_1_rank=gambler.hand[0].rank,
+            player_card_1_suit=gambler.hand[0].suit,
+            player_card_2_rank=gambler.hand[1].rank,
+            player_card_2_suit=gambler.hand[1].suit,
+        )
 
         # I will separate logging and dashboarding in the future
         # logger.info(f'{player.name}-{player.hand[0].rank}{player.hand[0].suit}{player.hand[1].rank}{player.hand[1].suit}')
         # logger.info(
         #     '%s.hand = [Card("%s", "%s"), Card("%s", "%s")]' % (
-        #         player.name, 
-        #         player.hand[0].rank, player.hand[0].suit, 
+        #         player.name,
+        #         player.hand[0].rank, player.hand[0].suit,
         #         player.hand[1].rank, player.hand[1].suit
         #     )
-        # ) 
+        # )
 
         # log_cards_player(round_id=round_id, card_1_rank=gambler.hand[0].rank, card_1_suit=gambler.hand[0].suit, card_2_rank=gambler.hand[1].rank, card_2_suit=gambler.hand[1].suit)
         # logger.debug(f"Player {gambler.name} has {gambler.hand}")
@@ -197,17 +209,34 @@ def play_round(table, test_cards=None, seed=None):
 
     # log the cards...
     # but what happens if everybody folds? Did that never happen... do we still show cards?
-    # TODO easiest is to add Nans.
+    # TODO
 
-    log_round_and_communal_cards(round_id, table.community_cards[0].rank, table.community_cards[0].suit, table.community_cards[1].rank, table.community_cards[1].suit, table.community_cards[2].rank, table.community_cards[2].suit, table.community_cards[3].rank, table.community_cards[3].suit, table.community_cards[4].rank, table.community_cards[4].suit)
+    # BACKUP METHOD IF ANALYSIS IS MORE TROUBLESOME THAN EXPECTED:
+    # Instead of logging only the players that are still in the game, we log all seats
+    # Log each player's hand by creating another seatlist
+    # seat_counter = 0
+    # seat_list = []
+    # for seat in table.starting_players_and_seats:
+    #     if seat not in table.players:
+    #         logger.debug("Player %s is out of the game", seat.name)
+    #         empty_seat = create_player(f"Empty_seat_of {seat.name}", "conservative", Chips(0))
+    #         empty_seat.hand = [Card(None, None), Card(None, None)]
+    #         seat_list.append(empty_seat)
+    #     else:
+    #         seat_list.append(seat)
+    #     seat_counter += 1
 
+    # # this should happen at the game level, not at the round level so we only need to loop once.
+    # # I will do it here now to prevent my next functions to crash
+    # if seat_counter < 6:
+    #     logger.debug("We need to add empty seats")
+    #     for i in range(6 - seat_counter):
+    #         empty_seat = create_player(f"Empty_seat{i}", "conservative", Chips(0))
+    #         empty_seat.hand = [Card(None, None), Card(None, None)]
+    #         seat_list.append(empty_seat)
 
-    # logger.info(f'{table.community_cards[4].rank}{table.community_cards[4].suit}')
-
-    # for debugging purposes while running random simulations, this made life easier to copy paste
-    # logger.info(
-    #     f'test_cards = [Card("{table.community_cards[0].rank}", "{table.community_cards[0].suit}"), Card("{table.community_cards[1].rank}", "{table.community_cards[1].suit}"), Card("{table.community_cards[2].rank}", "{table.community_cards[2].suit}"), Card("{table.community_cards[3].rank}", "{table.community_cards[3].suit}"), Card("{table.community_cards[4].rank}", "{table.community_cards[4].suit}")]'
-    # )
+    # for seat in seat_list:
+    #     print(seat.name, seat.hand)
 
     logger.debug(
         "On the table comes %s of %s.",
@@ -236,7 +265,58 @@ def play_round(table, test_cards=None, seed=None):
 
     # Determine the winner(s)
     logger.debug("Pay_the_winner(s)")
-    pay_winners(table)
+    pay_winners(table=table, round_id=round_id)
+
+    # log the cards and the chips
+    log_round_players_chips_cards(
+        round_id=round_id,
+        card_1_rank=table.community_cards[0].rank,
+        card_1_suit=table.community_cards[0].suit,
+        card_2_rank=table.community_cards[1].rank,
+        card_2_suit=table.community_cards[1].suit,
+        card_3_rank=table.community_cards[2].rank,
+        card_3_suit=table.community_cards[2].suit,
+        card_4_rank=table.community_cards[3].rank,
+        card_4_suit=table.community_cards[3].suit,
+        card_5_rank=table.community_cards[4].rank,
+        card_5_suit=table.community_cards[4].suit,  # ,
+        # player1=seat_list[0].name,
+        # player2=seat_list[1].name,
+        # player3=seat_list[2].name,
+        # player4=seat_list[3].name,
+        # player5=seat_list[4].name,
+        # player6=seat_list[5].name,
+        # player1_card_1_rank=seat_list[0].hand[0].rank,
+        # player1_card_1_suit=seat_list[0].hand[0].suit,
+        # player1_card_2_rank=seat_list[0].hand[1].rank,
+        # player1_card_2_suit=seat_list[0].hand[1].suit,
+        # player2_card_1_rank=seat_list[1].hand[0].rank,
+        # player2_card_1_suit=seat_list[1].hand[0].suit,
+        # player2_card_2_rank=seat_list[1].hand[1].rank,
+        # player2_card_2_suit=seat_list[1].hand[1].suit,
+        # player3_card_1_rank=seat_list[2].hand[0].rank,
+        # player3_card_1_suit=seat_list[2].hand[0].suit,
+        # player3_card_2_rank=seat_list[2].hand[1].rank,
+        # player3_card_2_suit=seat_list[2].hand[1].suit,
+        # player4_card_1_rank=seat_list[3].hand[0].rank,
+        # player4_card_1_suit=seat_list[3].hand[0].suit,
+        # player4_card_2_rank=seat_list[3].hand[1].rank,
+        # player4_card_2_suit=seat_list[3].hand[1].suit,
+        # player5_card_1_rank=seat_list[4].hand[0].rank,
+        # player5_card_1_suit=seat_list[4].hand[0].suit,
+        # player5_card_2_rank=seat_list[4].hand[1].rank,
+        # player5_card_2_suit=seat_list[4].hand[1].suit,
+        # player6_card_1_rank=seat_list[5].hand[0].rank,
+        # player6_card_1_suit=seat_list[5].hand[0].suit,
+        # player6_card_2_rank=seat_list[5].hand[1].rank,
+        # player6_card_2_suit=seat_list[5].hand[1].suit,
+        # player1_chips_end=seat_list[0].chips.amount,
+        # player2_chips_end=seat_list[1].chips.amount,
+        # player3_chips_end=seat_list[2].chips.amount,
+        # player4_chips_end=seat_list[3].chips.amount,
+        # player5_chips_end=seat_list[4].chips.amount,
+        # player6_chips_end=seat_list[5].chips.amount,
+    )
 
     # debugger to identify errors in long simulations
     # if sum(player.chips.amount for player in table.players) != 600:

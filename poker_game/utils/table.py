@@ -6,11 +6,18 @@ from .players import Player
 class Table:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.community_cards = []
+        
+        # the players that started the game
+        self.starting_players_and_seats = []
+        
+        # the players that have chips left
         self.players = []
-        self.starting_players = []
-        self.pots = []
+
+        # the players that have not yet folded
         self.players_game = deque()
+
+        self.community_cards = []
+        self.pots = []
         # self.seats = {}
         self.blind_size = 1
         self.dealer = None  # Initially, there is no dealer
@@ -24,8 +31,8 @@ class Table:
 
     def add_player(self, player):
 
-        self.starting_players.append(player)
-        # I am not sure if we still need this 'players' one, but added starting players because we remove players and I need the reference
+        self.starting_players_and_seats.append(player)
+        # I am not sure if we still need this one, but added starting players because we remove players and I need the reference
         self.players.append(player)
         self.players_game.append(player)
         # If this is the first player added, set them as the dealer

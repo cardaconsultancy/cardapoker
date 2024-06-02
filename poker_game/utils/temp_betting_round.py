@@ -26,7 +26,7 @@ def betting_round_completed(table, preflop_round=False) -> bool:
     for _ in table.players_game:
         logger.info("table.add_player(%s)", print_player.name)
         print_player = get_next_player(
-            starting_players=table.starting_players,
+            starting_players_and_seats=table.starting_players_and_seats,
             active_players=table.players_game,
             current_player=print_player,
         )
@@ -35,7 +35,7 @@ def betting_round_completed(table, preflop_round=False) -> bool:
     logger.info("start_round(table=table, test_cards = test_cards)")
 
     player = get_next_player(
-        starting_players=table.starting_players,
+        starting_players_and_seats=table.starting_players_and_seats,
         active_players=table.players_game,
         current_player=last_raiser,
     )
@@ -64,18 +64,18 @@ def betting_round_completed(table, preflop_round=False) -> bool:
             last_raiser = player
             logger.debug(
                 "this is the first bet and so %s automatically is last raiser",
-                last_raiser.name
+                last_raiser.name,
             )
             first_bet = False
         logger.debug(
             "the current last raiser is %s with %s chips",
             last_raiser.name,
-            last_raiser.total_bet_betting_round
+            last_raiser.total_bet_betting_round,
         )
         logger.debug(
             "%s is up and currently has %s in the betting round pot",
             player.name,
-            player.total_bet_betting_round
+            player.total_bet_betting_round,
         )
 
         if preflop_round:
@@ -89,7 +89,7 @@ def betting_round_completed(table, preflop_round=False) -> bool:
             logger.info("SB-%s-%s", player.name, player.total_bet_betting_round)
 
             player = get_next_player(
-                starting_players=table.starting_players,
+                starting_players_and_seats=table.starting_players_and_seats,
                 active_players=table.players_game,
                 current_player=player,
             )
@@ -121,7 +121,7 @@ def betting_round_completed(table, preflop_round=False) -> bool:
             logger.debug(
                 "The last raiser is now %s with %s",
                 player.name,
-                player.total_bet_betting_round
+                player.total_bet_betting_round,
             )
 
         logger.debug("%s is up.", player.name)
@@ -140,7 +140,7 @@ def betting_round_completed(table, preflop_round=False) -> bool:
         ):
             logger.debug(
                 "the max bet is lower than the BB, so we set it to the BB of %s",
-                table.blind_size * 2
+                table.blind_size * 2,
             )
             max_bet = table.blind_size * 2
 
@@ -281,7 +281,7 @@ def betting_round_completed(table, preflop_round=False) -> bool:
                 logger.debug(
                     """Something went wrong with the betting round, the 
                     player %s has not called, checked, raised or folded.""",
-                    player.name
+                    player.name,
                 )
                 return False
 
@@ -344,7 +344,7 @@ def betting_round_completed(table, preflop_round=False) -> bool:
                 # directly
                 logger.debug("The player was %s", player.name)
                 player = get_next_player(
-                    starting_players=table.starting_players,
+                    starting_players_and_seats=table.starting_players_and_seats,
                     active_players=table.players_game,
                     current_player=player,
                 )
@@ -356,7 +356,7 @@ def betting_round_completed(table, preflop_round=False) -> bool:
             # poker, which is why we can get the next one directly
             logger.debug("The player was %s", player.name)
             player = get_next_player(
-                starting_players=table.starting_players,
+                starting_players_and_seats=table.starting_players_and_seats,
                 active_players=table.players_game,
                 current_player=player,
             )
@@ -366,8 +366,7 @@ def betting_round_completed(table, preflop_round=False) -> bool:
 
     # all players are either all in or folded or have called/checked/raised
     logger.debug(
-        "Players left in the game %s",
-        [player.name for player in table.players_game]
+        "Players left in the game %s", [player.name for player in table.players_game]
     )
 
     # completed betting round

@@ -1,10 +1,11 @@
 import unittest
+import logging
 from poker_game.play_game import play_game
 from poker_game.utils.players import Player, ActualPlayerTemplate, create_player
 from poker_game.utils.table import Table
 from poker_game.utils.objects_on_table import Deck, Chips, Card
 from poker_game.utils.game import TexasHoldemGame
-import logging
+
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,6 @@ class TestTexasHoldemGame(unittest.TestCase):
     def test_play_round(self):
         nr_of_rounds = 0
         game_seed = 100
-        winnerdict = {}
         for game_seed in range(game_seed, game_seed + 2):
             table = Table()
 

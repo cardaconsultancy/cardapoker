@@ -1,5 +1,6 @@
 import logging
-
+import datetime
+from poker_game.utils.set_up_database import log_game
 from poker_game.utils.play_round import play_round
 
 logger = logging.getLogger(__name__)
@@ -21,12 +22,29 @@ def play_game(table, rounds_before_raise_blinds=20, seed=None):
             logger.debug(f"")
             for player in table.players_game:
                 logger.debug(
-                    f"------- Player {player.name} has {player.chips.amount} ------"
+                    f" Player {player.name} has {player.chips.amount}"
                 )
                 if player.chips.amount == total_chips:
                     logger.debug(
                         f"player {player.name} has won after {number_of_rounds} rounds!!!!"
                     )
+
+                    # log the results in the database
+                    log_game(
+                        game_id=str(datetime.datetime.now()),
+                        game_seed=seed,
+                        winner=player.name,
+                        seat_winner=table.starting_players_and_seats.index(player),
+                        strategy_winner=player.__class__.__name__,
+                        number_of_rounds=number_of_rounds,
+                        player_1=table.starting_players_and_seats[0].name,
+                        player_2=table.starting_players_and_seats[1].name,
+                        player_3=table.starting_players_and_seats[2].name,
+                        player_4=table.starting_players_and_seats[3].name,
+                        player_5=table.starting_players_and_seats[4].name,
+                        player_6=table.starting_players_and_seats[5].name
+                    )
+
                     return player.name, number_of_rounds
             logger.debug(f"next round: {number_of_rounds}")
 

@@ -1,9 +1,9 @@
 from .evaluate_hand import get_hand_rank, card_rank_value
+from poker_game.utils.set_up_database import log_round_winner
 import logging
 
 # Retrieve the already configured logger
 logger = logging.getLogger("poker_game")
-
 
 # Determine the winners of the round
 def determine_winners(pot_players, table):
@@ -51,7 +51,7 @@ def determine_winners(pot_players, table):
     return winner_list
 
 
-def pay_winners(table):
+def pay_winners(table, round_id):
     logger.debug("1. There are %s pots left", len(table.pots))
     while table.pots:
         logger.debug("2. There are %s pots left", len(table.pots))
@@ -73,6 +73,7 @@ def pay_winners(table):
         for winner in winner_list:
             logger.debug("%s gets %s chips", winner.name, bounty)
             logger.info("%s-wins-%s", winner.name, bounty)
+            log_round_winner(round_id, winner.name, bounty)
             winner.chips.win(bounty)
 
         # Distribute remainder chips
